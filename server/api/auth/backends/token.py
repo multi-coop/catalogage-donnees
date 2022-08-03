@@ -8,9 +8,9 @@ from starlette.authentication import (
 )
 from starlette.requests import HTTPConnection
 
-from server.application.auth.queries import GetUserByAPIToken
+from server.application.auth.queries import GetAccountByAPIToken
 from server.config.di import resolve
-from server.domain.auth.exceptions import UserDoesNotExist
+from server.domain.auth.exceptions import AccountDoesNotExist
 from server.seedwork.application.messages import MessageBus
 
 from ..models import ApiUser
@@ -44,11 +44,11 @@ class TokenAuthBackend(AuthenticationBackend):
 
         bus = resolve(MessageBus)
 
-        query = GetUserByAPIToken(api_token=api_token)
+        query = GetAccountByAPIToken(api_token=api_token)
 
         try:
-            user = await bus.execute(query)
-        except UserDoesNotExist:
+            account = await bus.execute(query)
+        except AccountDoesNotExist:
             raise AuthenticationError()
 
-        return AuthCredentials(scopes=["authenticated"]), ApiUser(user)
+        return AuthCredentials(scopes=["authenticated"]), ApiUser(account)

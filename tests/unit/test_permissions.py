@@ -17,11 +17,11 @@ from server.api.auth.permissions import (
 from server.api.types import APIRequest
 from server.domain.auth.entities import UserRole
 
-from ..helpers import TestUser
+from ..helpers import TestPasswordUser
 
 
 @pytest.mark.asyncio
-async def test_is_authenticated(temp_user: TestUser) -> None:
+async def test_is_authenticated(temp_user: TestPasswordUser) -> None:
     app = FastAPI()
 
     app.add_middleware(AuthMiddleware, backend=TokenAuthBackend())
@@ -34,13 +34,15 @@ async def test_is_authenticated(temp_user: TestUser) -> None:
         response = await client.get("/")
         assert response.status_code == 401
 
-        headers = {"Authorization": f"Bearer {temp_user.api_token}"}
+        headers = {"Authorization": f"Bearer {temp_user.account.api_token}"}
         response = await client.get("/", headers=headers)
         assert response.status_code == 200
 
 
 @pytest.mark.asyncio
-async def test_has_role(temp_user: TestUser, admin_user: TestUser) -> None:
+async def test_has_role(
+    temp_user: TestPasswordUser, admin_user: TestPasswordUser
+) -> None:
     app = FastAPI()
 
     app.add_middleware(AuthMiddleware, backend=TokenAuthBackend())
@@ -53,11 +55,11 @@ async def test_has_role(temp_user: TestUser, admin_user: TestUser) -> None:
         response = await client.get("/")
         assert response.status_code == 401
 
-        headers = {"Authorization": f"Bearer {temp_user.api_token}"}
+        headers = {"Authorization": f"Bearer {temp_user.account.api_token}"}
         response = await client.get("/", headers=headers)
         assert response.status_code == 403
 
-        headers = {"Authorization": f"Bearer {admin_user.api_token}"}
+        headers = {"Authorization": f"Bearer {admin_user.account.api_token}"}
         response = await client.get("/", headers=headers)
         assert response.status_code == 200
 

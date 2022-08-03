@@ -1,25 +1,33 @@
-from server.application.auth.commands import ChangePassword, CreateUser, DeleteUser
+from server.application.auth.commands import (
+    ChangePassword,
+    CreatePasswordUser,
+    DeletePasswordUser,
+)
 from server.application.auth.handlers import (
     change_password,
-    create_user,
-    delete_user,
-    get_user_by_api_token,
-    get_user_by_email,
-    login,
+    create_password_user,
+    delete_password_user,
+    get_account_by_api_token,
+    get_account_by_email,
+    login_password_user,
 )
-from server.application.auth.queries import GetUserByAPIToken, GetUserByEmail, Login
+from server.application.auth.queries import (
+    GetAccountByAPIToken,
+    GetAccountByEmail,
+    LoginPasswordUser,
+)
 from server.seedwork.application.modules import Module
 
 
 class AuthModule(Module):
     command_handlers = {
-        CreateUser: create_user,
-        DeleteUser: delete_user,
+        CreatePasswordUser: create_password_user,
+        DeletePasswordUser: delete_password_user,
         ChangePassword: change_password,
     }
 
     query_handlers = {
-        Login: login,
-        GetUserByEmail: get_user_by_email,
-        GetUserByAPIToken: get_user_by_api_token,
+        LoginPasswordUser: login_password_user,
+        GetAccountByEmail: get_account_by_email,
+        GetAccountByAPIToken: get_account_by_api_token,
     }

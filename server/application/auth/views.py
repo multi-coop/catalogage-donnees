@@ -5,14 +5,14 @@ from server.domain.common.types import ID
 from server.domain.organizations.types import Siret
 
 
-class UserView(BaseModel):
+class AccountView(BaseModel):
     id: ID
     organization_siret: Siret
     email: str
     role: UserRole
 
 
-class AuthenticatedUserView(BaseModel):
+class AuthenticatedAccountView(BaseModel):
     id: ID
     organization_siret: Siret
     email: str

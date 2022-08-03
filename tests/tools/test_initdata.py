@@ -5,8 +5,8 @@ from pathlib import Path
 import pytest
 from pydantic import EmailStr, SecretStr
 
-from server.application.auth.commands import DeleteUser
-from server.application.auth.queries import Login
+from server.application.auth.commands import DeletePasswordUser
+from server.application.auth.queries import LoginPasswordUser
 from server.application.datasets.commands import UpdateDataset
 from server.application.datasets.queries import GetAllDatasets, GetDatasetByID
 from server.config.di import resolve
@@ -85,12 +85,14 @@ async def test_initdata_env_password(
     monkeypatch.setenv("TOOLS_PASSWORDS", json.dumps({"test@admin.org": "testpwd"}))
     await initdata.main(path, no_input=True)
 
-    user = await bus.execute(
-        Login(email=EmailStr("test@admin.org"), password=SecretStr("testpwd"))
+    account = await bus.execute(
+        LoginPasswordUser(
+            email=EmailStr("test@admin.org"), password=SecretStr("testpwd")
+        )
     )
 
     # (Delete user to prevent email collision below.)
-    await bus.execute(DeleteUser(id=user.id))
+    await bus.execute(DeletePasswordUser(account_id=account.id))
 
     # If not set, it would be prompted in the terminal.
     monkeypatch.delenv("TOOLS_PASSWORDS")

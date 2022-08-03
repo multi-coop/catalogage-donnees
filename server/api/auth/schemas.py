@@ -3,12 +3,12 @@ from typing import Literal
 from pydantic import BaseModel, EmailStr, SecretStr
 
 
-class UserCreate(BaseModel):
+class PasswordUserCreate(BaseModel):
     email: EmailStr
     password: SecretStr
 
 
-class UserLogin(BaseModel):
+class PasswordUserLogin(BaseModel):
     email: EmailStr
     password: SecretStr
 

@@ -6,23 +6,23 @@ from pydantic import EmailStr, SecretStr
 
 from server.application.auth.commands import ChangePassword
 from server.config.di import bootstrap, resolve
-from server.domain.auth.entities import User
-from server.domain.auth.repositories import UserRepository
+from server.domain.auth.entities import PasswordUser
+from server.domain.auth.repositories import PasswordUserRepository
 from server.seedwork.application.messages import MessageBus
 
 
-async def _prompt_user() -> User:
-    repository = resolve(UserRepository)
+async def _prompt_password_user() -> PasswordUser:
+    repository = resolve(PasswordUserRepository)
 
     email = click.prompt("Email")
 
-    user = await repository.get_by_email(email)
+    password_user = await repository.get_by_email(email)
 
-    if user is None:
-        click.echo(click.style(f"User does not exist: {email}", fg="red"))
+    if password_user is None:
+        click.echo(click.style(f"PasswordUser does not exist: {email}", fg="red"))
         sys.exit(1)
 
-    return user
+    return password_user
 
 
 def _prompt_password() -> SecretStr:
@@ -37,10 +37,12 @@ def _prompt_password() -> SecretStr:
 async def main() -> None:
     bus = resolve(MessageBus)
 
-    user = await _prompt_user()
+    user = await _prompt_password_user()
     password = _prompt_password()
 
-    await bus.execute(ChangePassword(email=EmailStr(user.email), password=password))
+    await bus.execute(
+        ChangePassword(email=EmailStr(user.account.email), password=password)
+    )
 
 
 if __name__ == "__main__":

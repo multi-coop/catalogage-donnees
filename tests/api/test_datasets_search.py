@@ -10,7 +10,7 @@ from server.config.di import resolve
 from server.seedwork.application.messages import MessageBus
 from tests.factories import CreateDatasetFactory, UpdateDatasetFactory
 
-from ..helpers import TestUser
+from ..helpers import TestPasswordUser
 
 DEFAULT_CORPUS_ITEMS = [
     ("Inventaire national forestier", "Ensemble des forêts de France"),
@@ -84,7 +84,10 @@ async def add_corpus(items: List[Tuple[str, str]] = None) -> None:
     ],
 )
 async def test_search(
-    client: httpx.AsyncClient, temp_user: TestUser, q: str, expected_titles: List[str]
+    client: httpx.AsyncClient,
+    temp_user: TestPasswordUser,
+    q: str,
+    expected_titles: List[str],
 ) -> None:
     await add_corpus()
 
@@ -116,7 +119,7 @@ async def test_search(
     ],
 )
 async def test_search_robustness(
-    client: httpx.AsyncClient, temp_user: TestUser, q_ref: str, q_other: str
+    client: httpx.AsyncClient, temp_user: TestPasswordUser, q_ref: str, q_other: str
 ) -> None:
     await add_corpus()
 
@@ -145,7 +148,7 @@ async def test_search_robustness(
 @pytest.mark.asyncio
 async def test_search_results_change_when_data_changes(
     client: httpx.AsyncClient,
-    temp_user: TestUser,
+    temp_user: TestPasswordUser,
 ) -> None:
     await add_corpus()
 
@@ -219,7 +222,9 @@ async def test_search_results_change_when_data_changes(
 
 
 @pytest.mark.asyncio
-async def test_search_ranking(client: httpx.AsyncClient, temp_user: TestUser) -> None:
+async def test_search_ranking(
+    client: httpx.AsyncClient, temp_user: TestPasswordUser
+) -> None:
     items = [
         ("A", "..."),
         ("B", "Forêt nouvelle"),
@@ -271,7 +276,7 @@ async def test_search_ranking(client: httpx.AsyncClient, temp_user: TestUser) ->
 )
 async def test_search_highlight(
     client: httpx.AsyncClient,
-    temp_user: TestUser,
+    temp_user: TestPasswordUser,
     corpus: list,
     q: str,
     expected_headlines: Optional[dict],

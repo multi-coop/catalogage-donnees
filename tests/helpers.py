@@ -5,11 +5,11 @@ import httpx
 from pydantic import BaseModel
 
 from server.config.di import resolve
-from server.domain.auth.entities import User, UserRole
-from server.domain.auth.repositories import UserRepository
+from server.domain.auth.entities import PasswordUser, UserRole
+from server.domain.auth.repositories import PasswordUserRepository
 from server.seedwork.application.messages import MessageBus
 
-from .factories import CreateUserFactory
+from .factories import CreatePasswordUserFactory
 
 
 def create_client(app: Callable) -> httpx.AsyncClient:
@@ -23,7 +23,7 @@ def to_payload(obj: BaseModel) -> dict:
     return json.loads(obj.json())
 
 
-class TestUser(User):
+class TestPasswordUser(PasswordUser):
     """
     A user that exposes the plaintext password for testing purposes.
     """
@@ -38,18 +38,18 @@ class TestUser(User):
         Usage:
             response = client.post(..., auth=test_user.auth)
         """
-        request.headers["Authorization"] = f"Bearer {self.api_token}"
+        request.headers["Authorization"] = f"Bearer {self.account.api_token}"
         return request
 
 
-async def create_test_user(role: UserRole) -> TestUser:
+async def create_test_password_user(role: UserRole) -> TestPasswordUser:
     bus = resolve(MessageBus)
-    user_repository = resolve(UserRepository)
+    password_user_repository = resolve(PasswordUserRepository)
 
-    command = CreateUserFactory.build()
+    command = CreatePasswordUserFactory.build()
     await bus.execute(command, role=role)
 
-    user = await user_repository.get_by_email(command.email)
+    user = await password_user_repository.get_by_email(command.email)
     assert user is not None
 
-    return TestUser(**user.dict(), password=command.password.get_secret_value())
+    return TestPasswordUser(**user.dict(), password=command.password.get_secret_value())

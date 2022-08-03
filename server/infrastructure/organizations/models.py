@@ -8,7 +8,7 @@ from server.domain.organizations.types import Siret
 from ..database import Base
 
 if TYPE_CHECKING:
-    from ..auth.repositories import UserModel
+    from ..auth.models import AccountModel
     from ..catalogs.models import CatalogModel
 
 
@@ -24,7 +24,7 @@ class OrganizationModel(Base):
         uselist=False,
     )
 
-    users: List["UserModel"] = relationship(
-        "UserModel",
+    accounts: List["AccountModel"] = relationship(
+        "AccountModel",
         back_populates="organization",
     )

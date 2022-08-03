@@ -1,7 +1,7 @@
 import pytest
 from pydantic import EmailStr
 
-from server.application.auth.queries import GetUserByEmail
+from server.application.auth.queries import GetAccountByEmail
 from server.application.datasets.queries import GetDatasetByID
 from server.config.di import resolve
 from server.domain.organizations.types import Siret
@@ -10,7 +10,7 @@ from server.infrastructure.database import Database
 from server.infrastructure.organizations.repositories import OrganizationModel
 from server.seedwork.application.messages import MessageBus
 
-from ..factories import CreateDatasetFactory, CreateUserFactory
+from ..factories import CreateDatasetFactory, CreatePasswordUserFactory
 
 
 @pytest.mark.asyncio
@@ -32,10 +32,12 @@ async def test_catalog_creation_and_relationships() -> None:
 
     # Add a user to the organization...
     email = "test@mydomain.org"
-    await bus.execute(CreateUserFactory.build(organization_siret=siret, email=email))
+    await bus.execute(
+        CreatePasswordUserFactory.build(organization_siret=siret, email=email)
+    )
 
-    user = await bus.execute(GetUserByEmail(email=EmailStr("test@mydomain.org")))
-    assert user.organization_siret == siret
+    account = await bus.execute(GetAccountByEmail(email=EmailStr("test@mydomain.org")))
+    assert account.organization_siret == siret
 
     # Add a dataset to the catalog...
     dataset_id = await bus.execute(CreateDatasetFactory.build(organization_siret=siret))

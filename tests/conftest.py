@@ -20,7 +20,7 @@ from server.infrastructure.database import Database
 from server.seedwork.application.messages import MessageBus
 from tests.factories import CreateTagFactory
 
-from .helpers import TestUser, create_client, create_test_user
+from .helpers import TestPasswordUser, create_client, create_test_password_user
 
 if TYPE_CHECKING:
     from server.api.app import App
@@ -106,10 +106,10 @@ async def client(app: "App") -> AsyncIterator[httpx.AsyncClient]:
 
 
 @pytest_asyncio.fixture(name="temp_user")
-async def fixture_temp_user() -> TestUser:
-    return await create_test_user(UserRole.USER)
+async def fixture_temp_user() -> TestPasswordUser:
+    return await create_test_password_user(UserRole.USER)
 
 
 @pytest_asyncio.fixture
-async def admin_user() -> TestUser:
-    return await create_test_user(UserRole.ADMIN)
+async def admin_user() -> TestPasswordUser:
+    return await create_test_password_user(UserRole.ADMIN)
