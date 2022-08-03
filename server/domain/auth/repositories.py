@@ -3,7 +3,7 @@ from typing import Optional
 from server.seedwork.domain.repositories import Repository
 
 from ..common.types import ID, id_factory
-from .entities import Account, PasswordUser
+from .entities import Account, DataPassUser, PasswordUser
 
 
 class AccountRepository(Repository):
@@ -28,4 +28,12 @@ class PasswordUserRepository(Repository):
         raise NotImplementedError  # pragma: no cover
 
     async def delete(self, id: ID) -> None:
+        raise NotImplementedError  # pragma: no cover
+
+
+class DataPassUserRepository(Repository):
+    async def get_by_email(self, email: str) -> Optional[DataPassUser]:
+        raise NotImplementedError  # pragma: no cover
+
+    async def insert(self, entity: DataPassUser) -> ID:
         raise NotImplementedError  # pragma: no cover

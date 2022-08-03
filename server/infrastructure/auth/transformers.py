@@ -1,6 +1,6 @@
-from server.domain.auth.entities import Account, PasswordUser
+from server.domain.auth.entities import Account, DataPassUser, PasswordUser
 
-from .models import AccountModel, PasswordUserModel
+from .models import AccountModel, DataPassUserModel, PasswordUserModel
 
 
 def make_account_instance(entity: Account) -> AccountModel:
@@ -44,3 +44,16 @@ def update_instance(instance: PasswordUserModel, entity: PasswordUser) -> None:
 
     for field in set(Account.__fields__) - {"id"}:
         setattr(instance, field, getattr(entity.account, field))
+
+
+def make_datapass_user_instance(entity: DataPassUser) -> DataPassUserModel:
+    return DataPassUserModel(
+        account_id=entity.account_id,
+    )
+
+
+def make_datapass_user_entity(instance: DataPassUserModel) -> DataPassUser:
+    return DataPassUser(
+        account_id=instance.account_id,
+        account=make_account_entity(instance.account),
+    )

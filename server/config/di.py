@@ -58,18 +58,28 @@ Or in routes:
 
 Or in any custom scripts as seems fit.
 """
+from typing import Type, TypeVar
 
 from server.application.auth.passwords import PasswordEncoder
-from server.domain.auth.repositories import AccountRepository, PasswordUserRepository
+from server.domain.auth.repositories import (
+    AccountRepository,
+    DataPassUserRepository,
+    PasswordUserRepository,
+)
 from server.domain.catalog_records.repositories import CatalogRecordRepository
 from server.domain.catalogs.repositories import CatalogRepository
 from server.domain.datasets.repositories import DatasetRepository
 from server.domain.organizations.repositories import OrganizationRepository
 from server.domain.tags.repositories import TagRepository
 from server.infrastructure.adapters.messages import MessageBusAdapter
+from server.infrastructure.auth.datapass import (
+    DataPassOpenIDClient,
+    get_datapass_openid_client,
+)
 from server.infrastructure.auth.passwords import Argon2PasswordEncoder
 from server.infrastructure.auth.repositories import (
     SqlAccountRepository,
+    SqlDataPassUserRepository,
     SqlPasswordUserRepository,
 )
 from server.infrastructure.catalog_records.repositories import (
@@ -85,6 +95,8 @@ from server.seedwork.application.messages import MessageBus
 from server.seedwork.application.modules import load_modules
 
 from .settings import Settings
+
+T = TypeVar("T")
 
 MODULES = [
     "server.infrastructure.datasets.module.DatasetsModule",
@@ -108,9 +120,11 @@ def configure(container: "Container") -> None:
     settings = Settings()
     container.register_instance(Settings, settings)
 
-    # Common services
-
+    # Auth services
     container.register_instance(PasswordEncoder, Argon2PasswordEncoder())
+    container.register_instance(
+        DataPassOpenIDClient, get_datapass_openid_client(settings)
+    )
 
     # Event handling (Commands, queries, and the message bus)
 
@@ -140,6 +154,7 @@ def configure(container: "Container") -> None:
 
     container.register_instance(AccountRepository, SqlAccountRepository(db))
     container.register_instance(PasswordUserRepository, SqlPasswordUserRepository(db))
+    container.register_instance(DataPassUserRepository, SqlDataPassUserRepository(db))
     container.register_instance(CatalogRecordRepository, SqlCatalogRecordRepository(db))
     container.register_instance(DatasetRepository, SqlDatasetRepository(db))
     container.register_instance(TagRepository, SqlTagRepository(db))
@@ -150,4 +165,8 @@ def configure(container: "Container") -> None:
 _CONTAINER = Container(configure)
 
 bootstrap = _CONTAINER.bootstrap
-resolve = _CONTAINER.resolve
+
+
+def resolve(type_: Type[T]) -> T:
+    # Allow monkeypatching `_CONTAINER` for overrides.
+    return _CONTAINER.resolve(type_)

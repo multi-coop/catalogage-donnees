@@ -5,16 +5,22 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import contains_eager
 
-from server.domain.auth.entities import Account, PasswordUser
+from server.domain.auth.entities import Account, DataPassUser, PasswordUser
 from server.domain.auth.exceptions import AccountDoesNotExist
-from server.domain.auth.repositories import AccountRepository, PasswordUserRepository
+from server.domain.auth.repositories import (
+    AccountRepository,
+    DataPassUserRepository,
+    PasswordUserRepository,
+)
 from server.domain.common.types import ID
 
 from ..database import Database
-from .models import AccountModel, PasswordUserModel
+from .models import AccountModel, DataPassUserModel, PasswordUserModel
 from .transformers import (
     make_account_entity,
     make_account_instance,
+    make_datapass_user_entity,
+    make_datapass_user_instance,
     make_password_user_entity,
     make_password_user_instance,
     update_instance,
@@ -114,3 +120,38 @@ class SqlPasswordUserRepository(PasswordUserRepository):
 
             await session.delete(instance)
             await session.commit()
+
+
+class SqlDataPassUserRepository(DataPassUserRepository):
+    def __init__(self, db: Database) -> None:
+        self._db = db
+
+    async def get_by_email(self, email: str) -> Optional[DataPassUser]:
+        async with self._db.session() as session:
+            stmt = (
+                select(DataPassUserModel)
+                .join(AccountModel)
+                .options(contains_eager(DataPassUserModel.account))
+                .where(AccountModel.email == email)
+            )
+
+            result = await session.execute(stmt)
+            instance = result.scalar_one_or_none()
+
+            if instance is None:
+                return None
+
+            return make_datapass_user_entity(instance)
+
+    async def insert(self, entity: DataPassUser) -> ID:
+        async with self._db.session() as session:
+            account_instance = make_account_instance(entity.account)
+            session.add(account_instance)
+
+            instance = make_datapass_user_instance(entity)
+            session.add(instance)
+
+            await session.commit()
+            await session.refresh(instance)
+
+            return ID(instance.account_id)

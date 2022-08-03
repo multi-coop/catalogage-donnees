@@ -1,17 +1,32 @@
 from server.application.auth.views import AccountView, AuthenticatedAccountView
 from server.config.di import resolve
-from server.domain.auth.entities import Account, PasswordUser, UserRole
+from server.domain.auth.entities import Account, DataPassUser, PasswordUser, UserRole
 from server.domain.auth.exceptions import (
     AccountDoesNotExist,
+    DataPassUserAlreadyExists,
     EmailAlreadyExists,
     LoginFailed,
 )
-from server.domain.auth.repositories import AccountRepository, PasswordUserRepository
+from server.domain.auth.repositories import (
+    AccountRepository,
+    DataPassUserRepository,
+    PasswordUserRepository,
+)
 from server.domain.common.types import ID
 
-from .commands import ChangePassword, CreatePasswordUser, DeletePasswordUser
+from .commands import (
+    ChangePassword,
+    CreateDataPassUser,
+    CreatePasswordUser,
+    DeletePasswordUser,
+)
 from .passwords import PasswordEncoder, generate_api_token
-from .queries import GetAccountByAPIToken, GetAccountByEmail, LoginPasswordUser
+from .queries import (
+    GetAccountByAPIToken,
+    GetAccountByEmail,
+    LoginDataPassUser,
+    LoginPasswordUser,
+)
 
 
 async def create_password_user(
@@ -68,6 +83,48 @@ async def login_password_user(query: LoginPasswordUser) -> AuthenticatedAccountV
         raise LoginFailed("Invalid credentials")
 
     return AuthenticatedAccountView(**password_user.account.dict())
+
+
+async def create_datapass_user(command: CreateDataPassUser) -> ID:
+    datapass_user_repository = resolve(DataPassUserRepository)
+    account_repository = resolve(AccountRepository)
+
+    email = command.email
+
+    # Reuse an existing account (e.g. tied to an existing PasswordUser), or create one.
+    account = await account_repository.get_by_email(email)
+
+    if account is None:
+        account = Account(
+            id=account_repository.make_id(),
+            organization_siret=command.organization_siret,
+            email=email,
+            role=UserRole.USER,
+            api_token=generate_api_token(),
+        )
+
+    datapass_user = await datapass_user_repository.get_by_email(email)
+
+    if datapass_user is not None:
+        raise DataPassUserAlreadyExists(account.id)
+
+    datapass_user = DataPassUser(
+        account_id=account.id,
+        account=account,
+    )
+
+    return await datapass_user_repository.insert(datapass_user)
+
+
+async def login_datapass_user(query: LoginDataPassUser) -> AuthenticatedAccountView:
+    repository = resolve(DataPassUserRepository)
+
+    datapass_user = await repository.get_by_email(query.email)
+
+    if datapass_user is None:
+        raise LoginFailed("Invalid credentials")
+
+    return AuthenticatedAccountView(**datapass_user.account.dict())
 
 
 async def get_account_by_email(query: GetAccountByEmail) -> AccountView:

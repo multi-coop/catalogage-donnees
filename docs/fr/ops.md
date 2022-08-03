@@ -4,6 +4,8 @@
 
 - [Généralités](#généralités)
 - [Architecture](#architecture)
+  - [Vue globale](#vue-globale)
+  - [Comptes DataPass](#comptes-datapass)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Tests](#tests)
@@ -26,6 +28,8 @@ Il y a un seul _groupe_ Ansible : `web`.
 
 ## Architecture
 
+### Vue globale
+
 L'architecture du service déployé est la suivante :
 
 ```
@@ -47,6 +51,22 @@ Par ailleurs :
 * Uvicorn et Node sont gérés par le _process manager_ `supervisor`, ce qui permet notamment d'assurer leur redémarrage en cas d'arrêt inopiné.
 * Le lien entre Uvicorn et la base de données PostgreSQL est paramétrable (_database URL_). Cette dernier ne vit donc pas nécessairement sur la même machine que le serveur applicatif.
 * Nginx fait la terminaison TLS avec des certificats gérés avec [Certbot](https://eff-certbot.readthedocs.io) (LetsEncrypt).
+
+### Comptes DataPass
+
+L'outil délègue la gestion des organisations à [Comptes DataPass](https://github.com/betagouv/api-auth), un fédérateur d'entités de personnes morales.
+
+La documentation de son serveur OpenID Connect est accessible dans leur [README](https://github.com/betagouv/api-auth/blob/1145f9edca8f4c4054922c7bebc98021c4858d80/README.md).
+
+Dans les [secrets](#secrets) de chaque environnement est configuré un couple d'identifiants client ID/client correspondant à une instance Comptes DataPass, selon le tableau suivant :
+
+| Environnement | Instance Comptes DataPass |
+|---------------|---------------------------|
+| staging       | staging                   |
+| demo          | production                |
+| sandbox       | production                |
+
+En local, il est possible de copier les identifiants `staging` (depuis les secrets de l'environnement) dans son `.env` (voir [Configuration (Démarrage)](./demarrage.md#configuration)) pour développer avec l'authentification par DataPass.
 
 ## Installation
 

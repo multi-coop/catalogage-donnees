@@ -172,7 +172,10 @@ Le projet est configurable à l'aide des variables d'environnement suivantes.
 
 | Variable | Description | Valeur par défaut |
 |---|---|---|
+| `APP_SECRET_KEY` | Clé secrète utilisée pour la signature des cookies | _Requis_ (Indice : en générer une avec [django-secret-key-generator](https://django-secret-key-generator.netlify.app/)) |
 | `APP_DATABASE_URL` | URL vers la base de données PostgreSQL | `postgresql+asyncpg://localhost:5432/catalogage` |
+| `APP_DATAPASS_CLIENT_ID` | `client_id` du serveur OpenID Connect de Comptes DataPass | - |
+| `APP_DATAPASS_CLIENT_SECRET` | `client_secret` du serveur OpenID Connect de Comptes DataPass | - |
 | `APP_DEBUG` | Active le mode debug : _debug logs_ SQL, [_debug toolbar_](https://github.com/mongkok/fastapi-debug-toolbar) dans la doc d'API | `False` |
 
 Définissez les valeurs spécifiques à votre situation dans un fichier `.env` placé à la racine du projet, que vous pouvez créer à partir du modèle `.env.example` :
@@ -189,6 +192,8 @@ Par exemple :
 APP_DEBUG=1 make serve
 ```
 
+En développement local, les variables `APP_DATAPASS_CLIENT_ID` et `APP_DATAPASS_CLIENT_SECRET` peuvent être configurées selon les identifiants de l'instance `staging` de Comptes DataPass. Voir [Authentification par Comptes DataPass](./ops.md#authentification-par-comptes-datapass) pour plus d'informations.
+
 Des paramètres avancés (principalement dédiés au déploiement - voir [Opérations](./ops.md)) sont également disponibles :
 
 | Variable | Description | Valeur par défaut |
@@ -196,6 +201,7 @@ Des paramètres avancés (principalement dédiés au déploiement - voir [Opéra
 | `APP_SERVER_MODE` | Un mode d'opération qui configure Uvicorn en conséquence : <br> - `local` : pour le développement local (_hot reload_ activé, etc) <br> - `live` : pour tout déploiement tel que défini via Ansible | `local` |
 | `APP_PORT` | Port du server d'API | `3579` |
 | `APP_CONFIG_API_KEY` | Clé d'API pour le dépôt de configuration de l'instance | |
+| `APP_CLIENT_URL` | URL du client, que le serveur d'API peut par exemple utiliser pour des besoins de redirection | `http://localhost:3000` |
 | `TOOLS_PASSWORDS` | Mapping `email -> password`, voir [Données initiales](./outils.md#données-initiales)) | |
 | `VITE_API_BROWSER_URL` | URL utilisée par le navigateur lors de requêtes d'API. En mode `live`, indiquer le chemin vers l'API configuré sur Nginx : `/api`. | `http://localhost:3579` |
 | `VITE_API_SSR_URL` | URL utilisée par le serveur frontend lors de requêtes d'API | `http://localhost:3579` |

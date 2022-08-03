@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Set
 
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
@@ -26,6 +26,12 @@ class SqlOrganizationRepository(OrganizationRepository):
                 return None
             else:
                 return make_entity(instance)
+
+    async def get_siret_set(self) -> Set[Siret]:
+        async with self._db.session() as session:
+            stmt = select(OrganizationModel.siret.distinct())
+            result = await session.execute(stmt)
+            return {Siret(v) for v in result.scalars()}
 
     async def insert(self, entity: Organization) -> Siret:
         async with self._db.session() as session:

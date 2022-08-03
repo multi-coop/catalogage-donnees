@@ -39,6 +39,9 @@ class AccountModel(Base):
     password_user: Optional["PasswordUserModel"] = relationship(
         "PasswordUserModel", back_populates="account", uselist=False
     )
+    datapass_user: Optional["DataPassUserModel"] = relationship(
+        "DataPassUserModel", back_populates="account", uselist=False
+    )
 
 
 class PasswordUserModel(Base):
@@ -55,3 +58,18 @@ class PasswordUserModel(Base):
         "AccountModel", back_populates="password_user", cascade="delete"
     )
     password_hash: str = Column(String, nullable=False)
+
+
+class DataPassUserModel(Base):
+    """
+    Store information specific to users that authenticate with a DataPass account.
+    """
+
+    __tablename__ = "datapass_user"
+
+    account_id: ID = Column(
+        ForeignKey("account.id", ondelete="CASCADE"), primary_key=True
+    )
+    account: "AccountModel" = relationship(
+        "AccountModel", back_populates="datapass_user", cascade="delete"
+    )

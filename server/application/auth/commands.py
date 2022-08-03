@@ -12,6 +12,11 @@ class CreatePasswordUser(Command[ID]):
     password: SecretStr
 
 
+class CreateDataPassUser(Command[ID]):
+    organization_siret: Siret
+    email: EmailStr
+
+
 class DeletePasswordUser(Command[None]):
     account_id: ID
 

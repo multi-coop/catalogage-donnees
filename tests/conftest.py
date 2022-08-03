@@ -27,6 +27,10 @@ if TYPE_CHECKING:
 
 os.environ["APP_TESTING"] = "True"
 os.environ["APP_CONFIG_REPO_API_KEY"] = "<testing>"
+os.environ["APP_CLIENT_URL"] = "http://client.testserver"
+os.environ["APP_DATAPASS_URL"] = "https://auth-staging.api.gouv.fr"
+os.environ["APP_DATAPASS_CLIENT_ID"] = "<testing>"
+os.environ["APP_DATAPASS_CLIENT_SECRET"] = "<testing>"
 
 bootstrap()
 

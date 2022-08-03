@@ -1,6 +1,7 @@
 from debug_toolbar.middleware import DebugToolbarMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 
 from server.config import Settings
 from server.config.di import resolve
@@ -36,6 +37,9 @@ def create_app(settings: Settings = None) -> App:
     )
 
     app.add_middleware(AuthMiddleware, backend=auth_backend)
+
+    # Required by DataPass authlib OpenID client.
+    app.add_middleware(SessionMiddleware, secret_key=settings.secret_key)
 
     if settings.debug:
         app.add_middleware(

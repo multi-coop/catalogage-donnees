@@ -9,10 +9,13 @@ from server.domain.auth.exceptions import EmailAlreadyExists, LoginFailed
 from server.domain.common.types import ID
 from server.seedwork.application.messages import MessageBus
 
+from . import datapass
 from .permissions import HasRole, IsAuthenticated
 from .schemas import CheckAuthResponse, PasswordUserCreate, PasswordUserLogin
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+router.include_router(datapass.router)
 
 
 @router.post(
