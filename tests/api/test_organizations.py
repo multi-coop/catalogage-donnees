@@ -2,7 +2,7 @@ import httpx
 import pytest
 
 from ..factories import CreateOrganizationFactory
-from ..helpers import TestUser, to_payload
+from ..helpers import TestPasswordUser, to_payload
 
 
 def api_key_auth(request: httpx.Request) -> httpx.Request:
@@ -39,7 +39,7 @@ def api_key_auth(request: httpx.Request) -> httpx.Request:
 )
 async def test_create_organization_invalid(
     client: httpx.AsyncClient,
-    temp_user: TestUser,
+    temp_user: TestPasswordUser,
     payload: dict,
     expected_errors_attrs: list,
 ) -> None:
@@ -104,7 +104,7 @@ class TestOrganizationPermissions:
         assert response.status_code == 403
 
     async def test_create_authenticated(
-        self, client: httpx.AsyncClient, temp_user: TestUser
+        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
     ) -> None:
         response = await client.post(
             "/organizations/",

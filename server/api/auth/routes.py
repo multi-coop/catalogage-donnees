@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from server.application.auth.commands import CreateUser, DeleteUser
-from server.application.auth.queries import GetUserByEmail, Login
-from server.application.auth.views import AuthenticatedUserView, UserView
+from server.application.auth.commands import CreatePasswordUser, DeletePasswordUser
+from server.application.auth.queries import GetAccountByEmail, LoginPasswordUser
+from server.application.auth.views import AccountView, AuthenticatedAccountView
 from server.config.di import resolve
 from server.domain.auth.entities import UserRole
 from server.domain.auth.exceptions import EmailAlreadyExists, LoginFailed
@@ -10,7 +10,7 @@ from server.domain.common.types import ID
 from server.seedwork.application.messages import MessageBus
 
 from .permissions import HasRole, IsAuthenticated
-from .schemas import CheckAuthResponse, UserCreate, UserLogin
+from .schemas import CheckAuthResponse, PasswordUserCreate, PasswordUserLogin
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -18,28 +18,28 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.post(
     "/users/",
     dependencies=[Depends(IsAuthenticated() & HasRole(UserRole.ADMIN))],
-    response_model=UserView,
+    response_model=AccountView,
     status_code=201,
 )
-async def create_user(data: UserCreate) -> UserView:
+async def create_password_user(data: PasswordUserCreate) -> AccountView:
     bus = resolve(MessageBus)
 
-    command = CreateUser(email=data.email, password=data.password)
+    command = CreatePasswordUser(email=data.email, password=data.password)
 
     try:
         await bus.execute(command)
     except EmailAlreadyExists as exc:
         raise HTTPException(400, detail=str(exc))
 
-    query = GetUserByEmail(email=data.email)
+    query = GetAccountByEmail(email=data.email)
     return await bus.execute(query)
 
 
-@router.post("/login/", response_model=AuthenticatedUserView)
-async def login(data: UserLogin) -> AuthenticatedUserView:
+@router.post("/login/", response_model=AuthenticatedAccountView)
+async def login_password_user(data: PasswordUserLogin) -> AuthenticatedAccountView:
     bus = resolve(MessageBus)
 
-    query = Login(email=data.email, password=data.password)
+    query = LoginPasswordUser(email=data.email, password=data.password)
 
     try:
         return await bus.execute(query)
@@ -52,10 +52,10 @@ async def login(data: UserLogin) -> AuthenticatedUserView:
     dependencies=[Depends(IsAuthenticated() & HasRole(UserRole.ADMIN))],
     status_code=204,
 )
-async def delete_user(id: ID) -> None:
+async def delete_password_user(id: ID) -> None:
     bus = resolve(MessageBus)
 
-    command = DeleteUser(id=id)
+    command = DeletePasswordUser(account_id=id)
     await bus.execute(command)
 
 

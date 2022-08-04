@@ -60,14 +60,17 @@ Or in any custom scripts as seems fit.
 """
 
 from server.application.auth.passwords import PasswordEncoder
-from server.domain.auth.repositories import UserRepository
+from server.domain.auth.repositories import AccountRepository, PasswordUserRepository
 from server.domain.catalog_records.repositories import CatalogRecordRepository
 from server.domain.datasets.repositories import DatasetRepository
 from server.domain.organizations.repositories import OrganizationRepository
 from server.domain.tags.repositories import TagRepository
 from server.infrastructure.adapters.messages import MessageBusAdapter
 from server.infrastructure.auth.passwords import Argon2PasswordEncoder
-from server.infrastructure.auth.repositories import SqlUserRepository
+from server.infrastructure.auth.repositories import (
+    SqlAccountRepository,
+    SqlPasswordUserRepository,
+)
 from server.infrastructure.catalog_records.repositories import (
     SqlCatalogRecordRepository,
 )
@@ -133,7 +136,8 @@ def configure(container: "Container") -> None:
 
     # Repositories
 
-    container.register_instance(UserRepository, SqlUserRepository(db))
+    container.register_instance(AccountRepository, SqlAccountRepository(db))
+    container.register_instance(PasswordUserRepository, SqlPasswordUserRepository(db))
     container.register_instance(CatalogRecordRepository, SqlCatalogRecordRepository(db))
     container.register_instance(DatasetRepository, SqlDatasetRepository(db))
     container.register_instance(TagRepository, SqlTagRepository(db))

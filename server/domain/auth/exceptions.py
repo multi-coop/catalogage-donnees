@@ -1,8 +1,8 @@
 from ..common.exceptions import DoesNotExist
 
 
-class UserDoesNotExist(DoesNotExist):
-    entity_name = "User"
+class AccountDoesNotExist(DoesNotExist):
+    entity_name = "Account"
 
 
 class EmailAlreadyExists(Exception):

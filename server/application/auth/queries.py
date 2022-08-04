@@ -1,17 +1,17 @@
 from pydantic import EmailStr, SecretStr
 
-from server.application.auth.views import AuthenticatedUserView, UserView
+from server.application.auth.views import AccountView, AuthenticatedAccountView
 from server.seedwork.application.queries import Query
 
 
-class Login(Query[AuthenticatedUserView]):
+class LoginPasswordUser(Query[AuthenticatedAccountView]):
     email: EmailStr
     password: SecretStr
 
 
-class GetUserByEmail(Query[UserView]):
+class GetAccountByEmail(Query[AccountView]):
     email: EmailStr
 
 
-class GetUserByAPIToken(Query[UserView]):
+class GetAccountByAPIToken(Query[AccountView]):
     api_token: str

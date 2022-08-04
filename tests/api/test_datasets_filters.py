@@ -10,12 +10,12 @@ from server.domain.datasets.entities import DataFormat
 from server.seedwork.application.messages import MessageBus
 
 from ..factories import CreateDatasetFactory, CreateTagFactory
-from ..helpers import TestUser
+from ..helpers import TestPasswordUser
 
 
 @pytest.mark.asyncio
 async def test_dataset_filters_info(
-    client: httpx.AsyncClient, temp_user: TestUser
+    client: httpx.AsyncClient, temp_user: TestPasswordUser
 ) -> None:
     bus = resolve(MessageBus)
 
@@ -142,7 +142,7 @@ class _Env:
 )
 async def test_dataset_filters_apply(
     client: httpx.AsyncClient,
-    temp_user: TestUser,
+    temp_user: TestPasswordUser,
     filtername: str,
     create_kwargs: Callable[[_Env], dict],
     positive_value: Callable[[_Env], list],
@@ -171,7 +171,7 @@ async def test_dataset_filters_apply(
 
 @pytest.mark.asyncio
 async def test_dataset_filters_license_any(
-    client: httpx.AsyncClient, temp_user: TestUser
+    client: httpx.AsyncClient, temp_user: TestPasswordUser
 ) -> None:
     bus = resolve(MessageBus)
 

@@ -11,19 +11,24 @@ class UserRole(enum.Enum):
     ADMIN = "ADMIN"
 
 
-class User(Entity):
+class Account(Entity):
     id: ID
     organization_siret: Siret
     email: str
-    password_hash: str
     role: UserRole
     api_token: str
-
-    def update_password(self, password_hash: str) -> None:
-        self.password_hash = password_hash
 
     def update_api_token(self, api_token: str) -> None:
         self.api_token = api_token
 
     class Config:
         orm_mode = True
+
+
+class PasswordUser(Entity):
+    account_id: ID
+    account: Account
+    password_hash: str
+
+    def update_password(self, password_hash: str) -> None:
+        self.password_hash = password_hash

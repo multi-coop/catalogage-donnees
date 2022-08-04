@@ -4,14 +4,14 @@ import httpx
 import pytest
 from pydantic import EmailStr
 
-from server.application.auth.queries import GetUserByEmail
+from server.application.auth.queries import GetAccountByEmail
 from server.config.di import resolve
-from server.domain.auth.exceptions import UserDoesNotExist
+from server.domain.auth.exceptions import AccountDoesNotExist
 from server.domain.common.types import id_factory
 from server.domain.organizations.entities import LEGACY_ORGANIZATION_SIRET
 from server.seedwork.application.messages import MessageBus
 
-from ..helpers import TestUser
+from ..helpers import TestPasswordUser
 
 
 @pytest.mark.asyncio
@@ -55,7 +55,7 @@ from ..helpers import TestUser
 )
 async def test_create_user_invalid(
     client: httpx.AsyncClient,
-    admin_user: TestUser,
+    admin_user: TestPasswordUser,
     payload: dict,
     expected_errors_attrs: List[dict],
 ) -> None:
@@ -72,7 +72,7 @@ async def test_create_user_invalid(
 
 @pytest.mark.asyncio
 async def test_create_user(
-    client: httpx.AsyncClient, temp_user: TestUser, admin_user: TestUser
+    client: httpx.AsyncClient, temp_user: TestPasswordUser, admin_user: TestPasswordUser
 ) -> None:
     payload = {"email": "john@doe.com", "password": "s3kr3t"}
 
@@ -97,25 +97,25 @@ async def test_create_user(
 
 @pytest.mark.asyncio
 async def test_create_user_already_exists(
-    client: httpx.AsyncClient, temp_user: TestUser, admin_user: TestUser
+    client: httpx.AsyncClient, temp_user: TestPasswordUser, admin_user: TestPasswordUser
 ) -> None:
-    payload = {"email": temp_user.email, "password": "somethingelse"}
+    payload = {"email": temp_user.account.email, "password": "somethingelse"}
     response = await client.post("/auth/users/", json=payload, auth=admin_user.auth)
     assert response.status_code == 400
 
 
 @pytest.mark.asyncio
-async def test_login(client: httpx.AsyncClient, temp_user: TestUser) -> None:
-    payload = {"email": temp_user.email, "password": temp_user.password}
+async def test_login(client: httpx.AsyncClient, temp_user: TestPasswordUser) -> None:
+    payload = {"email": temp_user.account.email, "password": temp_user.password}
     response = await client.post("/auth/login/", json=payload)
     assert response.status_code == 200
     user = response.json()
     assert user == {
-        "id": str(temp_user.id),
+        "id": str(temp_user.account_id),
         "organization_siret": str(LEGACY_ORGANIZATION_SIRET),
-        "email": temp_user.email,
-        "role": temp_user.role.value,
-        "api_token": temp_user.api_token,
+        "email": temp_user.account.email,
+        "role": temp_user.account.role.value,
+        "api_token": temp_user.account.api_token,
     }
 
 
@@ -128,10 +128,10 @@ async def test_login(client: httpx.AsyncClient, temp_user: TestUser) -> None:
     ],
 )
 async def test_login_failed(
-    client: httpx.AsyncClient, email: str, password: str, temp_user: TestUser
+    client: httpx.AsyncClient, email: str, password: str, temp_user: TestPasswordUser
 ) -> None:
     payload = {
-        "email": email.format(email=temp_user.email),
+        "email": email.format(email=temp_user.account.email),
         "password": password.format(password=temp_user.password),
     }
     response = await client.post("/auth/login/", json=payload)
@@ -141,7 +141,7 @@ async def test_login_failed(
 
 
 @pytest.mark.asyncio
-async def test_check(client: httpx.AsyncClient, temp_user: TestUser) -> None:
+async def test_check(client: httpx.AsyncClient, temp_user: TestPasswordUser) -> None:
     response = await client.get("/auth/check/", auth=temp_user.auth)
     assert response.status_code == 200
 
@@ -158,11 +158,11 @@ async def test_check(client: httpx.AsyncClient, temp_user: TestUser) -> None:
     ],
 )
 async def test_check_failed(
-    client: httpx.AsyncClient, temp_user: TestUser, headers: dict
+    client: httpx.AsyncClient, temp_user: TestPasswordUser, headers: dict
 ) -> None:
     if "Authorization" in headers:
         headers["Authorization"] = headers["Authorization"].format(
-            api_token=temp_user.api_token
+            api_token=temp_user.account.api_token
         )
 
     response = await client.get("/auth/check/", headers=headers)
@@ -173,27 +173,31 @@ async def test_check_failed(
 
 @pytest.mark.asyncio
 async def test_delete_user(
-    client: httpx.AsyncClient, temp_user: TestUser, admin_user: TestUser
+    client: httpx.AsyncClient, temp_user: TestPasswordUser, admin_user: TestPasswordUser
 ) -> None:
     bus = resolve(MessageBus)
 
     # Permissions
-    response = await client.delete(f"/auth/users/{temp_user.id}/")
+    response = await client.delete(f"/auth/users/{temp_user.account_id}/")
     assert response.status_code == 401
-    response = await client.delete(f"/auth/users/{temp_user.id}/", auth=temp_user.auth)
+    response = await client.delete(
+        f"/auth/users/{temp_user.account_id}/", auth=temp_user.auth
+    )
     assert response.status_code == 403
 
-    response = await client.delete(f"/auth/users/{temp_user.id}/", auth=admin_user.auth)
+    response = await client.delete(
+        f"/auth/users/{temp_user.account_id}/", auth=admin_user.auth
+    )
     assert response.status_code == 204
 
-    query = GetUserByEmail(email=EmailStr(temp_user.email))
-    with pytest.raises(UserDoesNotExist):
+    query = GetAccountByEmail(email=EmailStr(temp_user.account.email))
+    with pytest.raises(AccountDoesNotExist):
         await bus.execute(query)
 
 
 @pytest.mark.asyncio
 async def test_delete_user_idempotent(
-    client: httpx.AsyncClient, admin_user: TestUser
+    client: httpx.AsyncClient, admin_user: TestPasswordUser
 ) -> None:
     # Represents a non-existing user, or a user previously deleted.
     # These should be handled the same way as existing users by

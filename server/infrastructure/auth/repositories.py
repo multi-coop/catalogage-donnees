@@ -1,85 +1,116 @@
 from typing import Any, Optional
 
-from sqlalchemy import delete, select
+from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import contains_eager
 
-from server.domain.auth.entities import User
-from server.domain.auth.exceptions import UserDoesNotExist
-from server.domain.auth.repositories import UserRepository
+from server.domain.auth.entities import Account, PasswordUser
+from server.domain.auth.exceptions import AccountDoesNotExist
+from server.domain.auth.repositories import AccountRepository, PasswordUserRepository
 from server.domain.common.types import ID
 
 from ..database import Database
-from .models import UserModel
-from .transformers import update_instance
+from .models import AccountModel, PasswordUserModel
+from .transformers import (
+    make_account_entity,
+    make_account_instance,
+    make_password_user_entity,
+    make_password_user_instance,
+    update_instance,
+)
 
 
-class SqlUserRepository(UserRepository):
+class SqlAccountRepository(AccountRepository):
     def __init__(self, db: Database) -> None:
         self._db = db
 
     async def _maybe_get_by(
-        self, session: AsyncSession, **kwargs: Any
-    ) -> Optional[UserModel]:
-        whereclauses = (
-            getattr(UserModel, column) == value for column, value in kwargs.items()
+        self, session: AsyncSession, *whereclauses: Any
+    ) -> Optional[AccountModel]:
+        stmt = select(AccountModel).where(*whereclauses)
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def get_by_email(self, email: str) -> Optional[Account]:
+        async with self._db.session() as session:
+            instance = await self._maybe_get_by(session, AccountModel.email == email)
+            if instance is None:
+                return None
+            return make_account_entity(instance)
+
+    async def get_by_api_token(self, api_token: str) -> Optional[Account]:
+        async with self._db.session() as session:
+            instance = await self._maybe_get_by(
+                session, AccountModel.api_token == api_token
+            )
+            if instance is None:
+                return None
+            return make_account_entity(instance)
+
+
+class SqlPasswordUserRepository(PasswordUserRepository):
+    def __init__(self, db: Database) -> None:
+        self._db = db
+
+    async def _maybe_get_by(
+        self, session: AsyncSession, *whereclauses: Any
+    ) -> Optional[PasswordUserModel]:
+        stmt = (
+            select(PasswordUserModel)
+            .join(AccountModel)
+            .options(contains_eager(PasswordUserModel.account))
+            .where(*whereclauses)
         )
-        stmt = select(UserModel).where(*whereclauses)
         result = await session.execute(stmt)
         try:
             return result.scalar_one()
         except NoResultFound:
             return None
 
-    async def get_by_email(self, email: str) -> Optional[User]:
+    async def get_by_email(self, email: str) -> Optional[PasswordUser]:
         async with self._db.session() as session:
-            instance = await self._maybe_get_by(session, email=email)
+            instance = await self._maybe_get_by(session, AccountModel.email == email)
 
             if instance is None:
                 return None
 
-            return User.from_orm(instance)
+            return make_password_user_entity(instance)
 
-    async def get_by_api_token(self, api_token: str) -> Optional[User]:
+    async def insert(self, entity: PasswordUser) -> ID:
         async with self._db.session() as session:
-            instance = await self._maybe_get_by(session, api_token=api_token)
+            account_instance = make_account_instance(entity.account)
+            session.add(account_instance)
 
-            if instance is None:
-                return None
-
-            return User.from_orm(instance)
-
-    async def insert(self, entity: User) -> ID:
-        async with self._db.session() as session:
-            instance = UserModel(
-                id=entity.id,
-                organization_siret=entity.organization_siret,
-                email=entity.email,
-                password_hash=entity.password_hash,
-                role=entity.role,
-                api_token=entity.api_token,
-            )
-
+            instance = make_password_user_instance(entity)
             session.add(instance)
 
             await session.commit()
             await session.refresh(instance)
 
-            return ID(instance.id)
+            return ID(instance.account_id)
 
-    async def update(self, entity: User) -> None:
+    async def update(self, entity: PasswordUser) -> None:
         async with self._db.session() as session:
-            instance = await self._maybe_get_by(session, id=entity.id)
+            instance = await self._maybe_get_by(
+                session, PasswordUserModel.account_id == entity.account_id
+            )
 
             if instance is None:
-                raise UserDoesNotExist(entity.email)
+                raise AccountDoesNotExist(entity.account_id)
 
             update_instance(instance, entity)
 
             await session.commit()
 
-    async def delete(self, id: ID) -> None:
+    async def delete(self, account_id: ID) -> None:
         async with self._db.session() as session:
-            stmt = delete(UserModel).where(UserModel.id == id)
-            await session.execute(stmt)
+            instance = await self._maybe_get_by(
+                session, PasswordUserModel.account_id == account_id
+            )
+
+            if instance is None:
+                return
+
+            await session.delete(instance)
             await session.commit()

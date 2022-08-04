@@ -1,106 +1,110 @@
-from server.application.auth.views import AuthenticatedUserView, UserView
+from server.application.auth.views import AccountView, AuthenticatedAccountView
 from server.config.di import resolve
-from server.domain.auth.entities import User, UserRole
+from server.domain.auth.entities import Account, PasswordUser, UserRole
 from server.domain.auth.exceptions import (
+    AccountDoesNotExist,
     EmailAlreadyExists,
     LoginFailed,
-    UserDoesNotExist,
 )
-from server.domain.auth.repositories import UserRepository
+from server.domain.auth.repositories import AccountRepository, PasswordUserRepository
 from server.domain.common.types import ID
 
-from .commands import ChangePassword, CreateUser, DeleteUser
+from .commands import ChangePassword, CreatePasswordUser, DeletePasswordUser
 from .passwords import PasswordEncoder, generate_api_token
-from .queries import GetUserByAPIToken, GetUserByEmail, Login
+from .queries import GetAccountByAPIToken, GetAccountByEmail, LoginPasswordUser
 
 
-async def create_user(
-    command: CreateUser, *, id_: ID = None, role: UserRole = UserRole.USER
+async def create_password_user(
+    command: CreatePasswordUser, *, id_: ID = None, role: UserRole = UserRole.USER
 ) -> ID:
-    repository = resolve(UserRepository)
+    password_user_repository = resolve(PasswordUserRepository)
+    account_repository = resolve(AccountRepository)
     password_encoder = resolve(PasswordEncoder)
 
-    if id_ is None:
-        id_ = repository.make_id()
-
     email = command.email
+    account = await account_repository.get_by_email(email)
 
-    user = await repository.get_by_email(email)
-
-    if user is not None:
+    if account is not None:
         raise EmailAlreadyExists(email)
 
     password_hash = password_encoder.hash(command.password)
     api_token = generate_api_token()
 
-    user = User(
-        id=id_,
+    account = Account(
+        id=id_ if id_ is not None else account_repository.make_id(),
         organization_siret=command.organization_siret,
         email=email,
-        password_hash=password_hash,
         role=role,
         api_token=api_token,
     )
 
-    return await repository.insert(user)
+    password_user = PasswordUser(
+        account_id=account.id,
+        account=account,
+        password_hash=password_hash,
+    )
+
+    return await password_user_repository.insert(password_user)
 
 
-async def delete_user(command: DeleteUser) -> None:
-    repository = resolve(UserRepository)
-    await repository.delete(command.id)
+async def delete_password_user(command: DeletePasswordUser) -> None:
+    repository = resolve(PasswordUserRepository)
+    await repository.delete(command.account_id)
 
 
-async def login(query: Login) -> AuthenticatedUserView:
-    repository = resolve(UserRepository)
+async def login_password_user(query: LoginPasswordUser) -> AuthenticatedAccountView:
+    repository = resolve(PasswordUserRepository)
     password_encoder = resolve(PasswordEncoder)
 
-    user = await repository.get_by_email(query.email)
+    password_user = await repository.get_by_email(query.email)
 
-    if user is None:
+    if password_user is None:
         password_encoder.hash(query.password)  # Mitigate timing attacks.
         raise LoginFailed("Invalid credentials")
 
-    if not password_encoder.verify(password=query.password, hash=user.password_hash):
+    if not password_encoder.verify(
+        password=query.password, hash=password_user.password_hash
+    ):
         raise LoginFailed("Invalid credentials")
 
-    return AuthenticatedUserView(**user.dict())
+    return AuthenticatedAccountView(**password_user.account.dict())
 
 
-async def get_user_by_email(query: GetUserByEmail) -> UserView:
-    repository = resolve(UserRepository)
+async def get_account_by_email(query: GetAccountByEmail) -> AccountView:
+    repository = resolve(AccountRepository)
 
     email = query.email
 
-    user = await repository.get_by_email(email)
+    account = await repository.get_by_email(email)
 
-    if user is None:
-        raise UserDoesNotExist(email)
+    if account is None:
+        raise AccountDoesNotExist(email)
 
-    return UserView(**user.dict())
+    return AccountView(**account.dict())
 
 
-async def get_user_by_api_token(query: GetUserByAPIToken) -> UserView:
-    repository = resolve(UserRepository)
+async def get_account_by_api_token(query: GetAccountByAPIToken) -> AccountView:
+    repository = resolve(AccountRepository)
 
-    user = await repository.get_by_api_token(query.api_token)
+    account = await repository.get_by_api_token(query.api_token)
 
-    if user is None:
-        raise UserDoesNotExist("__token__")
+    if account is None:
+        raise AccountDoesNotExist("__token__")
 
-    return UserView(**user.dict())
+    return AccountView(**account.dict())
 
 
 async def change_password(command: ChangePassword) -> None:
-    repository = resolve(UserRepository)
+    repository = resolve(PasswordUserRepository)
     password_encoder = resolve(PasswordEncoder)
 
     email = command.email
-    user = await repository.get_by_email(email)
+    password_user = await repository.get_by_email(email)
 
-    if user is None:
-        raise UserDoesNotExist(email)
+    if password_user is None:
+        raise AccountDoesNotExist(email)
 
-    user.update_password(password_encoder.hash(command.password))
-    user.update_api_token(generate_api_token())  # Require new login
+    password_user.update_password(password_encoder.hash(command.password))
+    password_user.account.update_api_token(generate_api_token())  # Require new login
 
-    await repository.update(user)
+    await repository.update(password_user)

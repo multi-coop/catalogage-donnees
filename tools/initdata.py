@@ -11,12 +11,12 @@ import yaml
 from dotenv import load_dotenv
 from pydantic import BaseModel, ValidationError, parse_raw_as
 
-from server.application.auth.commands import CreateUser
+from server.application.auth.commands import CreatePasswordUser
 from server.application.datasets.commands import CreateDataset, UpdateDataset
 from server.application.tags.commands import CreateTag
 from server.config.di import bootstrap, resolve
 from server.domain.auth.entities import UserRole
-from server.domain.auth.repositories import UserRepository
+from server.domain.auth.repositories import PasswordUserRepository
 from server.domain.datasets.entities import Dataset
 from server.domain.datasets.repositories import DatasetRepository
 from server.domain.tags.repositories import TagRepository
@@ -51,13 +51,13 @@ async def handle_user(
     item: dict, *, no_input: bool, env_passwords: Dict[str, str]
 ) -> None:
     bus = resolve(MessageBus)
-    repository = resolve(UserRepository)
+    repository = resolve(PasswordUserRepository)
 
     email = item["params"]["email"]
     existing_user = await repository.get_by_email(email)
 
     if existing_user is not None:
-        print(f"{info('ok')}: User(email={email!r}, ...)")
+        print(f"{info('ok')}: PasswordUser(email={email!r}, ...)")
         return
 
     extras = UserExtras(**item.get("extras", {}))
@@ -74,7 +74,7 @@ async def handle_user(
             password = click.prompt(f"Password for {email}", hide_input=True)
         item["params"]["password"] = password
 
-    command = CreateUser(**item["params"])
+    command = CreatePasswordUser(**item["params"])
     await bus.execute(command, id_=item["id"], **extras.dict())
     print(f"{success('created')}: {command!r}")
 

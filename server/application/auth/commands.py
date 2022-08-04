@@ -6,14 +6,14 @@ from server.domain.organizations.types import Siret
 from server.seedwork.application.commands import Command
 
 
-class CreateUser(Command[ID]):
+class CreatePasswordUser(Command[ID]):
     organization_siret: Siret = LEGACY_ORGANIZATION_SIRET
     email: EmailStr
     password: SecretStr
 
 
-class DeleteUser(Command[None]):
-    id: ID
+class DeletePasswordUser(Command[None]):
+    account_id: ID
 
 
 class ChangePassword(Command[None]):

@@ -16,7 +16,7 @@ from server.seedwork.application.messages import MessageBus
 from tests.factories import CreateDatasetFactory
 
 from ..factories import UpdateDatasetFactory, fake
-from ..helpers import TestUser, to_payload
+from ..helpers import TestPasswordUser, to_payload
 
 
 @pytest.mark.asyncio
@@ -76,7 +76,7 @@ from ..helpers import TestUser, to_payload
 )
 async def test_create_dataset_invalid(
     client: httpx.AsyncClient,
-    temp_user: TestUser,
+    temp_user: TestPasswordUser,
     payload: dict,
     expected_errors_attrs: list,
 ) -> None:
@@ -93,7 +93,7 @@ async def test_create_dataset_invalid(
 
 @pytest.mark.asyncio
 async def test_dataset_crud(
-    client: httpx.AsyncClient, temp_user: TestUser, admin_user: TestUser
+    client: httpx.AsyncClient, temp_user: TestPasswordUser, admin_user: TestPasswordUser
 ) -> None:
     last_updated_at = fake.date_time_tz()
 
@@ -197,7 +197,7 @@ class TestDatasetPermissions:
         assert response.status_code == 401
 
     async def test_delete_not_admin(
-        self, client: httpx.AsyncClient, temp_user: TestUser
+        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
     ) -> None:
         pk = id_factory()
         response = await client.delete(f"/datasets/{pk}/", auth=temp_user.auth)
@@ -257,7 +257,7 @@ async def add_dataset_pagination_corpus(n: int, tags: list) -> None:
 )
 async def test_dataset_pagination(
     client: httpx.AsyncClient,
-    temp_user: TestUser,
+    temp_user: TestPasswordUser,
     tags: list,
     params: dict,
     expected_total_pages: int,
@@ -280,7 +280,7 @@ async def test_dataset_pagination(
 
 @pytest.mark.asyncio
 async def test_dataset_get_all_uses_reverse_chronological_order(
-    client: httpx.AsyncClient, temp_user: TestUser
+    client: httpx.AsyncClient, temp_user: TestPasswordUser
 ) -> None:
     bus = resolve(MessageBus)
     await bus.execute(CreateDatasetFactory.build(title="Oldest"))
@@ -306,7 +306,11 @@ class TestDatasetOptionalFields:
         ],
     )
     async def test_optional_fields_missing_uses_defaults(
-        self, client: httpx.AsyncClient, temp_user: TestUser, field: str, default: Any
+        self,
+        client: httpx.AsyncClient,
+        temp_user: TestPasswordUser,
+        field: str,
+        default: Any,
     ) -> None:
         payload = to_payload(CreateDatasetFactory.build())
         payload.pop(field)
@@ -316,7 +320,7 @@ class TestDatasetOptionalFields:
         assert dataset[field] == default
 
     async def test_optional_fields_invalid(
-        self, client: httpx.AsyncClient, temp_user: TestUser
+        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
     ) -> None:
         response = await client.post(
             "/datasets/",
@@ -345,7 +349,7 @@ class TestDatasetOptionalFields:
 @pytest.mark.asyncio
 class TestDatasetUpdate:
     async def test_not_found(
-        self, client: httpx.AsyncClient, temp_user: TestUser
+        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
     ) -> None:
         pk = id_factory()
         response = await client.put(
@@ -356,7 +360,7 @@ class TestDatasetUpdate:
         assert response.status_code == 404
 
     async def test_full_entity_expected(
-        self, client: httpx.AsyncClient, temp_user: TestUser
+        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
     ) -> None:
         bus = resolve(MessageBus)
         dataset_id = await bus.execute(CreateDatasetFactory.build())
@@ -388,7 +392,7 @@ class TestDatasetUpdate:
             assert error["type"] == "value_error.missing", field
 
     async def test_fields_empty_invalid(
-        self, client: httpx.AsyncClient, temp_user: TestUser
+        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
     ) -> None:
         bus = resolve(MessageBus)
 
@@ -432,7 +436,9 @@ class TestDatasetUpdate:
         assert err_url["loc"] == ["body", "url"]
         assert "empty" in err_service["msg"]
 
-    async def test_update(self, client: httpx.AsyncClient, temp_user: TestUser) -> None:
+    async def test_update(
+        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
+    ) -> None:
         bus = resolve(MessageBus)
         dataset_id = await bus.execute(CreateDatasetFactory.build())
 
@@ -505,7 +511,7 @@ class TestDatasetUpdate:
 @pytest.mark.asyncio
 class TestFormats:
     async def test_formats_add(
-        self, client: httpx.AsyncClient, temp_user: TestUser
+        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
     ) -> None:
         bus = resolve(MessageBus)
         command = CreateDatasetFactory.build(
@@ -528,7 +534,7 @@ class TestFormats:
         assert sorted(response.json()["formats"]) == ["api", "file_gis", "website"]
 
     async def test_formats_remove(
-        self, client: httpx.AsyncClient, temp_user: TestUser
+        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
     ) -> None:
         bus = resolve(MessageBus)
         command = CreateDatasetFactory.build(
@@ -554,7 +560,7 @@ class TestFormats:
 @pytest.mark.asyncio
 class TestTags:
     async def test_tags_add(
-        self, client: httpx.AsyncClient, temp_user: TestUser
+        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
     ) -> None:
         bus = resolve(MessageBus)
 
@@ -582,7 +588,7 @@ class TestTags:
         assert dataset.tags == [tag_architecture]
 
     async def test_tags_remove(
-        self, client: httpx.AsyncClient, temp_user: TestUser
+        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
     ) -> None:
         bus = resolve(MessageBus)
 
@@ -610,7 +616,7 @@ class TestTags:
 @pytest.mark.asyncio
 class TestDeleteDataset:
     async def test_delete(
-        self, client: httpx.AsyncClient, admin_user: TestUser
+        self, client: httpx.AsyncClient, admin_user: TestPasswordUser
     ) -> None:
         bus = resolve(MessageBus)
 
@@ -623,7 +629,7 @@ class TestDeleteDataset:
             await bus.execute(GetDatasetByID(id=dataset_id))
 
     async def test_idempotent(
-        self, client: httpx.AsyncClient, admin_user: TestUser
+        self, client: httpx.AsyncClient, admin_user: TestPasswordUser
     ) -> None:
         # Repeated calls on a deleted (or non-existing) resource should be fine.
         dataset_id = id_factory()

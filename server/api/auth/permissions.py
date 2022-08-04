@@ -130,7 +130,7 @@ class HasRole(BasePermission):
                 "Hint: use IsAuthenticated() & HasRole(...)"
             )
 
-        return request.user.obj.role in self._roles
+        return request.user.account.role in self._roles
 
 
 def _patch_openapi_security_params(*permissions: BasePermission) -> Callable:
