@@ -53,3 +53,8 @@ async def create_test_password_user(role: UserRole) -> TestPasswordUser:
     assert user is not None
 
     return TestPasswordUser(**user.dict(), password=command.password.get_secret_value())
+
+
+def api_key_auth(request: httpx.Request) -> httpx.Request:
+    request.headers["X-Api-Key"] = "<testing>"
+    return request

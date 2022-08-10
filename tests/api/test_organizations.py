@@ -2,12 +2,7 @@ import httpx
 import pytest
 
 from ..factories import CreateOrganizationFactory
-from ..helpers import TestPasswordUser, to_payload
-
-
-def api_key_auth(request: httpx.Request) -> httpx.Request:
-    request.headers["X-Api-Key"] = "<testing>"
-    return request
+from ..helpers import TestPasswordUser, api_key_auth, to_payload
 
 
 @pytest.mark.asyncio
