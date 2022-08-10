@@ -11,6 +11,11 @@ from ..catalog_records.views import CatalogRecordView
 from ..tags.views import TagView
 
 
+class ExtraFieldValueView(BaseModel):
+    extra_field_id: ID
+    value: str
+
+
 class DatasetView(BaseModel):
     id: ID
     catalog_record: CatalogRecordView
@@ -27,6 +32,7 @@ class DatasetView(BaseModel):
     url: Optional[str]
     license: Optional[str]
     tags: List[TagView]
+    extra_field_values: List[ExtraFieldValueView]
 
     # Extras
     headlines: Optional[DatasetHeadlines] = None

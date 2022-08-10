@@ -94,6 +94,7 @@ class GetAllQuery:
                 contains_eager(DatasetModel.catalog_record),
                 selectinload(DatasetModel.formats),
                 selectinload(DatasetModel.tags),
+                selectinload(DatasetModel.extra_field_values),
             )
             .where(*whereclauses)
             .order_by(*orderbyclauses, CatalogRecordModel.created_at.desc())

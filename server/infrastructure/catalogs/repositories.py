@@ -1,6 +1,7 @@
 from typing import Optional
 
 from sqlalchemy import select
+from sqlalchemy.orm import contains_eager
 
 from server.domain.catalogs.entities import Catalog
 from server.domain.catalogs.repositories import CatalogRepository
@@ -17,9 +18,14 @@ class SqlCatalogRepository(CatalogRepository):
 
     async def get_by_siret(self, siret: Siret) -> Optional[Catalog]:
         async with self._db.session() as session:
-            stmt = select(CatalogModel).where(CatalogModel.organization_siret == siret)
+            stmt = (
+                select(CatalogModel)
+                .join(CatalogModel.extra_fields, isouter=True)
+                .options(contains_eager(CatalogModel.extra_fields))
+                .where(CatalogModel.organization_siret == siret)
+            )
             result = await session.execute(stmt)
-            instance = result.scalar_one_or_none()
+            instance = result.unique().scalar_one_or_none()
             if instance is None:
                 return None
             return make_entity(instance)
@@ -29,6 +35,7 @@ class SqlCatalogRepository(CatalogRepository):
             instance = make_instance(entity)
 
             session.add(instance)
+            session.add_all(instance.extra_fields)
 
             await session.commit()
             await session.refresh(instance)

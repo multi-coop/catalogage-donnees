@@ -27,7 +27,7 @@ router = APIRouter(prefix="/catalogs", tags=["catalogs"])
 async def create_catalog(data: CatalogCreate) -> JSONResponse:
     bus = resolve(MessageBus)
 
-    command = CreateCatalog(organization_siret=data.organization_siret)
+    command = CreateCatalog(**data.dict())
 
     try:
         siret = await bus.execute(command)

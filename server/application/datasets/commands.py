@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from pydantic import EmailStr, Field
 
+from server.domain.catalogs.entities import ExtraFieldValue
 from server.domain.common.types import ID
 from server.domain.datasets.entities import DataFormat, UpdateFrequency
 from server.domain.organizations.entities import LEGACY_ORGANIZATION_SIRET
@@ -27,6 +28,7 @@ class CreateDataset(CreateDatasetValidationMixin, Command[ID]):
     url: Optional[str] = None
     license: Optional[str] = None
     tag_ids: List[ID] = Field(default_factory=list)
+    extra_field_values: List[ExtraFieldValue] = Field(default_factory=list)
 
 
 class UpdateDataset(UpdateDatasetValidationMixin, Command[None]):
@@ -44,6 +46,7 @@ class UpdateDataset(UpdateDatasetValidationMixin, Command[None]):
     url: Optional[str] = Field(...)
     license: Optional[str] = Field(...)
     tag_ids: List[ID]
+    extra_field_values: List[ExtraFieldValue]
 
 
 class DeleteDataset(Command[None]):

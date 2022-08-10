@@ -3,19 +3,25 @@ from typing import Any, List
 
 import httpx
 import pytest
+from sqlalchemy import select
 
+from server.application.catalogs.commands import CreateCatalog
+from server.application.catalogs.queries import GetCatalogBySiret
 from server.application.datasets.queries import GetDatasetByID
 from server.application.tags.commands import CreateTag
 from server.application.tags.queries import GetTagByID
 from server.config.di import resolve
-from server.domain.common.types import id_factory
+from server.domain.catalogs.entities import ExtraFieldValue, TextExtraField
+from server.domain.common.types import ID, id_factory
 from server.domain.datasets.entities import DataFormat, UpdateFrequency
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.organizations.entities import LEGACY_ORGANIZATION_SIRET
+from server.infrastructure.catalogs.models import ExtraFieldValueModel
+from server.infrastructure.database import Database
 from server.seedwork.application.messages import MessageBus
 from tests.factories import CreateDatasetFactory
 
-from ..factories import UpdateDatasetFactory, fake
+from ..factories import CreateOrganizationFactory, UpdateDatasetFactory, fake
 from ..helpers import TestPasswordUser, to_payload
 
 
@@ -141,6 +147,7 @@ async def test_dataset_crud(
         "url": None,
         "license": "Licence Ouverte",
         "tags": [],
+        "extra_field_values": [],
         "headlines": None,
     }
 
@@ -384,6 +391,7 @@ class TestDatasetUpdate:
             "url",
             "license",
             "tag_ids",
+            "extra_field_values",
         ]
         errors = response.json()["detail"]
         assert len(errors) == len(fields)
@@ -459,6 +467,7 @@ class TestDatasetUpdate:
                 url="https://data.gouv.fr/datasets/other",
                 license="ODC Open Database License",
                 tag_ids=[],
+                extra_field_values=[],
             )
         )
 
@@ -488,6 +497,7 @@ class TestDatasetUpdate:
             "url": "https://data.gouv.fr/datasets/other",
             "license": "ODC Open Database License",
             "tags": [],
+            "extra_field_values": [],
             "headlines": None,
         }
 
@@ -611,6 +621,128 @@ class TestTags:
 
         dataset = await bus.execute(GetDatasetByID(id=dataset_id))
         assert dataset.tags == []
+
+
+@pytest.mark.asyncio
+class TestExtraFieldValues:
+    async def _create_extra_field_in_catalog(self) -> ID:
+        bus = resolve(MessageBus)
+        siret = await bus.execute(CreateOrganizationFactory.build())
+
+        await bus.execute(
+            CreateCatalog(
+                organization_siret=siret,
+                extra_fields=[
+                    TextExtraField(
+                        organization_siret=siret,
+                        name="donnees_taille",
+                        title="Taille du jeu de données",
+                        hint_text="Informations sur la volumétrie du jeu de données",
+                    )
+                ],
+            )
+        )
+
+        catalog = await bus.execute(GetCatalogBySiret(siret=siret))
+        return catalog.extra_fields[0].id
+
+    async def test_create_dataset_with_extra_field_values(
+        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
+    ) -> None:
+        extra_field_id = await self._create_extra_field_in_catalog()
+
+        payload = to_payload(
+            CreateDatasetFactory.build(
+                extra_field_values=[
+                    ExtraFieldValue(extra_field_id=extra_field_id, value="2.4 Go")
+                ]
+            )
+        )
+        response = await client.post("/datasets/", json=payload, auth=temp_user.auth)
+        assert response.status_code == 201
+        data = response.json()
+        assert data["extra_field_values"] == [
+            {
+                "extra_field_id": str(extra_field_id),
+                "value": "2.4 Go",
+            }
+        ]
+
+    async def test_add_extra_field_value(
+        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
+    ) -> None:
+        bus = resolve(MessageBus)
+        extra_field_id = await self._create_extra_field_in_catalog()
+
+        command = CreateDatasetFactory.build()
+        dataset_id = await bus.execute(command)
+        dataset = await bus.execute(GetDatasetByID(id=dataset_id))
+        assert not dataset.extra_field_values
+
+        payload = to_payload(
+            UpdateDatasetFactory.build(
+                id=dataset_id,
+                extra_field_values=[
+                    ExtraFieldValue(
+                        extra_field_id=extra_field_id,
+                        value="Environ 10 To",
+                    )
+                ],
+                **command.dict(exclude={"extra_field_values"}),
+            )
+        )
+        response = await client.put(
+            f"/datasets/{dataset_id}/", json=payload, auth=temp_user.auth
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["extra_field_values"] == [
+            {
+                "extra_field_id": str(extra_field_id),
+                "value": "Environ 10 To",
+            }
+        ]
+
+    async def test_remove_extra_field_value(
+        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
+    ) -> None:
+        bus = resolve(MessageBus)
+        extra_field_id = await self._create_extra_field_in_catalog()
+
+        command = CreateDatasetFactory.build(
+            extra_field_values=[
+                ExtraFieldValue(
+                    extra_field_id=extra_field_id,
+                    value="2.4 Go",
+                )
+            ]
+        )
+        dataset_id = await bus.execute(command)
+        dataset = await bus.execute(GetDatasetByID(id=dataset_id))
+        assert len(dataset.extra_field_values) == 1
+
+        payload = to_payload(
+            UpdateDatasetFactory.build(
+                id=dataset_id,
+                extra_field_values=[],
+                **command.dict(exclude={"extra_field_values"}),
+            )
+        )
+        response = await client.put(
+            f"/datasets/{dataset_id}/", json=payload, auth=temp_user.auth
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["extra_field_values"] == []
+
+        # ExtraFieldValue row was indeed dropped from DB.
+        database = resolve(Database)
+        async with database.session() as session:
+            stmt = select(ExtraFieldValueModel).where(
+                ExtraFieldValueModel.dataset_id == dataset_id
+            )
+            result = await session.execute(stmt)
+            assert not list(result.scalars())
 
 
 @pytest.mark.asyncio
