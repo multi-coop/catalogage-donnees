@@ -121,7 +121,10 @@ datasets:
       license: Licence Ouverte
       tag_ids: []
 organizations:
-  - #foo
-    params:
+  - params:
       name: "Ministère de la Culture"
       siret: "44229377500031" # Siret of https://www.societe.com/societe/fake-442293775.html
+
+catalogs:
+  - params:
+      organization_siret: "44229377500031" # See "Ministère de la Culture"
