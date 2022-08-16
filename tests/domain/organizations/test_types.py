@@ -40,3 +40,9 @@ class TestSiret:
 
         with pytest.raises(ValueError):
             Model(siret="invalid")  # type: ignore
+
+    def test_equals(self) -> None:
+        assert Siret("65701934700404") == Siret("65701934700404")
+        assert Siret("65701934700404") == "65701934700404"
+        assert Siret("65701934700404") != 65701934700404
+        assert Siret("65701934700404") != "test"

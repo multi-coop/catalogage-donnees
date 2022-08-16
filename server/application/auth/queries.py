@@ -9,6 +9,10 @@ class LoginPasswordUser(Query[AuthenticatedAccountView]):
     password: SecretStr
 
 
+class LoginDataPassUser(Query[AuthenticatedAccountView]):
+    email: EmailStr
+
+
 class GetAccountByEmail(Query[AccountView]):
     email: EmailStr
 

@@ -32,3 +32,8 @@ class PasswordUser(Entity):
 
     def update_password(self, password_hash: str) -> None:
         self.password_hash = password_hash
+
+
+class DataPassUser(Entity):
+    account_id: ID
+    account: Account

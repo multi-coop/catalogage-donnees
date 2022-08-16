@@ -9,8 +9,13 @@ ServerMode = Literal["local", "live"]
 class Settings(BaseSettings):
     # For usage, see: https://pydantic-docs.helpmanual.io/usage/settings/
 
+    secret_key: str
     server_mode: ServerMode = "local"
     database_url: str = "postgresql+asyncpg://localhost:5432/catalogage"
+    client_url: str = "http://localhost:3000"
+    datapass_url: str = "https://auth-staging.api.gouv.fr"
+    datapass_client_id: str = "<define-me>"
+    datapass_client_secret: str = "<define-me>"
     host: str = "localhost"
     port: int = 3579
     docs_url: str = "/docs"

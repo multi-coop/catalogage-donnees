@@ -1,13 +1,16 @@
-from ..common.exceptions import DoesNotExist
+from ..common.exceptions import AlreadyExists, DoesNotExist
 
 
 class AccountDoesNotExist(DoesNotExist):
     entity_name = "Account"
 
 
-class EmailAlreadyExists(Exception):
-    def __init__(self, email: str) -> None:
-        super().__init__(f"Email already exists: {email!r}")
+class EmailAlreadyExists(AlreadyExists):
+    entity_name = "Email"
+
+
+class DataPassUserAlreadyExists(AlreadyExists):
+    entity_name = "DataPassUser"
 
 
 class LoginFailed(Exception):

@@ -1,3 +1,6 @@
 tls_enabled: true
 
 initdata_src: "{{ inventory_dir }}/assets/initdata.yml"
+
+client_url: "https://demo.catalogue.multi.coop"
+datapass_url: "https://auth.api.gouv.fr"
