@@ -120,7 +120,8 @@ datasets:
       url: "https://www.data.gouv.fr/fr/datasets/catalogue-des-enquetes-realisees-par-la-dares-2012-572205/"
       license: Licence Ouverte
       tag_ids: []
-# organizations:
-#   params:
-#     name: "Ministère de la Culture"
-#     siret: "44229377500031" # Siret of https://www.societe.com/societe/fake-442293775.html
+organizations:
+  - #foo
+    params:
+      name: "Ministère de la Culture"
+      siret: "44229377500031" # Siret of https://www.societe.com/societe/fake-442293775.html
