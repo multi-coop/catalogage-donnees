@@ -97,3 +97,6 @@ datasets:
       last_updated_at: null
       url: "https://www.data.gouv.fr/fr/datasets/catalogue-des-enquetes-realisees-par-la-dares-2012-572205/"
       tag_ids: []
+# créer une organization
+# créer un cataloge // Pour les relier utiliser un siret qui existe
+# Lier un dataset au catalogue
