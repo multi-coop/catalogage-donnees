@@ -25,6 +25,9 @@ async def test_initdata_empty(tmp_path: Path) -> None:
         users: []
         tags: []
         datasets: []
+        organizations: []
+        catalogs: []
+
         """
     )
     await initdata.main(path)
@@ -53,6 +56,9 @@ async def test_initdata_env_password_invalid(
               email: test@admin.org
               password: __env__
         datasets: []
+        organizations: []
+        catalogs: []
+
         """
     )
 
@@ -78,6 +84,9 @@ async def test_initdata_env_password(
               password: __env__
         tags: []
         datasets: []
+        organizations: []
+        catalogs: []
+
         """
     )
 
@@ -115,7 +124,9 @@ async def test_repo_initdata(
     num_users = 2
     num_tags = 7
     num_datasets = 4
-    num_entities = num_users + num_tags + num_datasets
+    num_organization = 1
+    num_catalog = 1
+    num_entities = num_users + num_tags + num_datasets + num_catalog + num_organization
 
     await initdata.main(path, no_input=True)
     captured = capsys.readouterr()
