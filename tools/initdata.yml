@@ -89,7 +89,7 @@ datasets:
       description: |
         Par région, les ressources ci-dessous recensent les restaurants, brasseries et cafétérias dans le réseau des CROUS.
       service: Direction des données du CROUS
-      geographical_coverage: Monde  # Fake, for E2E testing purposes
+      geographical_coverage: Monde # Fake, for E2E testing purposes
       formats:
         - file_tabular
       technical_source: Système d'information central du CROUS
@@ -120,3 +120,11 @@ datasets:
       url: "https://www.data.gouv.fr/fr/datasets/catalogue-des-enquetes-realisees-par-la-dares-2012-572205/"
       license: Licence Ouverte
       tag_ids: []
+organizations:
+  - params:
+      name: "Ministère de la Culture"
+      siret: "44229377500031" # Siret of https://www.societe.com/societe/fake-442293775.html
+
+catalogs:
+  - params:
+      organization_siret: "44229377500031" # See "Ministère de la Culture"

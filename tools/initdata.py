@@ -12,13 +12,17 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, ValidationError, parse_raw_as
 
 from server.application.auth.commands import CreatePasswordUser
+from server.application.catalogs.commands import CreateCatalog
 from server.application.datasets.commands import CreateDataset, UpdateDataset
+from server.application.organizations.commands import CreateOrganization
 from server.application.tags.commands import CreateTag
 from server.config.di import bootstrap, resolve
 from server.domain.auth.entities import UserRole
 from server.domain.auth.repositories import PasswordUserRepository
+from server.domain.catalogs.repositories import CatalogRepository
 from server.domain.datasets.entities import Dataset
 from server.domain.datasets.repositories import DatasetRepository
+from server.domain.organizations.repositories import OrganizationRepository
 from server.domain.tags.repositories import TagRepository
 from server.seedwork.application.messages import MessageBus
 
@@ -130,6 +134,48 @@ async def handle_dataset(item: dict, reset: bool = False) -> None:
     print(f"{success('created')}: {create_command!r}")
 
 
+async def handle_organizations(item: dict) -> None:
+    bus = resolve(MessageBus)
+    repository = resolve(OrganizationRepository)
+
+    siret = item["params"]["siret"]
+
+    existing_organization = await repository.get_by_siret(siret)
+
+    if existing_organization is not None:
+
+        organization_repr = (
+            f"Organization(siret={siret!r}, name={item['params']['name']!r}, ...)"
+        )
+        print(f"{info('ok')}: {organization_repr}")
+        return
+
+    create_command = CreateOrganization(**item["params"])
+
+    await bus.execute(create_command)
+    print(f"{success('created')}: {create_command!r}")
+
+
+async def handle_catalogs(item: dict) -> None:
+    bus = resolve(MessageBus)
+    repository = resolve(CatalogRepository)
+
+    siret = item["params"]["organization_siret"]
+
+    existing_organization = await repository.get_by_siret(siret)
+
+    if existing_organization is not None:
+
+        organization_repr = f"Catalog(siret={siret!r}, ...)"
+        print(f"{info('ok')}: {organization_repr}")
+        return
+
+    create_command = CreateCatalog(**item["params"])
+
+    await bus.execute(create_command)
+    print(f"{success('created')}: {create_command!r}")
+
+
 async def main(path: pathlib.Path, reset: bool = False, no_input: bool = False) -> None:
     with path.open() as f:
         spec = yaml.safe_load(f)
@@ -150,6 +196,16 @@ async def main(path: pathlib.Path, reset: bool = False, no_input: bool = False) 
 
     for item in spec["datasets"]:
         await handle_dataset(item, reset=reset)
+
+    print("\n", ruler("Organizations"))
+
+    for item in spec["organizations"]:
+        await handle_organizations(item)
+
+    print("\n", ruler("Catalogs"))
+
+    for item in spec["catalogs"]:
+        await handle_catalogs(item)
 
 
 if __name__ == "__main__":
