@@ -1,5 +1,11 @@
-import { format, differenceInDays, differenceInYears, isToday, differenceInMonths, } from "date-fns";
-import * as fr from 'date-fns/locale/fr/index.js';
+import {
+  format,
+  differenceInDays,
+  differenceInYears,
+  isToday,
+  differenceInMonths,
+} from "date-fns";
+import * as fr from "date-fns/locale/fr/index.js";
 
 export const pluralize = (
   amount: number,
