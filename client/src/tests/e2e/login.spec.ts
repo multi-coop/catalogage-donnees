@@ -3,7 +3,7 @@ import { test } from "./fixtures";
 
 test.describe("Login", () => {
   test("Redirects unauthenticated visits to login page", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/fiches/search");
     await page
       .locator("text='Bienvenue sur votre outil de catalogage de données'")
       .waitFor();

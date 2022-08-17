@@ -14,7 +14,7 @@
   let page = 1;
 
   beforeUpdate(async () => {
-    if (Maybe.Some($user)) {
+    if (Maybe.Some($user) && !Maybe.Some(paginatedDatasets)) {
       page = getPageFromParams($pageStore.url.searchParams);
       paginatedDatasets = await getDatasets({
         fetch,
