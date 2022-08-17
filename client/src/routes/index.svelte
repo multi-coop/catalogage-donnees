@@ -10,6 +10,7 @@
   import { getPageFromParams } from "src/lib/util/pagination";
   import { getDatasets } from "src/lib/repositories/datasets";
   import Spinner from "src/lib/components/Spinner/Spinner.svelte";
+  import LandingTemplate from "src/lib/templates/LandingTemplate/LandingTemplate.svelte";
 
   let paginatedDatasets: Maybe<Paginated<Dataset>>;
   let page = 1;
@@ -40,7 +41,7 @@
 {:else if Maybe.Some($user) && Maybe.Some(paginatedDatasets)}
   <DatasetListTemplate currentPage={page} {paginatedDatasets} />
 {:else}
-  <p>foo</p>
+  <LandingTemplate />
 {/if}
 
 <style>
