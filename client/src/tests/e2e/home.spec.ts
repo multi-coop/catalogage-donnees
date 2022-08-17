@@ -2,6 +2,19 @@ import { expect } from "@playwright/test";
 import { STATE_AUTHENTICATED } from "./constants";
 import { test } from "./fixtures";
 
+test.describe("Landing Page", () => {
+  test("Visits the home page without being logged in", async ({ page }) => {
+    await page.goto("/");
+
+    await page
+      .locator(
+        "text=Bienvenue sur le service de catalogage de données de l’État"
+      )
+      .waitFor();
+    await page.locator("text=Comment accéder aux catalogues ?").waitFor();
+  });
+});
+
 test.describe("Catalog list", () => {
   test.use({ storageState: STATE_AUTHENTICATED });
 
