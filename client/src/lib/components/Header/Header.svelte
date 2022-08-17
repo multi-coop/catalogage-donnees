@@ -29,7 +29,7 @@
 
   const onClickLogout = async () => {
     logout();
-    await goto("/login");
+    await goto("/");
   };
 </script>
 
