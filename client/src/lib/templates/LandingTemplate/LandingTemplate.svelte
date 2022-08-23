@@ -94,8 +94,4 @@
   .button-container {
     gap: 10px;
   }
-
-  a {
-    display: block;
-  }
 </style>
