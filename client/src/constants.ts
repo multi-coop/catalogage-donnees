@@ -1,7 +1,11 @@
 import type { DataFormat, UpdateFrequency } from "./definitions/datasets";
 
 // Note : the / page (the home page) is "semi public". This page layout and information displayed depends whether the user is connected or not
-export const PUBLIC_PAGES = ["/login", "/", "/auth/datapass/create-organization"];
+export const PUBLIC_PAGES = [
+  "/login",
+  "/",
+  "/auth/datapass/create-organization",
+];
 
 export const DATA_FORMAT_LABELS: { [K in DataFormat]: string } = {
   file_tabular: "Fichier tabulaire (XLS, XLSX, CSV, ...)",
