@@ -10,7 +10,7 @@ export interface LoginApiRequestData {
   password: string;
 }
 
-type UserRole = "USER" | "ADMIN";
+export type UserRole = "USER" | "ADMIN";
 
 export interface LoginApiResponseData {
   email: string;
