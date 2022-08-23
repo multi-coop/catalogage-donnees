@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
+
   import books from "$lib/assets/books-circle.svg";
   import flowChart from "$lib/assets/registration_flow_chart.svg";
   import { getApiUrl } from "src/lib/fetch";
