@@ -19,6 +19,6 @@ export const authGuard = (url: URL): LoadOutput => {
 
   return {
     status: 302,
-    redirect: "/login",
+    redirect: "/",
   };
 };

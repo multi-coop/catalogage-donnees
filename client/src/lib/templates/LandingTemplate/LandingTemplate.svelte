@@ -1,6 +1,7 @@
 <script lang="ts">
   import books from "$lib/assets/books-circle.svg";
   import flowChart from "$lib/assets/registration_flow_chart.svg";
+  import { getApiUrl } from "src/lib/fetch";
 </script>
 
 <section class="banner fr-py-8w">
@@ -9,7 +10,7 @@
       <div class="fr-col-12 title-container">
         <img class="books-image" alt="" src={books} />
 
-        <header class="fr-pl-3w">
+        <div class="fr-pl-3w">
           <h1>Bienvenue sur le service de catalogage de données de l’État</h1>
           <p>
             Ce service permet de favoriser la circulation des données entre les
@@ -17,7 +18,28 @@
             L’intégration des différentes organisations se fait progressivement
             et en fonction des demandes.
           </p>
-        </header>
+
+          <div class="button-container">
+            <button
+              on:click={async () =>
+                await goto(`${getApiUrl()}/auth/datapass/login/`)}
+              class="fr-btn fr-icon-logout-box-r-line fr-btn--icon-right"
+              aria-label="vers se connecter via Datapass"
+            >
+              Se connecter
+            </button>
+
+            <button
+              class="fr-btn fr-btn--secondary fr-icon-user-add-line fr-btn--icon-right"
+              on:click={async () =>
+                await goto(`${getApiUrl()}/auth/datapass/login/`)}
+              aria-label="vers s'inscrire via Datapass"
+              href={`${getApiUrl()}/auth/datapass/login/`}
+            >
+              S'inscrire
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -61,7 +83,16 @@
     justify-content: center;
   }
 
-  .title-container {
+  .title-container,
+  .button-container {
     display: flex;
+  }
+
+  .button-container {
+    gap: 10px;
+  }
+
+  a {
+    display: block;
   }
 </style>
