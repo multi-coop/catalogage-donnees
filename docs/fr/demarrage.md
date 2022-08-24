@@ -192,7 +192,7 @@ Par exemple :
 APP_DEBUG=1 make serve
 ```
 
-En développement local, les variables `APP_DATAPASS_CLIENT_ID` et `APP_DATAPASS_CLIENT_SECRET` peuvent être configurées selon les identifiants de l'instance `staging` de Comptes DataPass. Voir [Authentification par Comptes DataPass](./ops.md#authentification-par-comptes-datapass) pour plus d'informations.
+En développement local, les variables `APP_DATAPASS_CLIENT_ID` et `APP_DATAPASS_CLIENT_SECRET` peuvent être configurées selon les identifiants de l'instance `staging` de Comptes DataPass. Voir [Comptes DataPass (Opérations)](./ops.md#comptes-datapass) pour plus d'informations.
 
 Des paramètres avancés (principalement dédiés au déploiement - voir [Opérations](./ops.md)) sont également disponibles :
 
