@@ -1,45 +1,24 @@
 <script lang="ts">
-  import { page as pageStore } from "$app/stores";
-  import type { Dataset } from "src/definitions/datasets";
-  import type { Paginated } from "src/definitions/pagination";
-  import { Maybe } from "$lib/util/maybe";
+  import { page } from "$app/stores";
   import { apiToken, user } from "src/lib/stores/auth";
   import DatasetListTemplate from "src/lib/templates/DatasetListTemplate/DatasetListTemplate.svelte";
-  import { beforeUpdate } from "svelte";
 
   import { getPageFromParams } from "src/lib/util/pagination";
   import { getDatasets } from "src/lib/repositories/datasets";
   import Spinner from "src/lib/components/Spinner/Spinner.svelte";
   import LandingTemplate from "src/lib/templates/LandingTemplate/LandingTemplate.svelte";
 
-  let paginatedDatasets: Maybe<Paginated<Dataset>>;
-  let page = 1;
-  let loading = false;
-
-  beforeUpdate(async () => {
-    loading = true;
-    if (Maybe.Some($user) && !Maybe.Some(paginatedDatasets)) {
-      page = getPageFromParams($pageStore.url.searchParams);
-      paginatedDatasets = await getDatasets({
-        fetch,
-        apiToken: $apiToken,
-        page,
-      });
-    }
-    loading = false;
-  });
+  let pageNumber = getPageFromParams($page.url.searchParams) || 1;
 </script>
 
-<svelte:head>
-  <title>Catalogue</title>
-</svelte:head>
-
-{#if loading}
-  <div class="spinner-container">
-    <Spinner />
-  </div>
-{:else if Maybe.Some($user) && Maybe.Some(paginatedDatasets)}
-  <DatasetListTemplate currentPage={page} {paginatedDatasets} />
+{#if $user}
+  {#await getDatasets({ fetch, apiToken: $apiToken, page: pageNumber })}
+    <div class="spinner-container">
+      <Spinner />
+    </div>
+  {:then paginatedDatasets}
+    <DatasetListTemplate currentPage={pageNumber} {paginatedDatasets} />
+  {/await}
 {:else}
   <LandingTemplate />
 {/if}
