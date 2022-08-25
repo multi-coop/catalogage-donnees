@@ -1,4 +1,5 @@
 import { expect } from "@playwright/test";
+import { TEST_EMAIL } from "./constants";
 import { test } from "./fixtures";
 
 test.describe("Login", () => {
@@ -16,8 +17,8 @@ test.describe("Login", () => {
     await expect(page).toHaveTitle("Connexion");
 
     const email = page.locator("form [name=email]");
-    await email.fill("demo@catalogue.data.gouv.fr");
-    expect(await email.inputValue()).toBe("demo@catalogue.data.gouv.fr");
+    await email.fill(TEST_EMAIL);
+    expect(await email.inputValue()).toBe(TEST_EMAIL);
 
     const password = page.locator("form [name=password]");
     await password.fill("demo");
@@ -33,7 +34,7 @@ test.describe("Login", () => {
     expect(request.method()).toBe("POST");
     expect(response.status()).toBe(200);
     const json = await response.json();
-    expect(json.email).toBe("demo@catalogue.data.gouv.fr");
+    expect(json.email).toBe(TEST_EMAIL);
     expect(json).toHaveProperty("api_token");
 
     await page.locator("text='Recherchez un jeu de données'").waitFor();
@@ -44,8 +45,8 @@ test.describe("Login", () => {
     await page.goto("/login");
 
     const email = page.locator("form [name=email]");
-    await email.fill("demo@catalogue.data.gouv.fr");
-    expect(await email.inputValue()).toBe("demo@catalogue.data.gouv.fr");
+    await email.fill(TEST_EMAIL);
+    expect(await email.inputValue()).toBe(TEST_EMAIL);
 
     const password = page.locator("form [name=password][type=password]");
     await password.fill("wrongpassword");

@@ -30,7 +30,7 @@ Pour plus d'informations, consultez [le guide de démarrage rapide](./docs/fr/de
 
 ## Démo
 
-Une instance de démonstration de l'application est accessible sur [demo.catalogue.multi.coop](http://demo.catalogue.multi.coop/). Login : `demo@catalogue.data.gouv.fr`, mot de passe : `demo`.
+Une instance de démonstration de l'application est accessible sur [demo.catalogue.multi.coop](http://demo.catalogue.multi.coop/). Login : `catalogue.demo@yopmail.com `, mot de passe : `password1234`.
 
 ## Contribuer
 

@@ -1,8 +1,8 @@
 users:
-  - id: "b80b614c-30d1-48cf-8acf-9f1056f8eb0f"
+  - id: "c33cc0bb-975c-45a1-ac2a-7fed9971ce6a"
     params:
-      email: demo@catalogue.data.gouv.fr
-      password: demo
+      email: catalogue.demo@yopmail.com
+      password: password1234
 
   - id: "4c2cefce-ea47-4e6e-8c79-8befd4495f45"
     params:
