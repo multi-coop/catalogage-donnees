@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import books from "$lib/assets/books-circle.svg";
   import flowChart from "$lib/assets/registration_flow_chart.svg";
 </script>
@@ -31,8 +31,6 @@
       <p>
         L’accès aux catalogues s’effectue via le compte datapass. Il est pour
         l’instant possible uniquement aux agents des organisations enregistrées.
-        Pour en savoir plus sur les moyens de s’enregistrer et intégrer son
-        catalogue, vous pouvez consulter la documentation détaillée.
       </p>
 
       <div class="flow-chart-container fr-pt-5w">
