@@ -29,7 +29,7 @@
 
   const onClickLogout = async () => {
     logout();
-    await goto("/login");
+    await goto("/");
   };
 </script>
 
@@ -70,7 +70,7 @@
             </a>
           </div>
         </div>
-        <div class="fr-header__tools">
+        <div class="fr-header__tools tools-container">
           <div class="fr-header__tools-links">
             {#if Maybe.Some($user)}
               <p>
@@ -158,5 +158,13 @@
     transform: rotate(45deg);
     background-color: var(--background-action-low-pink-tuile);
     content: "Version bêta";
+    z-index: 1;
+  }
+
+  @media (max-width: 1440px) and (min-width: 768px) {
+    /* To give a bit space between the beta banner and the tools (login/out button, email adress) only for LG and MD screen */
+    .tools-container {
+      padding-right: 80px;
+    }
   }
 </style>
