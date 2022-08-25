@@ -54,10 +54,11 @@ datasets:
         - website
       technical_source: SIG national de l'IGN
       producer_email: service@example.org
-      contact_emails: []
+      contact_emails: [ign.person@mydomain.org]
       update_frequency: null
       last_updated_at: null
       url: "https://www.data.gouv.fr/fr/datasets/donnees-brutes-de-l-inventaire-forestier/"
+      license: Licence Ouverte
       tag_ids:
         - "9c1549a5-02ef-43a9-aa20-6babdce0b733"
 
@@ -91,9 +92,17 @@ datasets:
       formats:
         - other
       technical_source: Catalogue des fiches de la DARES
-      producer_email: service@example.org
-      contact_emails: []
+      producer_email: null
+      contact_emails: [dares.person@mydomain.org]
       update_frequency: null
       last_updated_at: null
       url: "https://www.data.gouv.fr/fr/datasets/catalogue-des-enquetes-realisees-par-la-dares-2012-572205/"
       tag_ids: []
+organizations:
+  - params:
+      name: "Ministère de la Culture"
+      siret: "11004601800013"
+
+catalogs:
+  - params:
+      organization_siret: "11004601800013"
