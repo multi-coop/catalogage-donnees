@@ -55,7 +55,11 @@ async def update_dataset(command: UpdateDataset) -> None:
         raise DatasetDoesNotExist(pk)
 
     tags = await tag_repository.get_all(ids=command.tag_ids)
-    dataset.update(**command.dict(exclude={"id", "tag_ids"}), tags=tags)
+    dataset.update(
+        **command.dict(exclude={"id", "tag_ids", "extra_field_values"}),
+        tags=tags,
+        extra_field_values=command.extra_field_values,
+    )
 
     await repository.update(dataset)
 

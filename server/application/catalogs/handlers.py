@@ -32,6 +32,7 @@ async def create_catalog(command: CreateCatalog) -> Siret:
 
     catalog = Catalog(
         organization_siret=siret,
+        extra_fields=command.extra_fields,
     )
 
     return await repository.insert(catalog)

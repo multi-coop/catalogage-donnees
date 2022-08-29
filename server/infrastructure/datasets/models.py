@@ -1,5 +1,5 @@
 import uuid
-from typing import List
+from typing import TYPE_CHECKING, List
 
 from sqlalchemy import (
     Column,
@@ -20,6 +20,9 @@ from server.domain.datasets.entities import DataFormat, UpdateFrequency
 from ..catalog_records.repositories import CatalogRecordModel
 from ..database import Base, mapper_registry
 from ..tags.repositories import TagModel, dataset_tag
+
+if TYPE_CHECKING:  # pragma: no cover
+    from ..catalogs.models import ExtraFieldValueModel
 
 # Association table
 # See: https://docs.sqlalchemy.org/en/14/orm/basic_relationships.html#many-to-many
@@ -79,6 +82,9 @@ class DatasetModel(Base):
     license = Column(String)
     tags: List["TagModel"] = relationship(
         "TagModel", back_populates="datasets", secondary=dataset_tag
+    )
+    extra_field_values: List["ExtraFieldValueModel"] = relationship(
+        "ExtraFieldValueModel", cascade="all, delete-orphan", back_populates="dataset"
     )
 
     search_tsv: Mapped[str] = Column(

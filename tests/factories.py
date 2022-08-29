@@ -66,12 +66,14 @@ class CreateDatasetFactory(Factory[CreateDataset]):
     url = Use(lambda: fake.url() if random.random() < 0.5 else None)
     license = Use(random.choice, [None, *BUILTIN_LICENSE_SUGGESTIONS])
     tag_ids = Use(lambda: [])
+    extra_field_values = Use(lambda: [])
 
 
 class UpdateDatasetFactory(Factory[UpdateDataset]):
     __model__ = UpdateDataset
 
     tag_ids = Use(lambda: [])
+    extra_field_values = Use(lambda: [])
 
 
 class CreateOrganizationFactory(Factory[CreateOrganization]):

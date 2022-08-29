@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from pydantic import Field
 
+from server.domain.catalogs.entities import ExtraFieldValue
 from server.domain.tags.entities import Tag
 from server.seedwork.domain.entities import Entity
 
@@ -45,6 +46,7 @@ class Dataset(Entity):
     url: Optional[str] = None
     license: Optional[str] = None
     tags: List[Tag] = Field(default_factory=list)
+    extra_field_values: List[ExtraFieldValue] = Field(default_factory=list)
 
     class Config:
         orm_mode = True
@@ -64,6 +66,7 @@ class Dataset(Entity):
         url: Optional[str],
         license: Optional[str],
         tags: List[Tag],
+        extra_field_values: List[ExtraFieldValue],
     ) -> None:
         self.title = title
         self.description = description
@@ -78,3 +81,4 @@ class Dataset(Entity):
         self.url = url
         self.license = license
         self.tags = tags
+        self.extra_field_values = extra_field_values

@@ -1,8 +1,8 @@
 from typing import Optional
 
-from server.domain.organizations.types import Siret
 from server.seedwork.domain.repositories import Repository
 
+from ..organizations.types import Siret
 from .entities import Catalog
 
 

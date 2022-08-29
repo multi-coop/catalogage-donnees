@@ -54,6 +54,7 @@ class SqlDatasetRepository(DatasetRepository):
                 contains_eager(DatasetModel.catalog_record),
                 selectinload(DatasetModel.formats),
                 selectinload(DatasetModel.tags),
+                selectinload(DatasetModel.extra_field_values),
             )
         )
         result = await session.execute(stmt)

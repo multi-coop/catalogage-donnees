@@ -4,6 +4,7 @@ from typing import List, Optional
 from fastapi import Query
 from pydantic import BaseModel, EmailStr, Field
 
+from server.api.catalogs.schemas import ExtraFieldValueCreate
 from server.application.datasets.validation import (
     CreateDatasetValidationMixin,
     UpdateDatasetValidationMixin,
@@ -50,6 +51,7 @@ class DatasetCreate(CreateDatasetValidationMixin, BaseModel):
     url: Optional[str] = None
     license: Optional[str] = None
     tag_ids: List[ID] = Field(default_factory=list)
+    extra_field_values: List[ExtraFieldValueCreate] = Field(default_factory=list)
 
 
 class DatasetUpdate(UpdateDatasetValidationMixin, BaseModel):
@@ -66,3 +68,4 @@ class DatasetUpdate(UpdateDatasetValidationMixin, BaseModel):
     url: Optional[str] = Field(...)
     license: Optional[str] = Field(...)
     tag_ids: List[ID]
+    extra_field_values: List[ExtraFieldValueCreate] = Field(default_factory=list)
