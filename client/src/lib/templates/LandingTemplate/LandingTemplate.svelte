@@ -4,6 +4,10 @@
   import books from "$lib/assets/books-circle.svg";
   import flowChart from "$lib/assets/registration_flow_chart.svg";
   import { getApiUrl } from "src/lib/fetch";
+
+  const triggerDataPassLoginFlow = async () => {
+    await goto(`${getApiUrl()}/auth/datapass/login/`);
+  };
 </script>
 
 <section class="banner fr-py-8w">
@@ -23,20 +27,17 @@
 
           <div class="button-container">
             <button
-              on:click={async () =>
-                await goto(`${getApiUrl()}/auth/datapass/login/`)}
+              on:click={triggerDataPassLoginFlow}
               class="fr-btn fr-icon-logout-box-r-line fr-btn--icon-right"
-              aria-label="vers se connecter via Datapass"
+              aria-label="Se connecter via Datapass"
             >
               Se connecter
             </button>
 
             <button
               class="fr-btn fr-btn--secondary fr-icon-user-add-line fr-btn--icon-right"
-              on:click={async () =>
-                await goto(`${getApiUrl()}/auth/datapass/login/`)}
-              aria-label="vers s'inscrire via Datapass"
-              href={`${getApiUrl()}/auth/datapass/login/`}
+              on:click={triggerDataPassLoginFlow}
+              aria-label="S'inscrire via Datapass"
             >
               S'inscrire
             </button>

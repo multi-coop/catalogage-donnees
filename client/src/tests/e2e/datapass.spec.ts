@@ -1,6 +1,9 @@
-import { test } from "../fixtures";
-test.describe("Landing Page", () => {
-  test("Visits the home page without being logged in", async ({ page }) => {
+import { test } from "./fixtures";
+
+test.describe("Datapass", () => {
+  test("A user tried to log in but no organization has been found", async ({
+    page,
+  }) => {
     await page.goto("/auth/datapass/create-organization");
 
     await page
