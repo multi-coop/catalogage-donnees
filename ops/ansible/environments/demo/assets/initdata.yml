@@ -20,7 +20,7 @@ tags:
     params:
       name: services
 
-  - id: "9c1549a5-02ef-43a9-aa20-6babdce0b733"
+  - id: "5704a436-a4fe-440d-a67c-9e87a8b38045"
     params:
       name: population
 
@@ -73,11 +73,32 @@ datasets:
       formats:
         - file_tabular
       technical_source: Système d'information central du CROUS
-      producer_email: service@example.org
-      contact_emails: []
+      producer_email: null
+      contact_emails: [crous.person@mydomain.org]
       update_frequency: null
       last_updated_at: null
       url: "https://www.data.gouv.fr/fr/datasets/ensemble-des-lieux-de-restauration-des-crous-france-entiere-1/"
+      license: Autre (Open)
+      tag_ids:
+        - "ceb19363-1681-4052-813c-f771d4459295"
+
+  - # Mimicks: https://www.data.gouv.fr/fr/datasets/restaurants-brasseries-et-cafeterias-des-crous/
+    id: "3707e03b-d020-4a14-bb85-1ad0545b1578"
+    params:
+      title: Restaurants, brasseries et cafétérias des CROUS
+      description: |
+        Par région, les ressources ci-dessous recensent les restaurants, brasseries et cafétérias dans le réseau des CROUS.
+      service: Direction des données du CROUS
+      geographical_coverage: Monde # Fake, for E2E testing purposes
+      formats:
+        - file_tabular
+      technical_source: Système d'information central du CROUS
+      producer_email: null
+      contact_emails: [crous.person@mydomain.org]
+      update_frequency: null
+      last_updated_at: null
+      url: "https://www.data.gouv.fr/fr/datasets/ensemble-des-lieux-de-restauration-des-crous-france-entiere-1/"
+      license: Licence Ouverte
       tag_ids:
         - "ceb19363-1681-4052-813c-f771d4459295"
 
@@ -97,6 +118,7 @@ datasets:
       update_frequency: null
       last_updated_at: null
       url: "https://www.data.gouv.fr/fr/datasets/catalogue-des-enquetes-realisees-par-la-dares-2012-572205/"
+      license: Licence Ouverte
       tag_ids: []
 organizations:
   - params:
