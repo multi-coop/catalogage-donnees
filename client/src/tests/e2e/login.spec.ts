@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { TEST_EMAIL } from "./constants";
+import { TEST_EMAIL, TEST_PASSWORD } from "./constants";
 import { test } from "./fixtures";
 
 test.describe("Login", () => {
@@ -21,8 +21,8 @@ test.describe("Login", () => {
     expect(await email.inputValue()).toBe(TEST_EMAIL);
 
     const password = page.locator("form [name=password]");
-    await password.fill("demo");
-    expect(await password.inputValue()).toBe("demo");
+    await password.fill(TEST_PASSWORD);
+    expect(await password.inputValue()).toBe(TEST_PASSWORD);
 
     const button = page.locator("button[type='submit']");
     const [request, response] = await Promise.all([
