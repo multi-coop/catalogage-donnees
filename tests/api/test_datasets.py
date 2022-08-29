@@ -391,7 +391,7 @@ class TestDatasetUpdate:
             "url",
             "license",
             "tag_ids",
-            "extra_field_values",
+            # extra_field_values -- empty OK until frontend is implemented
         ]
         errors = response.json()["detail"]
         assert len(errors) == len(fields)

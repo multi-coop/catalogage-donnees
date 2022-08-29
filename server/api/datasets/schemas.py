@@ -68,4 +68,4 @@ class DatasetUpdate(UpdateDatasetValidationMixin, BaseModel):
     url: Optional[str] = Field(...)
     license: Optional[str] = Field(...)
     tag_ids: List[ID]
-    extra_field_values: List[ExtraFieldValueCreate]
+    extra_field_values: List[ExtraFieldValueCreate] = Field(default_factory=list)
