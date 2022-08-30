@@ -6,9 +6,11 @@ test.describe("Login", () => {
   test("Redirects unauthenticated visits to login page", async ({ page }) => {
     await page.goto("/fiches/search");
     await page
-      .locator("text='Bienvenue sur votre outil de catalogage de données'")
+      .locator(
+        "text='Bienvenue sur le service de catalogage de données de l’État'"
+      )
       .waitFor();
-    await expect(page).toHaveURL("/login");
+    await expect(page).toHaveURL("/");
   });
 
   test("Logs in", async ({ page }) => {
@@ -66,6 +68,6 @@ test.describe("Login", () => {
 
     const exampleProtectedPage = "/contribuer";
     await page.goto(exampleProtectedPage);
-    await page.waitForURL("/login");
+    await page.waitForURL("/");
   });
 });
