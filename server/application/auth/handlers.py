@@ -53,6 +53,8 @@ async def create_password_user(
         api_token=api_token,
     )
 
+    await account_repository.insert(account)
+
     password_user = PasswordUser(
         account_id=account.id,
         account=account,
@@ -102,6 +104,7 @@ async def create_datapass_user(command: CreateDataPassUser) -> ID:
             role=UserRole.USER,
             api_token=generate_api_token(),
         )
+        await account_repository.insert(account)
 
     datapass_user = await datapass_user_repository.get_by_email(email)
 

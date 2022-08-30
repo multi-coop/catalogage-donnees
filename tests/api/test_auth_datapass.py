@@ -9,12 +9,12 @@ from starlette.requests import Request
 import server.config.di
 from server.config.di import configure, resolve
 from server.domain.auth.entities import UserRole
-from server.domain.auth.repositories import DataPassUserRepository
+from server.domain.auth.repositories import AccountRepository, DataPassUserRepository
 from server.infrastructure.auth.datapass import DataPassOpenIDClient, DataPassUserInfo
 from server.infrastructure.database import Database
 from server.seedwork.application.di import Container
 from server.seedwork.application.messages import MessageBus
-from tests.factories import CreateOrganizationFactory
+from tests.factories import CreateOrganizationFactory, CreatePasswordUserFactory
 
 
 @pytest.mark.asyncio
@@ -165,3 +165,32 @@ class TestCallback:
             assert location.params["email"] == "johndoe@mydomain.org"
             assert location.params["role"] == "USER"
             assert location.params["api_token"] == user.account.api_token
+
+    async def test_existing_password_user_reuses_account(
+        self, client: httpx.AsyncClient, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        bus = resolve(MessageBus)
+
+        email = "johndoe@mydomain.org"
+        siret = "11122233344441"
+
+        userinfo: DataPassUserInfo = {
+            "email": email,
+            "organizations": [{"siret": siret, "label": "Organization 1"}],
+        }
+
+        async with self._mock_openid_client(monkeypatch, userinfo):
+            await bus.execute(CreateOrganizationFactory.build(siret=siret))
+            await bus.execute(
+                CreatePasswordUserFactory.build(organization_siret=siret, email=email)
+            )
+            account_repository = resolve(AccountRepository)
+            existing_account = await account_repository.get_by_email(email)
+
+            response = await client.get("/auth/datapass/callback/")
+            assert response.status_code == 307
+
+            datapass_user_repository = resolve(DataPassUserRepository)
+            user = await datapass_user_repository.get_by_email("johndoe@mydomain.org")
+            assert user is not None
+            assert user.account == existing_account

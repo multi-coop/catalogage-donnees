@@ -16,6 +16,9 @@ class AccountRepository(Repository):
     async def get_by_api_token(self, api_token: str) -> Optional[Account]:
         raise NotImplementedError  # pragma: no cover
 
+    async def insert(self, account: Account) -> ID:
+        raise NotImplementedError  # pragma: no cover
+
 
 class PasswordUserRepository(Repository):
     async def get_by_email(self, email: str) -> Optional[PasswordUser]:
