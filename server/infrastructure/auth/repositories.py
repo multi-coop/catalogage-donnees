@@ -54,6 +54,16 @@ class SqlAccountRepository(AccountRepository):
                 return None
             return make_account_entity(instance)
 
+    async def insert(self, account: Account) -> ID:
+        async with self._db.session() as session:
+            instance = make_account_instance(account)
+            session.add(instance)
+
+            await session.commit()
+            await session.refresh(instance)
+
+            return ID(instance.id)
+
 
 class SqlPasswordUserRepository(PasswordUserRepository):
     def __init__(self, db: Database) -> None:
@@ -85,9 +95,6 @@ class SqlPasswordUserRepository(PasswordUserRepository):
 
     async def insert(self, entity: PasswordUser) -> ID:
         async with self._db.session() as session:
-            account_instance = make_account_instance(entity.account)
-            session.add(account_instance)
-
             instance = make_password_user_instance(entity)
             session.add(instance)
 
@@ -145,9 +152,6 @@ class SqlDataPassUserRepository(DataPassUserRepository):
 
     async def insert(self, entity: DataPassUser) -> ID:
         async with self._db.session() as session:
-            account_instance = make_account_instance(entity.account)
-            session.add(account_instance)
-
             instance = make_datapass_user_instance(entity)
             session.add(instance)
 
