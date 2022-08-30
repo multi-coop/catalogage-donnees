@@ -57,7 +57,7 @@
 
           <p>
             Nous ne pouvons vous connecter au site actuellement. Merci de
-            contacter l'administrateur du site
+            contacter l'administrateur du site.
           </p>
         </div>
       </div>
