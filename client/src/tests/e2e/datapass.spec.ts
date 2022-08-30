@@ -1,3 +1,4 @@
+import { TEST_EMAIL } from "./constants";
 import { test } from "./fixtures";
 
 test.describe("Datapass", () => {
@@ -11,5 +12,13 @@ test.describe("Datapass", () => {
         "text=Votre compte n’est associé à aucune organisation enregistrée..."
       )
       .waitFor();
+  });
+
+  test("A user can log in with datapass", async ({ page, apiToken }) => {
+    await page.goto(
+      `/auth/datapass/login?role=USER&api_token=${apiToken}&email=${TEST_EMAIL}`
+    );
+
+    await page.locator("text='Recherchez un jeu de données'").waitFor();
   });
 });

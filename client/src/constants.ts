@@ -5,6 +5,7 @@ export const PUBLIC_PAGES = [
   "/login",
   "/",
   "/auth/datapass/create-organization",
+  "/auth/datapass/login",
 ];
 
 export const DATA_FORMAT_LABELS: { [K in DataFormat]: string } = {

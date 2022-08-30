@@ -1,7 +1,7 @@
 import { test as base, expect, type APIRequestContext } from "@playwright/test";
 import type { Dataset } from "src/definitions/datasets";
 import { toPayload } from "src/lib/transformers/dataset";
-import { ADMIN_EMAIL } from "./constants";
+import { ADMIN_EMAIL, TEST_EMAIL, TEST_PASSWORD } from "./constants";
 
 /**
  * These fixtures allow simplifying setup/teardown logic in tests,
@@ -17,6 +17,7 @@ type AppOptions = {
 type AppFixtures = {
   apiContext: APIRequestContext;
   adminApiToken: string;
+  apiToken: string;
   dataset: Dataset;
 };
 
@@ -24,7 +25,6 @@ export type AppTestArgs = AppOptions & AppFixtures;
 
 export const test = base.extend<AppTestArgs>({
   adminTestPassword: ["admin", { option: true }],
-
   apiContext: async ({ playwright }, use) => {
     const baseURL = "http://localhost:3579";
     const apiContext = await playwright.request.newContext({ baseURL });
@@ -36,6 +36,17 @@ export const test = base.extend<AppTestArgs>({
     const data = {
       email: ADMIN_EMAIL,
       password: adminTestPassword,
+    };
+    const response = await apiContext.post("/auth/login/", { data });
+    expect(response.ok()).toBeTruthy();
+    const { api_token: apiToken } = await response.json();
+    await use(apiToken);
+  },
+
+  apiToken: async ({ apiContext }, use) => {
+    const data = {
+      email: TEST_EMAIL,
+      password: TEST_PASSWORD,
     };
     const response = await apiContext.post("/auth/login/", { data });
     expect(response.ok()).toBeTruthy();
