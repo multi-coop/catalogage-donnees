@@ -1,7 +1,9 @@
 import argon2
+import itsdangerous
 from pydantic import SecretStr
 
-from server.application.auth.passwords import PasswordEncoder
+from server.application.auth.passwords import PasswordEncoder, Signer
+from server.config.settings import Settings
 
 
 class Argon2PasswordEncoder(PasswordEncoder):
@@ -18,3 +20,14 @@ class Argon2PasswordEncoder(PasswordEncoder):
             return False
         except argon2.exceptions.InvalidHash:
             return False
+
+
+class ItsDangerousSigner(Signer):
+    def __init__(self, settings: Settings) -> None:
+        self._signer = itsdangerous.TimestampSigner(settings.secret_key)
+
+    def sign(self, value: str) -> bytes:
+        return self._signer.sign(value)
+
+    def verify(self, data: bytes) -> bool:
+        return self._signer.validate(data)

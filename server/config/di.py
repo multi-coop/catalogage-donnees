@@ -60,7 +60,7 @@ Or in any custom scripts as seems fit.
 """
 from typing import Type, TypeVar
 
-from server.application.auth.passwords import PasswordEncoder
+from server.application.auth.passwords import PasswordEncoder, Signer
 from server.domain.auth.repositories import (
     AccountRepository,
     DataPassUserRepository,
@@ -76,7 +76,10 @@ from server.infrastructure.auth.datapass import (
     DataPassOpenIDClient,
     get_datapass_openid_client,
 )
-from server.infrastructure.auth.passwords import Argon2PasswordEncoder
+from server.infrastructure.auth.passwords import (
+    Argon2PasswordEncoder,
+    ItsDangerousSigner,
+)
 from server.infrastructure.auth.repositories import (
     SqlAccountRepository,
     SqlDataPassUserRepository,
@@ -122,6 +125,7 @@ def configure(container: "Container") -> None:
 
     # Auth services
     container.register_instance(PasswordEncoder, Argon2PasswordEncoder())
+    container.register_instance(Signer, ItsDangerousSigner(settings))
     container.register_instance(
         DataPassOpenIDClient, get_datapass_openid_client(settings)
     )

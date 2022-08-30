@@ -1,6 +1,7 @@
 import functools
 import inspect
 import logging
+import secrets
 from typing import Any, Callable, List, cast
 
 import fastapi.params
@@ -8,6 +9,7 @@ from fastapi import Depends, HTTPException
 from fastapi.security.api_key import APIKeyHeader
 from fastapi.security.base import SecurityBase
 
+from server.application.auth.passwords import Signer
 from server.config import Settings
 from server.config.di import resolve
 from server.domain.auth.entities import UserRole
@@ -233,6 +235,44 @@ class HasAPIKey(BasePermission):
         request: APIRequest,
         _: str = Depends(
             APIKeyHeader(name="X-Api-Key", scheme_name="API Key", auto_error=False)
+        ),  # For OpenAPI docs.
+    ) -> None:
+        super().__call__(request)
+
+
+class HasSignedToken(BasePermission):
+    """
+    Require an `X-Signed-Token` header containing a valid signed token previously
+    emitted by the server.
+
+    A valid signature is hard to guess, so this simplified scheme (e.g. no expiration
+    mechanism) prevents requests from clients that have not been provided with such a
+    signed token.
+    """
+
+    @classmethod
+    def make_signed_token(cls) -> str:
+        signer = resolve(Signer)
+        return signer.sign(secrets.token_hex(32)).decode("utf-8")
+
+    def has_permission(self, request: APIRequest) -> bool:
+        signer = resolve(Signer)
+
+        data = request.headers.get("X-Signed-Token")
+
+        if data is None:
+            logger.info("[HasSignedToken]: no X-Signed-Token header")
+            return False
+
+        return signer.verify(data)
+
+    def __call__(
+        self,
+        request: APIRequest,
+        _: str = Depends(
+            APIKeyHeader(
+                name="X-Signed-Token", scheme_name="Signed Token", auto_error=False
+            )
         ),  # For OpenAPI docs.
     ) -> None:
         super().__call__(request)

@@ -5,7 +5,7 @@ authlib==1.0.1
 alembic==1.8.0
 fastapi==0.78.0
 gunicorn==20.1.0
-itsdangerous==2.1.2  # Starlette SessionMiddleware
+itsdangerous==2.1.2
 punq==0.6.2
 pydantic[email]==1.9.0
 python-json-logger==2.0.2

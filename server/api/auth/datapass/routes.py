@@ -6,7 +6,7 @@ See: https://github.com/betagouv/api-auth
 import json
 from textwrap import dedent
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import EmailStr
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, Response
@@ -14,12 +14,16 @@ from starlette.responses import RedirectResponse, Response
 from server.api.utils.urls import get_client_root_url
 from server.application.auth.commands import CreateDataPassUser
 from server.application.auth.queries import LoginDataPassUser
+from server.application.auth.views import AuthenticatedAccountView
 from server.config.di import resolve
-from server.domain.auth.exceptions import LoginFailed
+from server.domain.auth.exceptions import DataPassUserAlreadyExists, LoginFailed
 from server.domain.organizations.repositories import OrganizationRepository
 from server.domain.organizations.types import Siret
 from server.infrastructure.auth.datapass import DataPassOpenIDClient
 from server.seedwork.application.messages import MessageBus
+
+from ..permissions import HasSignedToken
+from .schemas import DataPassUserCreate
 
 router = APIRouter(prefix="/datapass")
 
@@ -98,19 +102,27 @@ async def login(request: Request) -> Response:
                 If the user's DataPass organizations match with 2 or more known
                 organizations.
 
-                The user should be prompted to pick one of those.
+                The user should be prompted to pick one of those. The client may then
+                call [`POST /auth/datapass/users/`](#/auth/register_datapass_user_auth_datapass_users__post)  <!-- # noqa -->
+                to finalize registration.
 
                 #### Redirected URL query parameters
 
-                * `organizations`: a URL-encoded JSON object containing a list
-                  of organizations represented as:
+                * `token`: an opaque token to send back to the server
+                  when creating the `DataPassUser`.
+                * `info`: an URL-encoded JSON object with the following format:
 
-                    ```json
-                    {
+                  ```json
+                  {
+                    "email": "string($email)",
+                    "organizations": [
+                      {
                         "siret": "string($siret)",
                         "name": "string"
-                    }
-                    ```
+                      }
+                    ]
+                  }
+                  ```
                 """
             )
         }
@@ -155,13 +167,18 @@ async def callback(request: Request) -> Response:
         if len(their_organizations_here) > 1:
             # More than one of the user's organizations is registered in our system,
             # we need the user to pick one.
-            choices = [
+            organization_choices = [
                 {"siret": org["siret"], "name": org["label"]}
                 for org in their_organizations_here
             ]
+            info = {
+                "email": email,
+                "organizations": organization_choices,
+            }
+            signed_token = HasSignedToken.make_signed_token()
             url = get_client_root_url()
             url = url.replace(path="/auth/datapass/pick-organization")
-            url = url.include_query_params(organizations=json.dumps(choices))
+            url = url.include_query_params(info=json.dumps(info), token=signed_token)
             return RedirectResponse(url, status_code=307)
 
         organization_siret = Siret(their_organizations_here[0]["siret"])
@@ -188,3 +205,22 @@ async def callback(request: Request) -> Response:
     )
 
     return RedirectResponse(url, status_code=307)
+
+
+@router.post("/users/", status_code=201, dependencies=[Depends(HasSignedToken())])
+async def register_datapass_user(
+    data: DataPassUserCreate,
+) -> AuthenticatedAccountView:
+    bus = resolve(MessageBus)
+
+    command = CreateDataPassUser(
+        organization_siret=data.organization_siret,
+        email=data.email,
+    )
+
+    try:
+        await bus.execute(command)
+    except DataPassUserAlreadyExists as exc:
+        raise HTTPException(400, detail=str(exc))
+
+    return await bus.execute(LoginDataPassUser(email=data.email))

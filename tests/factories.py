@@ -7,7 +7,7 @@ from faker.providers import BaseProvider
 from pydantic import BaseModel
 from pydantic_factories import ModelFactory, Use
 
-from server.application.auth.commands import CreatePasswordUser
+from server.application.auth.commands import CreateDataPassUser, CreatePasswordUser
 from server.application.datasets.commands import CreateDataset, UpdateDataset
 from server.application.organizations.commands import CreateOrganization
 from server.application.tags.commands import CreateTag
@@ -42,6 +42,10 @@ class CreatePasswordUserFactory(Factory[CreatePasswordUser]):
     __model__ = CreatePasswordUser
 
     organization_siret = Use(lambda: LEGACY_ORGANIZATION_SIRET)
+
+
+class CreateDataPassUserFactory(Factory[CreateDataPassUser]):
+    __model__ = CreateDataPassUser
 
 
 class CreateTagFactory(Factory[CreateTag]):
