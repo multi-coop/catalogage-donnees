@@ -3,6 +3,7 @@ import type {
   DatasetCreateData,
   DatasetUpdateData,
 } from "src/definitions/datasets";
+import { omit } from "../util/object";
 
 export const camelToUnderscore = (key: string): string => {
   return key.replace(/([A-Z])/g, "_$1").toLowerCase();
@@ -22,7 +23,17 @@ export const transformKeysToUnderscoreCase = (object: {
 export const toPayload = (
   data: DatasetCreateData | DatasetUpdateData
 ): { [K: string]: unknown } => {
-  return transformKeysToUnderscoreCase(data);
+  const extra_field_values = (data.extraFieldValues || []).map(
+    ({ extraFieldId, value }) => ({
+      extra_field_id: extraFieldId,
+      value,
+    })
+  );
+
+  return {
+    ...transformKeysToUnderscoreCase(omit(data, ["extraFieldValues"])),
+    extra_field_values,
+  };
 };
 
 export const toDataset = (item: any): Dataset => {
@@ -35,6 +46,7 @@ export const toDataset = (item: any): Dataset => {
     geographical_coverage,
     technical_source,
     url,
+    extra_field_values,
     ...rest
   } = item;
   const { created_at, organization } = catalog_record;
@@ -51,5 +63,9 @@ export const toDataset = (item: any): Dataset => {
     technicalSource: technical_source,
     lastUpdatedAt: last_updated_at ? new Date(last_updated_at) : null,
     url,
+    extraFieldValues: extra_field_values.map(({ extra_field_id, value }) => ({
+      extraFieldId: extra_field_id,
+      value,
+    })),
   };
 };

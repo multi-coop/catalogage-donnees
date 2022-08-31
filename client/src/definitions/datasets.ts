@@ -1,4 +1,5 @@
 import type { Maybe } from "$lib/util/maybe";
+import type { ExtraFieldValue } from "./catalogs";
 import type { CatalogRecord } from "./catalog_records";
 import type { Tag } from "./tag";
 
@@ -41,6 +42,7 @@ export type Dataset = {
   url: string | null;
   license: string | null;
   tags: Tag[];
+  extraFieldValues: ExtraFieldValue[];
 };
 
 export type DatasetFormInitial = Omit<Dataset, "id">;

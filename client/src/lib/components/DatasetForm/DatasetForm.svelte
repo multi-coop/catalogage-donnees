@@ -4,6 +4,7 @@
   import { createForm } from "svelte-forms-lib";
   import type {
     DataFormat,
+    Dataset,
     DatasetFormData,
     DatasetFormInitial,
     UpdateFrequency,
@@ -23,6 +24,7 @@
   import { Maybe } from "$lib/util/maybe";
   import TagSelector from "../TagSelector/TagSelector.svelte";
   import LicenseField from "./_LicenseField.svelte";
+  import type { ExtraFieldValue } from "src/definitions/catalogs";
 
   export let submitLabel = "Publier la fiche de données";
   export let loadingLabel = "Publication en cours...";
@@ -51,6 +53,7 @@
     url: string | null;
     license: string;
     tags: Tag[];
+    extraFieldValues: ExtraFieldValue[];
   };
 
   const dataFormatChoices = Object.entries(DATA_FORMAT_LABELS).map(
@@ -78,6 +81,7 @@
     url: initial?.url || null,
     license: initial?.license || "",
     tags: initial?.tags || [],
+    extraFieldValues: initial?.extraFieldValues || [],
   };
 
   // Handle this value manually.
@@ -119,6 +123,13 @@
             })
           )
           .min(1, "Veuillez séléctionner au moins 1 mot-clé"),
+        extraFieldValues: yup
+          .array()
+          .of(
+            yup
+              .object()
+              .shape({ extraFieldId: yup.string(), value: yup.string() })
+          ),
       }),
       onSubmit: (values: DatasetFormValues) => {
         const formats = values.dataFormats
