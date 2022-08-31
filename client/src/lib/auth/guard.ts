@@ -1,7 +1,7 @@
 import { get } from "svelte/store";
 import type { LoadOutput } from "@sveltejs/kit";
 import { user } from "../stores/auth";
-import { STATIC_PAGES } from "src/constants";
+import { NON_AUTH_GUARDED_PAGES } from "src/constants";
 import { Maybe } from "$lib/util/maybe";
 
 /**
@@ -9,7 +9,7 @@ import { Maybe } from "$lib/util/maybe";
  * is attempting to access a protected page.
  */
 export const authGuard = (url: URL): LoadOutput => {
-  if (STATIC_PAGES.includes(url.pathname)) {
+  if (NON_AUTH_GUARDED_PAGES.includes(url.pathname)) {
     return {};
   }
 
