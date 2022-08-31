@@ -120,10 +120,10 @@ async def test_repo_initdata(
         "TOOLS_PASSWORDS", json.dumps({"admin@catalogue.data.gouv.fr": "test"})
     )
 
-    num_users = 2
+    num_users = 3
     num_tags = 7
     num_datasets = 4
-    num_organizations = 1
+    num_organizations = 2
     num_catalogs = 1
     num_entities = (
         num_users + num_tags + num_datasets + num_catalogs + num_organizations

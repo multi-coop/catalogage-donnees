@@ -7,10 +7,18 @@ type DatapassUserPayload = {
   token: string;
 };
 
+type CreatedDatapassUserResponse = {
+  id: string;
+  siret: string;
+  email: string;
+  role: string;
+  apiToken: string;
+};
+
 type CreateDatapassUser = (opts: {
   fetch: Fetch;
   data: DatapassUserPayload;
-}) => Promise<void>;
+}) => Promise<CreatedDatapassUserResponse>;
 
 export const createDatapassUser: CreateDatapassUser = async ({
   fetch,
@@ -29,4 +37,14 @@ export const createDatapassUser: CreateDatapassUser = async ({
   if (!response.ok) {
     throw new Error("unable to create the datapass user");
   }
+
+  const data = await response.json();
+
+  return {
+    apiToken: data.api_token,
+    siret: data.organization_siret,
+    role: data.role,
+    email: data.email,
+    id: data.id,
+  };
 };

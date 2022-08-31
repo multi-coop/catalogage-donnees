@@ -1,10 +1,14 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
+
   import { page } from "$app/stores";
 
   import padlock from "$lib/assets/padlock.svg";
+  import type { UserRole } from "src/definitions/auth";
   import type { Organization } from "src/definitions/organization";
   import Spinner from "src/lib/components/Spinner/Spinner.svelte";
   import { createDatapassUser } from "src/lib/repositories/datapass";
+  import { login } from "src/lib/stores/auth";
   import { onMount } from "svelte";
 
   let hasError = false;
@@ -55,7 +59,15 @@
     loading = true;
 
     try {
-      await createDatapassUser({ fetch, data: { siret, email, token } });
+      const { role, apiToken } = await createDatapassUser({
+        fetch,
+        data: { siret, email, token },
+      });
+
+      const user = { role: role as UserRole, apiToken, email };
+      login(user);
+
+      await goto("/");
     } catch (error) {
       errorWhenCreatingDatapassUser = true;
     } finally {
@@ -78,7 +90,7 @@
 
         {#if hasError}
           <div>
-            <h3>Nous n'arrivons pas à retrouver vous informations ...</h3>
+            <h3>Nous n'arrivons pas à retrouver vos informations ...</h3>
 
             <p>
               Nous sommes actuellement dans l'incapacité de retrouver les

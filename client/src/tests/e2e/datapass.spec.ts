@@ -1,6 +1,6 @@
 import { TEST_EMAIL } from "./constants.js";
 import { test } from "./fixtures.js";
-
+import { expect } from "@playwright/test";
 test.describe("Datapass", () => {
   test("A user tried to log in but no organization has been found", async ({
     page,
@@ -22,7 +22,7 @@ test.describe("Datapass", () => {
     await page.locator("text='Recherchez un jeu de données'").waitFor();
   });
 
-  test("A user can NOT pick the organization he wants to be linked with -- bad token case", async ({
+  test("A user can NOT pick the organization he wants to be linked with -- invalid token case", async ({
     page,
   }) => {
     const token = "not-valid";
@@ -45,7 +45,17 @@ test.describe("Datapass", () => {
       .locator("text=Votre compte peut être associé à plusieurs organisations.")
       .waitFor();
     await page.locator("text=Ministère de la culture").check();
-    await page.locator("text=Associer mon compte").click();
+
+    const button = await page.locator("text=Associer mon compte");
+
+    const [request, response] = await Promise.all([
+      page.waitForRequest("**/auth/datapass/users/"),
+      page.waitForResponse("**/auth/datapass/users/"),
+      button.click(),
+    ]);
+
+    expect(request.method()).toBe("POST");
+    expect(response.status()).toBe(403);
 
     await page
       .locator("text=Nous n'arrivons pas à créer votre compte.")
@@ -67,7 +77,7 @@ test.describe("Datapass", () => {
     );
 
     await page
-      .locator("text=Nous n'arrivons pas à retrouver vous informations ...")
+      .locator("text=Nous n'arrivons pas à retrouver vos informations ...")
       .waitFor();
   });
 });
