@@ -22,6 +22,7 @@ const config = {
     csp: {
       directives: {
         "default-src": ["self"],
+        "manifest-src": ["self", "data:"],
         "connect-src":
           // Allow XHR requests to API during local development
           VITE_SERVER_MODE === "live" ? undefined : ["self", "localhost:3579"],
