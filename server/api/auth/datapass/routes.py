@@ -109,7 +109,8 @@ async def login(request: Request) -> Response:
                 #### Redirected URL query parameters
 
                 * `token`: an opaque token to send back to the server
-                  when creating the `DataPassUser`.
+                  when creating the `DataPassUser`. 
+                  This token must be added in in the `X-Signed-Token` request header
                 * `info`: an URL-encoded JSON object with the following format:
 
                   ```json

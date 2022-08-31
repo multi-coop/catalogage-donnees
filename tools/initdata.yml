@@ -1,7 +1,10 @@
-organizations:
+t rorganizations:
   - params:
       name: "Ministère de la Culture"
       siret: "11004601800013"
+  - params:
+      name: "Ministère de la Santé"
+      siret: "13001653800014"
 
 catalogs:
   - params:
