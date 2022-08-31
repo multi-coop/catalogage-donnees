@@ -6,6 +6,8 @@ export const STATIC_PAGES = [
   "/auth/datapass/login",
 ];
 
+export const NON_AUTH_GUARDED_PAGES = [...STATIC_PAGES, "/"];
+
 export const DATA_FORMAT_LABELS: { [K in DataFormat]: string } = {
   file_tabular: "Fichier tabulaire (XLS, XLSX, CSV, ...)",
   file_gis: "Fichier SIG (Shapefile, ...)",
