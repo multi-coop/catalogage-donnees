@@ -71,4 +71,3 @@ export const getMe: GetMe = async ({ fetch, apiToken }) => {
     return toAccount(data);
   });
 };
-

@@ -1,4 +1,4 @@
 export type Organization = {
-    siret: string;
-    name: string
-}
+  siret: string;
+  name: string;
+};
