@@ -14,7 +14,13 @@ from server.infrastructure.auth.datapass import DataPassOpenIDClient, DataPassUs
 from server.infrastructure.database import Database
 from server.seedwork.application.di import Container
 from server.seedwork.application.messages import MessageBus
-from tests.factories import CreateOrganizationFactory, CreatePasswordUserFactory
+
+from ..factories import (
+    CreateDataPassUserFactory,
+    CreateOrganizationFactory,
+    CreatePasswordUserFactory,
+)
+from ..helpers import to_payload
 
 
 @pytest.mark.asyncio
@@ -95,11 +101,12 @@ class TestCallback:
     ) -> None:
         bus = resolve(MessageBus)
 
+        email = "johndoe@mydomain.org"
         siret_1 = "11122233344441"
         siret_2 = "11122233344442"
 
         userinfo: DataPassUserInfo = {
-            "email": "johndoe@mydomain.org",
+            "email": email,
             "organizations": [
                 {
                     "siret": siret_1,
@@ -120,11 +127,51 @@ class TestCallback:
             assert location.scheme == "http"
             assert location.netloc == b"client.testserver"
             assert location.path == "/auth/datapass/pick-organization"
-            orgs = json.loads(location.params["organizations"])
-            assert orgs == [
-                {"siret": siret_1, "name": "Organization 1"},
-                {"siret": siret_2, "name": "Organization 2"},
-            ]
+            info = json.loads(location.params["info"])
+            assert info == {
+                "email": email,
+                "organizations": [
+                    {"siret": siret_1, "name": "Organization 1"},
+                    {"siret": siret_2, "name": "Organization 2"},
+                ],
+            }
+
+            # Backend provides an opaque token.
+            token = location.params["token"]
+
+            # Frontend may then use this token to register the user in the chosen org.
+
+            # Without this token, request is not authorized...
+            payload = to_payload(
+                CreateDataPassUserFactory.build(organization_siret=siret_1, email=email)
+            )
+            response = await client.post("/auth/datapass/users/", json=payload)
+            assert response.status_code == 403
+            datapass_user_repository = resolve(DataPassUserRepository)
+            user = await datapass_user_repository.get_by_email(email)
+            assert user is None
+
+            # With this token, request is authorized and user is registered...
+            response = await client.post(
+                "/auth/datapass/users/",
+                json=payload,
+                headers={"X-Signed-Token": token},
+            )
+            assert response.status_code == 201
+            data = response.json()
+            assert data == {
+                "id": data["id"],
+                "organization_siret": siret_1,
+                "email": email,
+                "role": "USER",
+                "api_token": data["api_token"],
+            }
+
+            user = await datapass_user_repository.get_by_email(email)
+            assert user is not None
+            assert user.account.organization_siret == siret_1
+            assert user.account.email == email
+            assert user.account.role == UserRole.USER
 
     async def test_if_only_one_org_exists_then_creates_user_and_redirects_with_details(
         self, client: httpx.AsyncClient, monkeypatch: pytest.MonkeyPatch
