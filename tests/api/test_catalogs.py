@@ -7,7 +7,7 @@ from server.application.catalogs.commands import CreateCatalog
 from server.application.catalogs.queries import GetCatalogBySiret
 from server.application.datasets.queries import GetDatasetByID
 from server.config.di import resolve
-from server.domain.catalogs.entities import ExtraFieldType
+from server.domain.catalogs.entities import ExtraFieldType, TextExtraField
 from server.seedwork.application.messages import MessageBus
 
 from ..factories import CreateDatasetFactory, CreateOrganizationFactory
@@ -276,6 +276,47 @@ async def test_create_catalog_with_extra_fields(client: httpx.AsyncClient) -> No
 
 
 @pytest.mark.asyncio
+async def test_get_catalog(
+    client: httpx.AsyncClient, temp_user: TestPasswordUser
+) -> None:
+    bus = resolve(MessageBus)
+
+    siret = await bus.execute(CreateOrganizationFactory.build())
+    response = await client.get(f"/catalogs/{siret}/", auth=temp_user.auth)
+    assert response.status_code == 404
+
+    await bus.execute(
+        CreateCatalog(
+            organization_siret=siret,
+            extra_fields=[
+                TextExtraField(
+                    organization_siret=siret,
+                    name="domaine",
+                    title="Domaine",
+                    hint_text="Domaine associé au jeu de données",
+                )
+            ],
+        )
+    )
+    response = await client.get(f"/catalogs/{siret}/", auth=temp_user.auth)
+    assert response.status_code == 200
+    data = response.json()
+    assert data == {
+        "organization_siret": siret,
+        "extra_fields": [
+            {
+                "id": data["extra_fields"][0]["id"],
+                "type": "TEXT",
+                "name": "domaine",
+                "title": "Domaine",
+                "hint_text": "Domaine associé au jeu de données",
+                "data": {},
+            }
+        ],
+    }
+
+
+@pytest.mark.asyncio
 class TestCatalogPermissions:
     async def test_create_anonymous_forbidden(self, client: httpx.AsyncClient) -> None:
         bus = resolve(MessageBus)
@@ -294,3 +335,10 @@ class TestCatalogPermissions:
             "/catalogs/", json={"organization_siret": str(siret)}, auth=temp_user.auth
         )
         assert response.status_code == 403
+
+    async def test_get_not_authenticated(self, client: httpx.AsyncClient) -> None:
+        bus = resolve(MessageBus)
+        siret = await bus.execute(CreateOrganizationFactory.build())
+        await bus.execute(CreateCatalog(organization_siret=siret))
+        response = await client.get(f"/catalogs/{siret}/")
+        assert response.status_code == 401
