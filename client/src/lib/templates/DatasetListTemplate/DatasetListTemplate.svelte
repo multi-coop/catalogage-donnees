@@ -38,7 +38,7 @@
     <div class="fr-col-12">
       {#if Maybe.Some(paginatedDatasets)}
         <h2 class="fr-mb-3w">
-          {paginatedDatasets.totalItems} jeux de donnnées contribués
+          {paginatedDatasets.totalItems} jeux de données contribués
         </h2>
 
         <DatasetList datasets={paginatedDatasets.items} />
