@@ -24,18 +24,29 @@ describe("transformers -- dataset", () => {
   });
 
   test("toPayload", () => {
-    const dataset = getFakeDataset();
-    const result = toPayload(dataset);
+    const data = {
+      ...getFakeDataset(),
+      organizationSiret: "<siret>",
+      tagIds: [],
+    };
+    const result = toPayload(data);
     expect(Object.keys(result).every((key) => key === key.toLowerCase())).toBe(
       true
     );
   });
 
   test("toDataset", () => {
-    const dataset = toPayload(getFakeDataset());
+    const data = toPayload({
+      ...getFakeDataset(),
+      organizationSiret: "<siret>",
+      tagIds: [],
+    });
     const result = toDataset({
-      ...dataset,
-      catalog_record: { created_at: new Date().toISOString() },
+      ...data,
+      catalog_record: {
+        created_at: new Date().toISOString(),
+        organization: { name: "Fake", siret: "<siret>" },
+      },
     });
     expect(Object.keys(result).every((key) => key === key.toLowerCase())).toBe(
       false

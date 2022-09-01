@@ -1,5 +1,8 @@
-import type { Dataset } from "src/definitions/datasets";
-import { omit } from "../util/object.js";
+import type {
+  Dataset,
+  DatasetCreateData,
+  DatasetUpdateData,
+} from "src/definitions/datasets";
 
 export const camelToUnderscore = (key: string): string => {
   return key.replace(/([A-Z])/g, "_$1").toLowerCase();
@@ -17,9 +20,9 @@ export const transformKeysToUnderscoreCase = (object: {
 };
 
 export const toPayload = (
-  data: Partial<Record<keyof Dataset, any>>
+  data: DatasetCreateData | DatasetUpdateData
 ): { [K: string]: unknown } => {
-  return transformKeysToUnderscoreCase(omit(data, ["catalogRecord"]));
+  return transformKeysToUnderscoreCase(data);
 };
 
 export const toDataset = (item: any): Dataset => {
@@ -34,11 +37,12 @@ export const toDataset = (item: any): Dataset => {
     url,
     ...rest
   } = item;
-  const { created_at } = catalog_record;
+  const { created_at, organization } = catalog_record;
   return {
     ...rest,
     catalogRecord: {
       createdAt: new Date(created_at),
+      organization,
     },
     producerEmail: producer_email,
     contactEmails: contact_emails,

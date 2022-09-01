@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 
+from server.api.types import APIRequest
 from server.application.auth.commands import CreatePasswordUser, DeletePasswordUser
 from server.application.auth.queries import GetAccountByEmail, LoginPasswordUser
 from server.application.auth.views import AccountView, AuthenticatedAccountView
@@ -11,7 +12,7 @@ from server.seedwork.application.messages import MessageBus
 
 from . import datapass
 from .permissions import HasRole, IsAuthenticated
-from .schemas import CheckAuthResponse, PasswordUserCreate, PasswordUserLogin
+from .schemas import PasswordUserCreate, PasswordUserLogin
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -50,6 +51,14 @@ async def login_password_user(data: PasswordUserLogin) -> AuthenticatedAccountVi
         raise HTTPException(401, detail=str(exc))
 
 
+@router.get(
+    "/users/me/",
+    dependencies=[Depends(IsAuthenticated())],
+)
+async def get_connected_user(request: APIRequest) -> AccountView:
+    return request.user.account
+
+
 @router.delete(
     "/users/{id}/",
     dependencies=[Depends(IsAuthenticated() & HasRole(UserRole.ADMIN))],
@@ -60,8 +69,3 @@ async def delete_password_user(id: ID) -> None:
 
     command = DeletePasswordUser(account_id=id)
     await bus.execute(command)
-
-
-@router.get("/check/", dependencies=[Depends(IsAuthenticated())])
-async def check_auth() -> CheckAuthResponse:
-    return CheckAuthResponse()

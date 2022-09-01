@@ -5,6 +5,7 @@
   import type {
     DataFormat,
     DatasetFormData,
+    DatasetFormInitial,
     UpdateFrequency,
   } from "src/definitions/datasets";
   import type { Tag } from "src/definitions/tag";
@@ -30,12 +31,13 @@
   export let licenses: string[] = [];
   export let geographicalCoverages: string[] = [];
 
-  export let initial: DatasetFormData | null = null;
+  export let initial: DatasetFormInitial | null = null;
 
   const dispatch =
     createEventDispatcher<{ save: DatasetFormData; touched: boolean }>();
 
   type DatasetFormValues = {
+    organizationSiret: string;
     title: string;
     description: string;
     service: string;
@@ -56,6 +58,9 @@
   );
 
   const initialValues: DatasetFormValues = {
+    organizationSiret:
+      initial?.catalogRecord.organization.siret ||
+      Maybe.expect($account, "$account").organizationSiret,
     title: initial?.title || "",
     description: initial?.description || "",
     service: initial?.service || "",
@@ -82,6 +87,7 @@
     createForm({
       initialValues,
       validationSchema: yup.object().shape({
+        organizationSiret: yup.string().required("Ce champs est requis"),
         title: yup.string().required("Ce champ est requis"),
         description: yup.string().required("Ce champs est requis"),
         service: yup.string().required("Ce champs est requis"),
