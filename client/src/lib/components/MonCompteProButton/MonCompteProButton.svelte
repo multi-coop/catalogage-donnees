@@ -2,11 +2,15 @@
   import franceConnect from "$lib/assets/france-connect.svg";
 </script>
 
-<div class="mon-compte-pro-container">
-  <button aria-label="s'identifier avec Mon Compte Pro" on:click>
+<div>
+  <button
+    class="fr-mb-1w"
+    aria-label="s'identifier avec Mon Compte Pro"
+    on:click
+  >
     <img class="padlock" alt="" src={franceConnect} />
 
-    <p class="fr-text--md">
+    <p class=" text fr-pl-1w">
       S'identifier avec <br />
       <span class="fr-text--bold">Mon Compte Pro</span>
     </p>
@@ -18,20 +22,12 @@
 </div>
 
 <style>
-  .mon-compte-pro-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
   button {
     background-color: #006adc;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 8px;
-    padding: 5px;
+    padding: 4px 8px;
   }
 
   button:hover {
@@ -42,5 +38,6 @@
     margin: 0;
     padding: 0;
     color: white;
+    line-height: 1 !important;
   }
 </style>

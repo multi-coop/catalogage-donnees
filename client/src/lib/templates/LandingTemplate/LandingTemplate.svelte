@@ -82,8 +82,4 @@
     align-items: center;
     gap: 15px;
   }
-
-  .button-container {
-    width: 30%;
-  }
 </style>
