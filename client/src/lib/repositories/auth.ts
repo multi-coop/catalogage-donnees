@@ -1,16 +1,18 @@
 import type {
-  LoginApiRequestData,
-  LoginApiResponseData,
+  PasswordLoginData,
+  AuthenticatedUser,
 } from "src/definitions/auth";
 import type { ApiResponse, Fetch } from "src/definitions/fetch";
 import { getApiUrl, getHeaders, makeApiRequest } from "../fetch";
+import { toAccount } from "../transformers/auth";
+import type { Maybe } from "../util/maybe";
 
-type Login = (opts: {
+type LoginWithPassword = (opts: {
   fetch: Fetch;
-  data: LoginApiRequestData;
-}) => Promise<ApiResponse<LoginApiResponseData>>;
+  data: PasswordLoginData;
+}) => Promise<ApiResponse<AuthenticatedUser>>;
 
-export const login: Login = async ({ fetch, data }) => {
+export const loginWithPassword: LoginWithPassword = async ({ fetch, data }) => {
   const body = JSON.stringify(data);
   const url = `${getApiUrl()}/auth/login/`;
 
@@ -27,10 +29,28 @@ export const login: Login = async ({ fetch, data }) => {
   return {
     status: response.status,
     data: {
-      email: apiData.email,
-      role: apiData.role,
+      account: toAccount(apiData),
       apiToken: apiData.api_token,
     },
+  };
+};
+
+type LoginWithDataPass = (opts: {
+  params: URLSearchParams;
+}) => Promise<Maybe<AuthenticatedUser>>;
+
+export const loginWithDataPass: LoginWithDataPass = async ({ params }) => {
+  const email = params.get("email");
+  const role = params.get("role");
+  const api_token = params.get("api_token");
+
+  if (!email || !role || !api_token) {
+    return null;
+  }
+
+  return {
+    account: toAccount({ email, role }),
+    apiToken: api_token,
   };
 };
 
