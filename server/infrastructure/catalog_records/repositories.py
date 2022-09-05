@@ -1,12 +1,13 @@
 from typing import Optional
 
 from sqlalchemy import select
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.orm import contains_eager
 
 from server.domain.catalog_records.entities import CatalogRecord
 from server.domain.catalog_records.repositories import CatalogRecordRepository
 from server.domain.common.types import ID
 
+from ..catalogs.models import CatalogModel
 from ..database import Database
 from .models import CatalogRecordModel
 from .transformers import make_entity, make_instance
@@ -18,14 +19,22 @@ class SqlCatalogRecordRepository(CatalogRecordRepository):
 
     async def get_by_id(self, id: ID) -> Optional[CatalogRecord]:
         async with self._db.session() as session:
-            stmt = select(CatalogRecordModel).where(CatalogRecordModel.id == id)
+            stmt = (
+                select(CatalogRecordModel)
+                .join(CatalogRecordModel.catalog)
+                .join(CatalogModel.organization)
+                .options(
+                    contains_eager(CatalogRecordModel.catalog).contains_eager(
+                        CatalogModel.organization
+                    )
+                )
+                .where(CatalogRecordModel.id == id)
+            )
             result = await session.execute(stmt)
-            try:
-                instance = result.scalar_one()
-            except NoResultFound:
+            instance = result.scalar_one_or_none()
+            if instance is None:
                 return None
-            else:
-                return make_entity(instance)
+            return make_entity(instance)
 
     async def insert(self, entity: CatalogRecord) -> ID:
         async with self._db.session() as session:

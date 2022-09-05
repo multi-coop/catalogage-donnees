@@ -17,11 +17,11 @@ from sqlalchemy.orm import Mapped, relationship
 
 from server.domain.datasets.entities import DataFormat, UpdateFrequency
 
-from ..catalog_records.models import CatalogRecordModel
 from ..database import Base, mapper_registry
 from ..tags.models import TagModel, dataset_tag
 
 if TYPE_CHECKING:  # pragma: no cover
+    from ..catalog_records.models import CatalogRecordModel
     from ..catalogs.models import ExtraFieldValueModel
 
 # Association table

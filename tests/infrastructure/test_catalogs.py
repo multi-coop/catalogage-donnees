@@ -43,4 +43,4 @@ async def test_catalog_creation_and_relationships() -> None:
     dataset_id = await bus.execute(CreateDatasetFactory.build(organization_siret=siret))
 
     dataset = await bus.execute(GetDatasetByID(id=dataset_id))
-    assert dataset.catalog_record.organization_siret == siret
+    assert dataset.catalog_record.organization.siret == siret

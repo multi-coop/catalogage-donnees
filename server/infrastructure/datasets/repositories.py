@@ -10,7 +10,9 @@ from server.domain.datasets.entities import Dataset
 from server.domain.datasets.repositories import DatasetGetAllExtras, DatasetRepository
 from server.domain.datasets.specifications import DatasetSpec
 
+from ..catalog_records.models import CatalogRecordModel
 from ..catalog_records.raw_queries import get_catalog_record_instance_by_id
+from ..catalogs.models import CatalogModel
 from ..database import Database
 from ..helpers.sqlalchemy import get_count_from, to_limit_offset
 from ..tags.raw_queries import get_all_tag_instances_by_ids
@@ -49,9 +51,13 @@ class SqlDatasetRepository(DatasetRepository):
         stmt = (
             select(DatasetModel)
             .join(DatasetModel.catalog_record)
+            .join(CatalogRecordModel.catalog)
+            .join(CatalogModel.organization)
             .where(DatasetModel.id == id)
             .options(
-                contains_eager(DatasetModel.catalog_record),
+                contains_eager(DatasetModel.catalog_record)
+                .contains_eager(CatalogRecordModel.catalog)
+                .contains_eager(CatalogModel.organization),
                 selectinload(DatasetModel.formats),
                 selectinload(DatasetModel.tags),
                 selectinload(DatasetModel.extra_field_values),
