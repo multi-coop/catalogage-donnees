@@ -96,6 +96,19 @@ async def create_datapass_user(command: CreateDataPassUser) -> ID:
     # Reuse an existing account (e.g. tied to an existing PasswordUser), or create one.
     account = await account_repository.get_by_email(email)
 
+    # Caution: if we messed up data setup, it may not be linked to the same
+    # organization...
+    if account is not None and account.organization_siret != command.organization_siret:
+        raise RuntimeError(
+            f"Found account for {email=!r} "
+            f"in organization {account.organization_siret!r}, "
+            "and requested to create a DataPassUser for it "
+            f"in different organization {command.organization_siret!r}. "
+            "HINT: This is most likely a data setup issue on the developer side. "
+            "Did you set up a PasswordUser for this email "
+            f"in organization {account.organization_siret}? "
+        )
+
     if account is None:
         account = Account(
             id=account_repository.make_id(),
