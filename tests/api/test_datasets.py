@@ -15,7 +15,7 @@ from server.domain.catalogs.entities import ExtraFieldValue, TextExtraField
 from server.domain.common.types import ID, id_factory
 from server.domain.datasets.entities import DataFormat, UpdateFrequency
 from server.domain.datasets.exceptions import DatasetDoesNotExist
-from server.domain.organizations.entities import LEGACY_ORGANIZATION_SIRET
+from server.domain.organizations.entities import LEGACY_ORGANIZATION
 from server.infrastructure.catalogs.models import ExtraFieldValueModel
 from server.infrastructure.database import Database
 from server.seedwork.application.messages import MessageBus
@@ -132,7 +132,7 @@ async def test_dataset_crud(
         "id": pk,
         "catalog_record": {
             **data["catalog_record"],
-            "organization_siret": str(LEGACY_ORGANIZATION_SIRET),
+            "organization_siret": str(LEGACY_ORGANIZATION.siret),
         },
         "title": "Example title",
         "description": "Example description",
@@ -482,7 +482,7 @@ class TestDatasetUpdate:
             "id": str(dataset_id),
             "catalog_record": {
                 **data["catalog_record"],
-                "organization_siret": str(LEGACY_ORGANIZATION_SIRET),
+                "organization_siret": str(LEGACY_ORGANIZATION.siret),
             },
             "title": "Other title",
             "description": "Other description",

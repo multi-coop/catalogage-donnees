@@ -8,7 +8,7 @@ from server.application.auth.queries import GetAccountByEmail
 from server.config.di import resolve
 from server.domain.auth.exceptions import AccountDoesNotExist
 from server.domain.common.types import id_factory
-from server.domain.organizations.entities import LEGACY_ORGANIZATION_SIRET
+from server.domain.organizations.entities import LEGACY_ORGANIZATION
 from server.seedwork.application.messages import MessageBus
 
 from ..helpers import TestPasswordUser
@@ -89,7 +89,7 @@ async def test_create_user(
     assert isinstance(id_, str)
     assert user == {
         "id": id_,
-        "organization_siret": str(LEGACY_ORGANIZATION_SIRET),
+        "organization_siret": str(LEGACY_ORGANIZATION.siret),
         "email": "john@doe.com",
         "role": "USER",
     }
@@ -112,7 +112,7 @@ async def test_login(client: httpx.AsyncClient, temp_user: TestPasswordUser) -> 
     user = response.json()
     assert user == {
         "id": str(temp_user.account_id),
-        "organization_siret": str(LEGACY_ORGANIZATION_SIRET),
+        "organization_siret": str(LEGACY_ORGANIZATION.siret),
         "email": temp_user.account.email,
         "role": temp_user.account.role.value,
         "api_token": temp_user.account.api_token,

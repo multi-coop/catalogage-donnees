@@ -6,7 +6,7 @@ from pydantic import EmailStr, Field
 from server.domain.catalogs.entities import ExtraFieldValue
 from server.domain.common.types import ID
 from server.domain.datasets.entities import DataFormat, UpdateFrequency
-from server.domain.organizations.entities import LEGACY_ORGANIZATION_SIRET
+from server.domain.organizations.entities import LEGACY_ORGANIZATION
 from server.domain.organizations.types import Siret
 from server.seedwork.application.commands import Command
 
@@ -14,7 +14,7 @@ from .validation import CreateDatasetValidationMixin, UpdateDatasetValidationMix
 
 
 class CreateDataset(CreateDatasetValidationMixin, Command[ID]):
-    organization_siret: Siret = LEGACY_ORGANIZATION_SIRET
+    organization_siret: Siret = LEGACY_ORGANIZATION.siret
     title: str
     description: str
     service: str
