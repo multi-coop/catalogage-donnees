@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
@@ -6,10 +6,11 @@ from server.application.catalogs.commands import CreateCatalog
 from server.application.catalogs.queries import GetCatalogBySiret
 from server.application.catalogs.views import CatalogView
 from server.config.di import resolve
-from server.domain.catalogs.exceptions import CatalogAlreadyExists
+from server.domain.catalogs.exceptions import CatalogAlreadyExists, CatalogDoesNotExist
+from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 
-from ..auth.permissions import HasAPIKey
+from ..auth.permissions import HasAPIKey, IsAuthenticated
 from .schemas import CatalogCreate
 
 router = APIRouter(prefix="/catalogs", tags=["catalogs"])
@@ -40,3 +41,13 @@ async def create_catalog(data: CatalogCreate) -> JSONResponse:
     content = jsonable_encoder(catalog)
 
     return JSONResponse(content, status_code=201)
+
+
+@router.get("/{siret}/", dependencies=[Depends(IsAuthenticated())])
+async def get_catalog(siret: Siret) -> CatalogView:
+    bus = resolve(MessageBus)
+
+    try:
+        return await bus.execute(GetCatalogBySiret(siret=siret))
+    except CatalogDoesNotExist as exc:
+        raise HTTPException(404, detail=str(exc))
