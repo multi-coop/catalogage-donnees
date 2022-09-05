@@ -4,9 +4,9 @@ from sqlalchemy.orm import contains_eager, selectinload
 
 from server.domain.datasets.repositories import DatasetGetAllExtras
 from server.domain.datasets.specifications import DatasetSpec
-from server.infrastructure.catalog_records.repositories import CatalogRecordModel
-from server.infrastructure.tags.repositories import TagModel
 
+from ...catalog_records.models import CatalogRecordModel
+from ...tags.models import TagModel
 from ..models import DataFormatModel, DatasetModel
 
 _TS_HEADLINE_TITLE_COL = "ts_headline_title"

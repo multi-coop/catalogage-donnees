@@ -1,15 +1,16 @@
 from typing import List
 
 from server.domain.datasets.entities import Dataset
-from server.infrastructure.catalogs.transformers import (
+
+from ..catalog_records.models import CatalogRecordModel
+from ..catalog_records.transformers import make_entity as make_catalog_record_entity
+from ..catalogs.transformers import (
     make_extra_field_value_entity,
     make_extra_field_value_instance,
 )
-
-from ..catalog_records.repositories import make_entity as make_catalog_record_entity
-from ..tags.repositories import TagModel
-from ..tags.repositories import make_entity as make_tag_entity
-from .models import CatalogRecordModel, DataFormatModel, DatasetModel
+from ..tags.models import TagModel
+from ..tags.transformers import make_entity as make_tag_entity
+from .models import DataFormatModel, DatasetModel
 
 
 def make_entity(instance: DatasetModel) -> Dataset:

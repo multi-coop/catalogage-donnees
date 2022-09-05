@@ -1,45 +1,15 @@
-import uuid
-from typing import TYPE_CHECKING, List, Optional
+from typing import List, Optional
 
-from sqlalchemy import Column, ForeignKey, String, Table, select
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import relationship
 
 from server.domain.common.types import ID, id_factory
 from server.domain.tags.entities import Tag
 from server.domain.tags.repositories import TagRepository
-from server.infrastructure.database import Base, Database, mapper_registry
 
-if TYPE_CHECKING:
-    from ..datasets.models import DatasetModel
-
-
-dataset_tag = Table(
-    "dataset_tag",
-    mapper_registry.metadata,
-    Column("dataset_id", ForeignKey("dataset.id"), primary_key=True),
-    Column("tag_id", ForeignKey("tag.id"), primary_key=True),
-)
-
-
-class TagModel(Base):
-    __tablename__ = "tag"
-
-    id: uuid.UUID = Column(UUID(as_uuid=True), primary_key=True)
-    name = Column(String, nullable=False)
-
-    datasets: List["DatasetModel"] = relationship(
-        "DatasetModel", back_populates="tags", secondary=dataset_tag
-    )
-
-
-def make_entity(instance: TagModel) -> Tag:
-    return Tag(**{field: getattr(instance, field) for field in Tag.__fields__})
-
-
-def make_instance(entity: Tag) -> TagModel:
-    return TagModel(**entity.dict())
+from ..database import Database
+from .models import TagModel
+from .transformers import make_entity, make_instance
 
 
 class SqlTagRepository(TagRepository):

@@ -1,63 +1,15 @@
-import datetime as dt
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
-from sqlalchemy import CHAR, Column, DateTime, ForeignKey, func, select
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import relationship
 
 from server.domain.catalog_records.entities import CatalogRecord
 from server.domain.catalog_records.repositories import CatalogRecordRepository
 from server.domain.common.types import ID
-from server.domain.organizations.types import Siret
 
-from ..database import Base, Database
-
-if TYPE_CHECKING:
-    from ..catalogs.models import CatalogModel
-    from ..datasets.models import DatasetModel
-
-
-class CatalogRecordModel(Base):
-    __tablename__ = "catalog_record"
-
-    id: ID = Column(UUID(as_uuid=True), primary_key=True)
-    created_at: dt.datetime = Column(
-        DateTime(timezone=True), server_default=func.clock_timestamp(), nullable=False
-    )
-    organization_siret: Siret = Column(
-        CHAR(14),
-        ForeignKey("catalog.organization_siret"),
-        nullable=False,
-    )
-
-    catalog: "CatalogModel" = relationship(
-        "CatalogModel",
-        back_populates="catalog_records",
-    )
-
-    dataset: "DatasetModel" = relationship(
-        "DatasetModel",
-        back_populates="catalog_record",
-    )
-
-
-def make_entity(instance: CatalogRecordModel) -> CatalogRecord:
-    return CatalogRecord(
-        id=instance.id,
-        organization_siret=instance.organization_siret,
-        created_at=instance.created_at,
-    )
-
-
-def make_instance(entity: CatalogRecord) -> CatalogRecordModel:
-    return CatalogRecordModel(
-        **entity.dict(
-            exclude={
-                "created_at",  # Managed by DB for better time consistency
-            }
-        ),
-    )
+from ..database import Database
+from .models import CatalogRecordModel
+from .transformers import make_entity, make_instance
 
 
 class SqlCatalogRecordRepository(CatalogRecordRepository):
