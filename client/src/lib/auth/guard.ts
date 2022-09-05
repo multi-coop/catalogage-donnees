@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import type { LoadOutput } from "@sveltejs/kit";
-import { user } from "../stores/auth";
+import { account } from "../stores/auth";
 import { NON_AUTH_GUARDED_PAGES } from "src/constants";
 import { Maybe } from "$lib/util/maybe";
 
@@ -13,7 +13,7 @@ export const authGuard = (url: URL): LoadOutput => {
     return {};
   }
 
-  if (Maybe.Some(get(user))) {
+  if (Maybe.Some(get(account))) {
     return {};
   }
 

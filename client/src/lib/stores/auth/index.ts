@@ -1,33 +1,35 @@
-import type { UserInfo, User } from "src/definitions/auth";
+import type { UserInfo, Account } from "src/definitions/auth";
 import { derived } from "svelte/store";
-import { Maybe } from "$lib/util/maybe";
 import { storable } from "../localStorage";
 
 const validateExistingUserInfo = (value: UserInfo): boolean => {
-  const { loggedIn, user } = value;
-  return (loggedIn && !!user) || (!loggedIn && !user);
+  const { loggedIn, authenticatedUser } = value;
+  return (loggedIn && !!authenticatedUser) || (!loggedIn && !authenticatedUser);
 };
 
 const userInfo = storable<UserInfo>(
   "user-info",
-  { loggedIn: false, user: null },
+  { loggedIn: false, authenticatedUser: null },
   validateExistingUserInfo
 );
 
-export const user = derived(userInfo, (values) => values.user);
+export const account = derived(
+  userInfo,
+  (values) => values.authenticatedUser?.account
+);
 
-export const apiToken = derived(user, ($user) => {
-  return Maybe.Some($user) ? $user.apiToken : "";
+export const apiToken = derived(userInfo, (values) => {
+  return values.authenticatedUser?.apiToken as string;
 });
 
-export const isAdmin = derived(user, (user) => {
-  return user?.role === "ADMIN";
+export const isAdmin = derived(account, (account) => {
+  return account?.role === "ADMIN";
 });
 
-export const login = (user: User): void => {
-  userInfo.set({ loggedIn: true, user });
+export const login = (account: Account, apiToken: string): void => {
+  userInfo.set({ loggedIn: true, authenticatedUser: { account, apiToken } });
 };
 
 export const logout = (): void => {
-  userInfo.set({ loggedIn: false, user: null });
+  userInfo.set({ loggedIn: false, authenticatedUser: null });
 };

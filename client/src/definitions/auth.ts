@@ -5,26 +5,24 @@ export interface LoginFormData {
   password: string;
 }
 
-export interface LoginApiRequestData {
+export interface PasswordLoginData {
   email: string;
   password: string;
 }
 
 export type UserRole = "USER" | "ADMIN";
 
-export interface LoginApiResponseData {
+export interface Account {
   email: string;
   role: UserRole;
-  apiToken: string;
 }
 
-export interface User {
-  email: string;
-  role: UserRole;
+export interface AuthenticatedUser {
+  account: Account;
   apiToken: string;
 }
 
 export interface UserInfo {
   loggedIn: boolean;
-  user: Maybe<User>;
+  authenticatedUser: Maybe<AuthenticatedUser>;
 }
