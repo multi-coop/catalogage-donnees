@@ -54,7 +54,7 @@
             id="contactEmails-{i}"
             data-testid="contactEmails"
             placeholder="Adresse e-mail"
-            name={contactEmails[i]}
+            name="contactEmails-{i}"
             required={!hasAtLeastOneEmail}
             on:change
             on:blur

@@ -174,6 +174,11 @@
     dispatch("touched");
   };
 
+  const handleContactEmailsChange = () => {
+    // Skip regular handleChange() as the array has already been updated.
+    dispatch("touched");
+  };
+
   const handleLastUpdatedAtChange = async (
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
   ) => {
@@ -336,8 +341,8 @@
     <ContactEmailsField
       bind:errors={emailErrors}
       bind:contactEmails={$form.contactEmails}
-      on:blur={handleFieldChange}
-      on:input={handleFieldChange}
+      on:blur={handleContactEmailsChange}
+      on:input={handleContactEmailsChange}
     />
   </div>
 
