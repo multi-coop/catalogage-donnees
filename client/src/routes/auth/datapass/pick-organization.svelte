@@ -30,6 +30,11 @@
         getDatapassUserInfoFromURLSearchParams(params);
 
       organizations = info.organizations;
+
+      if (organizations.length === 0) {
+        hasError = true;
+        return;
+      }
       email = info.email;
       token = opaqueToken;
     } catch (error) {

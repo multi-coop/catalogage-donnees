@@ -1,4 +1,4 @@
-t rorganizations:
+organizations:
   - params:
       name: "Ministère de la Culture"
       siret: "11004601800013"

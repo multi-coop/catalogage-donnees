@@ -1,8 +1,7 @@
 import type { AuthenticatedUser } from "src/definitions/auth";
-import { SearchParamsValidationError } from "src/definitions/errors";
 import type { Fetch } from "src/definitions/fetch";
 import type { Organization } from "src/definitions/organization";
-import { getApiUrl } from "../fetch";
+import { getApiUrl, makeApiRequestOrFail } from "../fetch";
 
 type DatapassUserPayload = {
   siret: string;
@@ -28,21 +27,19 @@ export const createDatapassUser: CreateDatapassUser = async ({
     body,
   });
 
-  const response = await fetch(request);
-
-  if (!response.ok) {
-    throw new Error("unable to create the datapass user");
-  }
+  const response = await makeApiRequestOrFail(fetch, request);
 
   const data = await response.json();
 
-  return {
+  const authenticatedUser: AuthenticatedUser = {
     account: {
+      organizationSiret: data.organization_siret,
       role: data.role,
       email: data.email,
     },
     apiToken: data.api_token,
   };
+  return authenticatedUser;
 };
 
 type DatapassUserInfo = {
@@ -62,14 +59,10 @@ export const getDatapassUserInfoFromURLSearchParams = (
   const token = searchParams.get("token");
 
   if (!infoString || !token) {
-    throw new SearchParamsValidationError("no info or token found ");
+    throw new Error("no info or token found ");
   }
 
   const info = JSON.parse(infoString) as DatapassUserInfo;
-
-  if (!info.email || !info.organizations || info.organizations.length === 0) {
-    throw new SearchParamsValidationError("some informations are missing");
-  }
   return {
     token,
     info,
