@@ -7,7 +7,7 @@ from server.config.di import resolve
 from server.domain.organizations.types import Siret
 from server.infrastructure.catalogs.models import CatalogModel
 from server.infrastructure.database import Database
-from server.infrastructure.organizations.repositories import OrganizationModel
+from server.infrastructure.organizations.models import OrganizationModel
 from server.seedwork.application.messages import MessageBus
 
 from ..factories import CreateDatasetFactory, CreatePasswordUserFactory

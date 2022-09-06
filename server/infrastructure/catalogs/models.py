@@ -12,7 +12,7 @@ from server.domain.organizations.types import Siret
 from ..database import Base
 
 if TYPE_CHECKING:  # pragma: no cover
-    from ..catalog_records.repositories import CatalogRecordModel
+    from ..catalog_records.models import CatalogRecordModel
     from ..datasets.models import DatasetModel
     from ..organizations.models import OrganizationModel
 

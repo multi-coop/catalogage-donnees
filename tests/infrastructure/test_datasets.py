@@ -8,7 +8,7 @@ from server.config.di import resolve
 from server.domain.catalog_records.repositories import CatalogRecordRepository
 from server.infrastructure.database import Database
 from server.infrastructure.datasets.models import DatasetModel
-from server.infrastructure.tags.repositories import TagModel, dataset_tag
+from server.infrastructure.tags.models import TagModel, dataset_tag
 from server.seedwork.application.messages import MessageBus
 
 from ..factories import CreateDatasetFactory, CreateTagFactory

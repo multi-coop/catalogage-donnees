@@ -6,17 +6,17 @@ from sqlalchemy.orm import contains_eager, selectinload
 
 from server.domain.common.pagination import Page
 from server.domain.common.types import ID
-from server.domain.datasets.entities import DataFormat, Dataset
+from server.domain.datasets.entities import Dataset
 from server.domain.datasets.repositories import DatasetGetAllExtras, DatasetRepository
 from server.domain.datasets.specifications import DatasetSpec
-from server.domain.tags.entities import Tag
 
-from ..catalog_records.repositories import CatalogRecordModel
+from ..catalog_records.raw_queries import get_catalog_record_instance_by_id
 from ..database import Database
 from ..helpers.sqlalchemy import get_count_from, to_limit_offset
-from ..tags.repositories import TagModel
-from .models import DataFormatModel, DatasetModel
+from ..tags.raw_queries import get_all_tag_instances_by_ids
+from .models import DatasetModel
 from .queries.get_all import GetAllQuery
+from .raw_queries import get_all_dataformat_instances
 from .transformers import make_entity, make_instance, update_instance
 
 
@@ -98,33 +98,16 @@ class SqlDatasetRepository(DatasetRepository):
             result = await session.execute(stmt)
             return set(result.scalars())
 
-    async def _get_catalog_record(
-        self, session: AsyncSession, id_: ID
-    ) -> CatalogRecordModel:
-        stmt = select(CatalogRecordModel).where(CatalogRecordModel.id == id_)
-        result = await session.execute(stmt)
-        return result.scalar_one()
-
-    async def _get_formats(
-        self, session: AsyncSession, formats: List[DataFormat]
-    ) -> List[DataFormatModel]:
-        stmt = select(DataFormatModel).where(DataFormatModel.name.in_(formats))
-        result = await session.execute(stmt)
-        return result.scalars().all()
-
-    async def _get_tags(self, session: AsyncSession, tags: List[Tag]) -> List[TagModel]:
-        stmt = select(TagModel).where(TagModel.id.in_({tag.id for tag in tags}))
-        result = await session.execute(stmt)
-        return result.scalars().all()
-
     async def insert(self, entity: Dataset) -> ID:
         async with self._db.session() as session:
             async with session.begin():
-                catalog_record = await self._get_catalog_record(
+                catalog_record = await get_catalog_record_instance_by_id(
                     session, entity.catalog_record.id
                 )
-                formats = await self._get_formats(session, entity.formats)
-                tags = await self._get_tags(session, entity.tags)
+                formats = await get_all_dataformat_instances(session, entity.formats)
+                tags = await get_all_tag_instances_by_ids(
+                    session, [tag.id for tag in entity.tags]
+                )
                 instance = make_instance(entity, catalog_record, formats, tags)
 
                 session.add(instance)
@@ -141,8 +124,10 @@ class SqlDatasetRepository(DatasetRepository):
                 if instance is None:
                     return
 
-                formats = await self._get_formats(session, entity.formats)
-                tags = await self._get_tags(session, entity.tags)
+                formats = await get_all_dataformat_instances(session, entity.formats)
+                tags = await get_all_tag_instances_by_ids(
+                    session, [tag.id for tag in entity.tags]
+                )
                 update_instance(instance, entity, formats, tags)
 
     async def delete(self, id: ID) -> None:

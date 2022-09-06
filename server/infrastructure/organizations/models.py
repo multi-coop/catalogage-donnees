@@ -7,7 +7,7 @@ from server.domain.organizations.types import Siret
 
 from ..database import Base
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from ..auth.models import AccountModel
     from ..catalogs.models import CatalogModel
 
