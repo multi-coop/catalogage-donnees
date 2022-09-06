@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { UPDATE_FREQUENCY_LABELS } from "src/constants";
-import { STATE_AUTHENTICATED } from "./constants";
+import { UPDATE_FREQUENCY_LABELS } from "../../constants.js";
+import { STATE_AUTHENTICATED } from "./constants.js";
 
 test.describe("Basic form submission", () => {
   test.use({ storageState: STATE_AUTHENTICATED });

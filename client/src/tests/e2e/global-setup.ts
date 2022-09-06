@@ -11,8 +11,8 @@ import {
   STATE_AUTHENTICATED_ADMIN,
   TEST_EMAIL,
   TEST_PASSWORD,
-} from "./constants";
-import type { AppTestArgs } from "./fixtures";
+} from "./constants.js";
+import type { AppTestArgs } from "./fixtures.js";
 
 export default async function globalSetup(
   config: FullConfig<AppTestArgs>

@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test";
-import { STATE_AUTHENTICATED } from "./constants";
-import { test } from "./fixtures";
+import { STATE_AUTHENTICATED } from "./constants.js";
+import { test } from "./fixtures.js";
 
 test.describe("Landing Page", () => {
   test("Visits the home page without being logged in", async ({ page }) => {

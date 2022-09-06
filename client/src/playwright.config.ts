@@ -2,7 +2,7 @@ import path from "path";
 import dotenv from "dotenv";
 import type { PlaywrightTestConfig } from "@playwright/test";
 import type { AppTestArgs } from "src/tests/e2e/fixtures";
-import { ADMIN_EMAIL } from "./tests/e2e/constants";
+import { ADMIN_EMAIL } from "./tests/e2e/constants.js";
 
 dotenv.config({
   path: path.resolve("..", ".env"),
