@@ -4,9 +4,9 @@
 
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import type { LoginFormData, User } from "src/definitions/auth";
+  import type { LoginFormData } from "src/definitions/auth";
   import { login } from "$lib/stores/auth";
-  import { login as sendLoginRequest } from "$lib/repositories/auth";
+  import { loginWithPassword } from "$lib/repositories/auth";
   import LoginForm from "$lib/components/LoginForm/LoginForm.svelte";
 
   let loading = false;
@@ -17,20 +17,16 @@
       loading = true;
       loginFailed = false;
 
-      const response = await sendLoginRequest({ fetch, data: event.detail });
+      const response = await loginWithPassword({ fetch, data: event.detail });
       loginFailed = response.status === 401;
 
       if (loginFailed) {
         return;
       }
 
-      const user: User = {
-        email: response.data.email,
-        role: response.data.role,
-        apiToken: response.data.apiToken,
-      };
+      const { account, apiToken } = response.data;
 
-      login(user);
+      login(account, apiToken);
       await goto("/");
     } finally {
       loading = false;

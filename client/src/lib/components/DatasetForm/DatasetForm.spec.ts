@@ -254,7 +254,7 @@ describe("Test the dataset form", () => {
 
   describe("Authenticated tests", () => {
     beforeAll(() =>
-      login({ email: "john@domain.org", role: "USER", apiToken: "abcd1234" })
+      login({ email: "john@domain.org", role: "USER" }, "abcd1234")
     );
 
     afterAll(() => logout());

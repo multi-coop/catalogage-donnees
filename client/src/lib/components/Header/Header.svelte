@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
-  import { logout, user } from "$lib/stores/auth";
+  import { logout, account } from "$lib/stores/auth";
   import paths from "$lib/paths";
   import { Maybe } from "$lib/util/maybe";
 
@@ -72,9 +72,9 @@
         </div>
         <div class="fr-header__tools tools-container">
           <div class="fr-header__tools-links">
-            {#if Maybe.Some($user)}
+            {#if Maybe.Some($account)}
               <p>
-                {$user.email}
+                {$account.email}
               </p>
               <ul class="fr-btns-group">
                 <li>
@@ -116,7 +116,7 @@
 
       <div class="fr-header__menu-links" />
 
-      {#if Maybe.Some($user)}
+      {#if Maybe.Some($account)}
         <nav
           class="fr-nav"
           role="navigation"

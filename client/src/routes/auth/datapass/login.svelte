@@ -2,8 +2,9 @@
   import { goto } from "$app/navigation";
 
   import { page } from "$app/stores";
-  import type { User, UserRole } from "src/definitions/auth";
   import Spinner from "src/lib/components/Spinner/Spinner.svelte";
+  import { Maybe } from "src/lib/util/maybe";
+  import { loginWithDataPass } from "src/lib/repositories/auth";
   import { login } from "src/lib/stores/auth";
   import { onMount } from "svelte";
   import padlock from "$lib/assets/padlock.svg";
@@ -14,27 +15,16 @@
   onMount(async () => {
     const params = $page.url.searchParams;
 
-    const role = params.get("role");
-    const token = params.get("api_token");
-    const email = params.get("email");
-
-    if (!email || !token || !role) {
-      hasError = true;
-      loading = false;
-      return;
-    }
-
-    const user: User = {
-      role: role as UserRole,
-      apiToken: token,
-      email,
-    };
-
-    login(user);
-
-    await goto("/");
-
+    const user = await loginWithDataPass({ params });
     loading = false;
+
+    if (Maybe.Some(user)) {
+      const { account, apiToken } = user;
+      login(account, apiToken);
+      await goto("/");
+    } else {
+      hasError = true;
+    }
   });
 </script>
 

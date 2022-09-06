@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from "$app/stores";
-  import { apiToken, user } from "src/lib/stores/auth";
+  import { apiToken, account } from "src/lib/stores/auth";
   import DatasetListTemplate from "src/lib/templates/DatasetListTemplate/DatasetListTemplate.svelte";
 
   import { getPageFromParams } from "src/lib/util/pagination";
@@ -11,7 +11,7 @@
   let pageNumber = getPageFromParams($page.url.searchParams) || 1;
 </script>
 
-{#if $user}
+{#if $account}
   {#await getDatasets({ fetch, apiToken: $apiToken, page: pageNumber })}
     <div class="spinner-container">
       <Spinner />

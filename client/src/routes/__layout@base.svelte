@@ -3,14 +3,14 @@
   import Footer from "$lib/components/Footer/Footer.svelte";
   import { onMount } from "svelte";
   import LayoutProviders from "$lib/providers/LayoutProviders.svelte";
-  import { user } from "$lib/stores/auth";
+  import { account, apiToken } from "$lib/stores/auth";
   import { checkLogin } from "$lib/repositories/auth";
   import { Maybe } from "$lib/util/maybe";
 
   onMount(async () => {
-    if (Maybe.Some($user)) {
+    if (Maybe.Some($account)) {
       // Ensure user session is still valid.
-      await checkLogin({ fetch, apiToken: $user.apiToken });
+      await checkLogin({ fetch, apiToken: $apiToken });
     }
   });
 </script>

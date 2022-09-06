@@ -11,7 +11,7 @@
   import { DATA_FORMAT_LABELS, UPDATE_FREQUENCY_LABELS } from "src/constants";
   import { formatHTMLDate } from "$lib/util/format";
   import RequiredMarker from "../RequiredMarker/RequiredMarker.svelte";
-  import { user } from "src/lib/stores/auth";
+  import { account } from "src/lib/stores/auth";
   import ContactEmailsField from "../ContactEmailsField/ContactEmailsField.svelte";
   import GeographicalCoverageField from "./_GeographicalCoverageField.svelte";
   import Select from "../Select/Select.svelte";
@@ -63,7 +63,7 @@
       ({ value }) => !!(initial?.formats || []).find((v) => v === value)
     ),
     producerEmail: initial?.producerEmail || "",
-    contactEmails: initial?.contactEmails || [$user?.email || ""],
+    contactEmails: initial?.contactEmails || [$account?.email || ""],
     lastUpdatedAt: initial?.lastUpdatedAt
       ? formatHTMLDate(initial.lastUpdatedAt)
       : null,
@@ -171,6 +171,11 @@
     const { checked } = event.target as HTMLInputElement;
     dataFormatsValue[index] = checked;
     updateValidateField("dataFormats", dataFormatsValue);
+    dispatch("touched");
+  };
+
+  const handleContactEmailsChange = () => {
+    // Skip regular handleChange() as the array has already been updated.
     dispatch("touched");
   };
 
@@ -336,8 +341,8 @@
     <ContactEmailsField
       bind:errors={emailErrors}
       bind:contactEmails={$form.contactEmails}
-      on:blur={handleFieldChange}
-      on:input={handleFieldChange}
+      on:blur={handleContactEmailsChange}
+      on:input={handleContactEmailsChange}
     />
   </div>
 
