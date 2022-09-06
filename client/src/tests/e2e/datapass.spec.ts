@@ -1,6 +1,7 @@
-import { TEST_EMAIL } from "./constants.js";
+import { TEST_EMAIL, TEST_ORGANIZATION } from "./constants.js";
 import { test } from "./fixtures.js";
 import { expect } from "@playwright/test";
+
 test.describe("Datapass", () => {
   test("A user tried to log in but no organization has been found", async ({
     page,
@@ -28,12 +29,7 @@ test.describe("Datapass", () => {
     const token = "not-valid";
     const info = {
       email: TEST_EMAIL,
-      organizations: [
-        {
-          name: ORGANIZATION_NAME,
-          siret: ORGANIZATION_SIRET,
-        },
-      ],
+      organizations: [TEST_ORGANIZATION],
     };
     await page.goto(
       `/auth/datapass/pick-organization?token=${token}&info=${encodeURIComponent(

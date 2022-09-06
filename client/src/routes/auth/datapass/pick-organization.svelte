@@ -83,18 +83,20 @@
             <h3>Nous n'arrivons pas à retrouver vos informations ...</h3>
 
             <p>
-              Nous sommes actuellement dans l'incapacité de retrouver les
-              informations des organisations auxquelles vous êtes rattachés.
+              En raison d'un problème technique, nous sommes actuellement dans
+              l'incapacité de retrouver les informations des organisations
+              auxquelles vous êtes rattachés.
               <br />
               Veuillez-nous en excuser.
             </p>
           </div>
         {:else if errorWhenCreatingDatapassUser}
           <div>
-            <h3>Nous n'arrivons pas à créer votre compte.</h3>
+            <h3>Nous n'arrivons pas à créer votre compte...</h3>
 
             <p>
-              Nous sommes actuellement dans l'incapacité de créer votre compte
+              En raison d'un problème technique, nous sommes actuellement dans
+              l'incapacité de créer votre compte
               <br />
               Veuillez-nous en excuser.
             </p>
@@ -140,7 +142,8 @@
               <button
                 disabled={!pickedOrganization}
                 type="submit"
-                class="fr-btn">Associer mon compte</button
+                class="fr-btn fr-btn--icon-right  fr-icon-git-pull-request-line"
+                >Associer mon compte</button
               >
             </form>
           </div>
