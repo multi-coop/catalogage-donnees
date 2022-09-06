@@ -3,6 +3,7 @@
 
   import books from "$lib/assets/books-circle.svg";
   import flowChart from "$lib/assets/registration_flow_chart.svg";
+  import MonCompteProButton from "src/lib/components/MonCompteProButton/MonCompteProButton.svelte";
   import { getApiUrl } from "src/lib/fetch";
 
   const triggerDataPassLoginFlow = async () => {
@@ -26,21 +27,7 @@
           </p>
 
           <div class="button-container">
-            <button
-              on:click={triggerDataPassLoginFlow}
-              class="fr-btn fr-icon-logout-box-r-line fr-btn--icon-right"
-              aria-label="Se connecter via Datapass"
-            >
-              Se connecter
-            </button>
-
-            <button
-              class="fr-btn fr-btn--secondary fr-icon-user-add-line fr-btn--icon-right"
-              on:click={triggerDataPassLoginFlow}
-              aria-label="S'inscrire via Datapass"
-            >
-              S'inscrire
-            </button>
+            <MonCompteProButton on:click={triggerDataPassLoginFlow} />
           </div>
         </div>
       </div>
@@ -91,7 +78,8 @@
     display: flex;
   }
 
-  .button-container {
-    gap: 10px;
+  .title-container {
+    align-items: center;
+    gap: 15px;
   }
 </style>
