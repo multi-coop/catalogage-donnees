@@ -4,7 +4,6 @@
   import { page } from "$app/stores";
 
   import padlock from "$lib/assets/padlock.svg";
-  import type { UserRole } from "src/definitions/auth";
   import type { Organization } from "src/definitions/organization";
   import Spinner from "src/lib/components/Spinner/Spinner.svelte";
   import {
@@ -50,14 +49,13 @@
     loading = true;
 
     try {
-      const { role, apiToken } = await createDatapassUser({
+      const { account, apiToken } = await createDatapassUser({
         fetch,
         token,
         data: { siret, email },
       });
 
-      const user = { role: role as UserRole, apiToken, email };
-      login(user, apiToken);
+      login(account, apiToken);
 
       await goto("/");
     } catch (error) {

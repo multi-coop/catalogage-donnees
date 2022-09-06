@@ -1,3 +1,4 @@
+import type { AuthenticatedUser } from "src/definitions/auth";
 import { SearchParamsValidationError } from "src/definitions/errors";
 import type { Fetch } from "src/definitions/fetch";
 import type { Organization } from "src/definitions/organization";
@@ -8,19 +9,11 @@ type DatapassUserPayload = {
   email: string;
 };
 
-type CreatedDatapassUserResponse = {
-  id: string;
-  siret: string;
-  email: string;
-  role: string;
-  apiToken: string;
-};
-
 type CreateDatapassUser = (opts: {
   fetch: Fetch;
   token: string;
   data: DatapassUserPayload;
-}) => Promise<CreatedDatapassUserResponse>;
+}) => Promise<AuthenticatedUser>;
 
 export const createDatapassUser: CreateDatapassUser = async ({
   fetch,
@@ -44,11 +37,11 @@ export const createDatapassUser: CreateDatapassUser = async ({
   const data = await response.json();
 
   return {
+    account: {
+      role: data.role,
+      email: data.email,
+    },
     apiToken: data.api_token,
-    siret: data.organization_siret,
-    role: data.role,
-    email: data.email,
-    id: data.id,
   };
 };
 
