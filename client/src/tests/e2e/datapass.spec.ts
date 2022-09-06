@@ -64,7 +64,7 @@ test.describe("Datapass", () => {
     const token = "not-valid";
     const info = {
       email: TEST_EMAIL,
-      organizations: null,
+      organizations: null, // Simulate backend sending invalid info
     };
     await page.goto(
       `/auth/datapass/pick-organization?token=${token}&info=${encodeURIComponent(
