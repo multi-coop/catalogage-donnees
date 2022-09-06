@@ -23,10 +23,10 @@ test.describe("Datapass", () => {
     await page.locator("text='Recherchez un jeu de données'").waitFor();
   });
 
-  test("A user can NOT pick the organization he wants to be linked with -- invalid token case", async ({
+  test("A user picks the organization they want to be linked with", async ({
     page,
   }) => {
-    const token = "not-valid";
+    const token = "<fake>";
     const info = {
       email: TEST_EMAIL,
       organizations: [TEST_ORGANIZATION],
