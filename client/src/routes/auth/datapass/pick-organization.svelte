@@ -7,7 +7,10 @@
   import type { UserRole } from "src/definitions/auth";
   import type { Organization } from "src/definitions/organization";
   import Spinner from "src/lib/components/Spinner/Spinner.svelte";
-  import { createDatapassUser } from "src/lib/repositories/datapass";
+  import {
+    createDatapassUser,
+    getDatapassUserInfoFromURLSearchParams,
+  } from "src/lib/repositories/datapass";
   import { login } from "src/lib/stores/auth";
   import { onMount } from "svelte";
 
@@ -18,30 +21,18 @@
   let organizations: Organization[] = [];
 
   let errorWhenCreatingDatapassUser: boolean;
-
   let pickedOrganization: Organization;
 
   onMount(async () => {
     const params = $page.url.searchParams;
 
-    const info = params.get("info");
-    token = params.get("token");
-
-    if (!info || !token) {
-      hasError = true;
-      loading = false;
-      return;
-    }
-
     try {
-      const data = JSON.parse(info);
-      organizations = data.organizations;
-      email = data.email;
+      const { token: opaqueToken, info } =
+        getDatapassUserInfoFromURLSearchParams(params);
 
-      if (!organizations || organizations.length === 0 || !email) {
-        hasError = true;
-        return;
-      }
+      organizations = info.organizations;
+      email = info.email;
+      token = opaqueToken;
     } catch (error) {
       hasError = true;
     } finally {
@@ -61,11 +52,12 @@
     try {
       const { role, apiToken } = await createDatapassUser({
         fetch,
-        data: { siret, email, token },
+        token,
+        data: { siret, email },
       });
 
       const user = { role: role as UserRole, apiToken, email };
-      login(user);
+      login(user, apiToken);
 
       await goto("/");
     } catch (error) {
