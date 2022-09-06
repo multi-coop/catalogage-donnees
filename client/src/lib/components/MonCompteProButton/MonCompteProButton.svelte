@@ -10,7 +10,7 @@
   >
     <img class="padlock" alt="" src={franceConnect} />
 
-    <p class=" text fr-pl-1w">
+    <p class="fr-pl-1w">
       S'identifier avec <br />
       <span class="fr-text--bold">Mon Compte Pro</span>
     </p>
