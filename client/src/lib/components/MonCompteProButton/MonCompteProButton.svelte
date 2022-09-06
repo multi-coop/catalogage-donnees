@@ -16,7 +16,7 @@
     </p>
   </button>
 
-  <a href=" http://mon-compte-pro.beta.gouv.fr/" target="_blank">
+  <a class="fr-link fr-link--sm" href="http://mon-compte-pro.beta.gouv.fr/" target="_blank">
     Qu'est-ce que Mon Compte Pro ?</a
   >
 </div>
