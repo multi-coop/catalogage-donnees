@@ -152,5 +152,6 @@ datasets:
       last_updated_at: null
       url: "https://www.data.gouv.fr/fr/datasets/catalogue-des-enquetes-realisees-par-la-dares-2012-572205/"
       license: Licence Ouverte
-      tag_ids: []
+      tag_ids:
+        - "2b8f8d14-1ec5-4014-839d-d6dd3718d2b5"
       extra_field_values: []
