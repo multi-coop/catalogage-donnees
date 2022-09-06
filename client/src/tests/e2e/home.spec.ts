@@ -35,10 +35,22 @@ test.describe("Catalog list", () => {
     const currentPage = page.locator(
       "[data-testid='pagination-list'] [aria-current='page']"
     );
-    await expect(page.locator("text=Première page")).toBeDisabled();
-    await expect(page.locator("text=Page précédente")).toBeDisabled();
+    await expect(page.locator("text=Première page")).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    );
+    await expect(page.locator("text=Page précédente")).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    );
     await expect(currentPage).toHaveText("1");
-    await expect(page.locator("text=Page suivante")).toBeDisabled();
-    await expect(page.locator("text=Dernière page")).toBeDisabled();
+    await expect(page.locator("text=Page suivante")).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    );
+    await expect(page.locator("text=Dernière page")).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    );
   });
 });
