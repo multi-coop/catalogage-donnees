@@ -9,3 +9,9 @@ export const getPageY = (element: HTMLElement): number => {
   }
   return y;
 };
+
+export type MaybeHTMLString = string | { content: string; isHTML: boolean };
+
+export const sanitizeHTML = (html: string): string => {
+  return html;
+};

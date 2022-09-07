@@ -1,0 +1,16 @@
+.DS_Store
+node_modules
+/build
+/.svelte-kit
+/package
+.env
+.env.*
+!.env.example
+.vercel
+.output
+/coverage
+
+# End-to-end tests with Playwright
+/test-results
+
+src/lib/js/

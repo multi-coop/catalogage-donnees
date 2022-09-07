@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { MaybeHtmlString } from "src/lib/util/maybe";
+  import MaybeHtml from "../MaybeHtml/MaybeHtml.svelte";
   import RequiredMarker from "../RequiredMarker/RequiredMarker.svelte";
 
   // If support for other input types is added, add it here.
@@ -6,7 +8,7 @@
 
   export let name: string;
   export let label: string;
-  export let hintText = "";
+  export let hintText: MaybeHtmlString = "";
   export let type: SupportedInputType = "text";
   export let required = false;
   export let value: string | null;
@@ -25,7 +27,7 @@
     {/if}
     {#if hintText}
       <span class="fr-hint-text" id={hintTextId}>
-        {hintText}
+        <MaybeHtml text={hintText} />
       </span>
     {/if}
   </label>

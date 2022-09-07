@@ -1,12 +1,20 @@
 <script lang="ts">
   import type { ExtraField } from "src/definitions/catalogs";
   import { toSelectOptions } from "src/lib/transformers/form";
+  import { renderMarkdown } from "src/lib/util/markdown";
   import InputField from "../InputField/InputField.svelte";
   import RadioGroupField from "../RadioGroupField/RadioGroupField.svelte";
   import Select from "../Select/Select.svelte";
 
   export let extraField: ExtraField;
   export let value: string;
+
+  // NOTE: hint texts of extra fields are considered TRUSTED as catalogs can
+  // only be created via an approved PR on https://github.com/etalab/catalogage-donnees-config.
+  $: hintTextHtml = {
+    isHTML: true,
+    content: renderMarkdown(extraField.hintText),
+  };
 
   const makeBoolOptions = (trueValue: string, falseValue: string) => {
     return toSelectOptions({
@@ -26,7 +34,7 @@
   <InputField
     name={extraField.name}
     label={extraField.title}
-    hintText={extraField.hintText}
+    hintText={hintTextHtml}
     bind:value
     on:input
     on:blur
@@ -35,7 +43,7 @@
   <RadioGroupField
     name={extraField.name}
     label={extraField.title}
-    hintText={extraField.hintText}
+    hintText={hintTextHtml}
     options={makeBoolOptions(
       extraField.data.trueValue,
       extraField.data.falseValue
@@ -49,8 +57,9 @@
     id={extraField.name}
     name={extraField.name}
     label={extraField.title}
-    hintText={extraField.hintText}
     options={makeEnumOptions(extraField.data.values)}
+    hintText={hintTextHtml}
+    placeholder={extraField.title}
     bind:value
     on:change
     on:blur

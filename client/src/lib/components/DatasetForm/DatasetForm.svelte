@@ -4,7 +4,6 @@
   import { createForm } from "svelte-forms-lib";
   import type {
     DataFormat,
-    Dataset,
     DatasetFormData,
     DatasetFormInitial,
     UpdateFrequency,
