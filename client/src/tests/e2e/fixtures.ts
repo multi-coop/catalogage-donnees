@@ -1,7 +1,7 @@
 import { test as base, expect, type APIRequestContext } from "@playwright/test";
-import type { Dataset } from "src/definitions/datasets";
-import { toPayload } from "src/lib/transformers/dataset";
-import { ADMIN_EMAIL, TEST_EMAIL, TEST_PASSWORD } from "./constants";
+import type { Dataset } from "../../definitions/datasets.js";
+import { toPayload } from "../../lib/transformers/dataset.js";
+import { ADMIN_EMAIL, TEST_EMAIL, TEST_PASSWORD } from "./constants.js";
 
 /**
  * These fixtures allow simplifying setup/teardown logic in tests,

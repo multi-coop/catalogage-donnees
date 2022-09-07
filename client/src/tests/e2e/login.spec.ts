@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test";
-import { TEST_EMAIL, TEST_PASSWORD } from "./constants";
-import { test } from "./fixtures";
+import { TEST_EMAIL, TEST_PASSWORD } from "./constants.js";
+import { test } from "./fixtures.js";
 
 test.describe("Login", () => {
   test("Redirects unauthenticated visits to login page", async ({ page }) => {

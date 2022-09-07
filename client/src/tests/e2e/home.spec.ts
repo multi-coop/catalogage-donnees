@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test";
-import { STATE_AUTHENTICATED } from "./constants";
-import { test } from "./fixtures";
+import { STATE_AUTHENTICATED } from "./constants.js";
+import { test } from "./fixtures.js";
 
 test.describe("Landing Page", () => {
   test("Visits the home page without being logged in", async ({ page }) => {
@@ -35,10 +35,22 @@ test.describe("Catalog list", () => {
     const currentPage = page.locator(
       "[data-testid='pagination-list'] [aria-current='page']"
     );
-    await expect(page.locator("text=Première page")).toBeDisabled();
-    await expect(page.locator("text=Page précédente")).toBeDisabled();
+    await expect(page.locator("text=Première page")).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    );
+    await expect(page.locator("text=Page précédente")).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    );
     await expect(currentPage).toHaveText("1");
-    await expect(page.locator("text=Page suivante")).toBeDisabled();
-    await expect(page.locator("text=Dernière page")).toBeDisabled();
+    await expect(page.locator("text=Page suivante")).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    );
+    await expect(page.locator("text=Dernière page")).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    );
   });
 });

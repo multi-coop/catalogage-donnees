@@ -1,5 +1,5 @@
-import { TEST_EMAIL } from "./constants";
-import { test } from "./fixtures";
+import { TEST_EMAIL } from "./constants.js";
+import { test } from "./fixtures.js";
 
 test.describe("Datapass", () => {
   test("A user tried to log in but no organization has been found", async ({

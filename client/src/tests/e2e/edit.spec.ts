@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test";
-import { STATE_AUTHENTICATED, STATE_AUTHENTICATED_ADMIN } from "./constants";
-import { test } from "./fixtures";
+import { STATE_AUTHENTICATED, STATE_AUTHENTICATED_ADMIN } from "./constants.js";
+import { test } from "./fixtures.js";
 
 const DELETE_DATASET_BUTTON_LOCATOR = "text=Supprimer ce jeu de données";
 

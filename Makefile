@@ -8,10 +8,6 @@ pip = ${bin}pip
 pysources = server/ tools/ tests/
 git_current_ref = $(shell git rev-parse --verify --short HEAD)
 
-# Required for Playwright to work with TypeScript modules.
-# See: https://github.com/microsoft/playwright/issues/12487#issuecomment-1087614929
-export PW_EXPERIMENTAL_TS_ESM=1
-
 install: install-server install-client #- Install all dependencies (server and client)
 
 install-server: #- Install server dependencies

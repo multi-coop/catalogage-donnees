@@ -4,8 +4,8 @@ import {
   type Request,
   type Response,
 } from "@playwright/test";
-import { STATE_AUTHENTICATED } from "./constants";
-import { test } from "./fixtures";
+import { STATE_AUTHENTICATED } from "./constants.js";
+import { test } from "./fixtures.js";
 
 const performASearch = async (
   page: Page,
