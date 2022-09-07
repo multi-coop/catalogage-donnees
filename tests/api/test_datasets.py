@@ -15,7 +15,8 @@ from server.domain.catalogs.entities import ExtraFieldValue, TextExtraField
 from server.domain.common.types import ID, id_factory
 from server.domain.datasets.entities import DataFormat, UpdateFrequency
 from server.domain.datasets.exceptions import DatasetDoesNotExist
-from server.domain.organizations.entities import LEGACY_ORGANIZATION_SIRET
+from server.domain.organizations.entities import LEGACY_ORGANIZATION
+from server.domain.organizations.types import Siret
 from server.infrastructure.catalogs.models import ExtraFieldValueModel
 from server.infrastructure.database import Database
 from server.seedwork.application.messages import MessageBus
@@ -98,6 +99,18 @@ async def test_create_dataset_invalid(
 
 
 @pytest.mark.asyncio
+async def test_create_dataset_invalid_organization_does_not_exist(
+    client: httpx.AsyncClient, temp_user: TestPasswordUser
+) -> None:
+    siret = Siret(fake.siret())
+    payload = to_payload(CreateDatasetFactory.build(organization_siret=siret))
+    response = await client.post("/datasets/", json=payload, auth=temp_user.auth)
+    assert response.status_code == 400
+    data = response.json()
+    assert data["detail"] == f"Organization not found: '{siret}'"
+
+
+@pytest.mark.asyncio
 async def test_dataset_crud(
     client: httpx.AsyncClient, temp_user: TestPasswordUser, admin_user: TestPasswordUser
 ) -> None:
@@ -132,7 +145,7 @@ async def test_dataset_crud(
         "id": pk,
         "catalog_record": {
             **data["catalog_record"],
-            "organization_siret": str(LEGACY_ORGANIZATION_SIRET),
+            "organization": LEGACY_ORGANIZATION.dict(),
         },
         "title": "Example title",
         "description": "Example description",
@@ -482,7 +495,7 @@ class TestDatasetUpdate:
             "id": str(dataset_id),
             "catalog_record": {
                 **data["catalog_record"],
-                "organization_siret": str(LEGACY_ORGANIZATION_SIRET),
+                "organization": LEGACY_ORGANIZATION.dict(),
             },
             "title": "Other title",
             "description": "Other description",

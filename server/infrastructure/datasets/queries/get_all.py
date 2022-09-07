@@ -6,6 +6,7 @@ from server.domain.datasets.repositories import DatasetGetAllExtras
 from server.domain.datasets.specifications import DatasetSpec
 
 from ...catalog_records.models import CatalogRecordModel
+from ...catalogs.models import CatalogModel
 from ...tags.models import TagModel
 from ..models import DataFormatModel, DatasetModel
 
@@ -84,14 +85,21 @@ class GetAllQuery:
             else:
                 whereclauses.append(DatasetModel.license == license)
 
-        stmt = select(DatasetModel, *columns).join(DatasetModel.catalog_record)
+        stmt = (
+            select(DatasetModel, *columns)
+            .join(DatasetModel.catalog_record)
+            .join(CatalogRecordModel.catalog)
+            .join(CatalogModel.organization)
+        )
 
         for target, kwargs in joinclauses:
             stmt = stmt.join(target, **kwargs)
 
         self.statement = (
             stmt.options(
-                contains_eager(DatasetModel.catalog_record),
+                contains_eager(DatasetModel.catalog_record)
+                .contains_eager(CatalogRecordModel.catalog)
+                .contains_eager(CatalogModel.organization),
                 selectinload(DatasetModel.formats),
                 selectinload(DatasetModel.tags),
                 selectinload(DatasetModel.extra_field_values),

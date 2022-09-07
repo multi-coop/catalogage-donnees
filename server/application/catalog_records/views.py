@@ -3,10 +3,11 @@ import datetime as dt
 from pydantic import BaseModel
 
 from server.domain.common.types import ID
-from server.domain.organizations.types import Siret
+
+from ..organizations.views import OrganizationView
 
 
 class CatalogRecordView(BaseModel):
     id: ID
-    organization_siret: Siret
+    organization: OrganizationView
     created_at: dt.datetime

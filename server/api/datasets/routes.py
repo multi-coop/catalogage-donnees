@@ -15,6 +15,7 @@ from server.domain.common.pagination import Page, Pagination
 from server.domain.common.types import ID
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.datasets.specifications import DatasetSpec
+from server.domain.organizations.exceptions import OrganizationDoesNotExist
 from server.seedwork.application.messages import MessageBus
 
 from ..auth.permissions import HasRole, IsAuthenticated
@@ -81,7 +82,10 @@ async def create_dataset(data: DatasetCreate) -> DatasetView:
 
     command = CreateDataset(**data.dict())
 
-    id = await bus.execute(command)
+    try:
+        id = await bus.execute(command)
+    except OrganizationDoesNotExist as exc:
+        raise HTTPException(400, detail=str(exc))
 
     query = GetDatasetByID(id=id)
     return await bus.execute(query)
