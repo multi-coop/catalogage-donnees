@@ -3,14 +3,16 @@
   import Footer from "$lib/components/Footer/Footer.svelte";
   import { onMount } from "svelte";
   import LayoutProviders from "$lib/providers/LayoutProviders.svelte";
-  import { account, apiToken } from "$lib/stores/auth";
-  import { checkLogin } from "$lib/repositories/auth";
+  import { account, apiToken, refresh } from "$lib/stores/auth";
   import { Maybe } from "$lib/util/maybe";
+  import { getMe } from "$lib/repositories/auth";
 
   onMount(async () => {
     if (Maybe.Some($account)) {
-      // Ensure user session is still valid.
-      await checkLogin({ fetch, apiToken: $apiToken });
+      // Ensure user session is still valid and has updated info.
+      Maybe.map(await getMe({ fetch, apiToken: $apiToken }), (freshAccount) =>
+        refresh(freshAccount)
+      );
     }
   });
 </script>

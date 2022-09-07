@@ -5,11 +5,28 @@ import "@testing-library/jest-dom";
 
 import DatasetForm from "./DatasetForm.svelte";
 import { render, fireEvent } from "@testing-library/svelte";
-import type { DataFormat, DatasetFormData } from "src/definitions/datasets";
+import type {
+  DataFormat,
+  DatasetFormData,
+  DatasetFormInitial,
+} from "src/definitions/datasets";
 import { login, logout } from "$lib/stores/auth";
 import { buildFakeTag } from "src/tests/factories/tags";
 
 describe("Test the dataset form", () => {
+  beforeAll(() =>
+    login(
+      {
+        organizationSiret: "<siret>",
+        email: "john@domain.org",
+        role: "USER",
+      },
+      "abcd1234"
+    )
+  );
+
+  afterAll(() => logout());
+
   test('The "title" field is present', () => {
     const { getByLabelText } = render(DatasetForm);
     const title = getByLabelText("Nom du jeu de données", { exact: false });
@@ -83,10 +100,19 @@ describe("Test the dataset form", () => {
 
   test('The "contact emails" field is present', () => {
     const { getAllByLabelText } = render(DatasetForm);
-    const inputs = getAllByLabelText(/Contact \d/);
+    const inputs = getAllByLabelText(/Contact \d/) as HTMLInputElement[];
     expect(inputs.length).toBe(1);
-    expect(inputs[0]).toBeRequired();
     expect(inputs[0]).toHaveAttribute("type", "email");
+    expect(inputs[0]).not.toBeRequired();
+    expect(inputs[0].value).toBe("john@domain.org");
+  });
+
+  test('The "contact emails" field requires at least one value', async () => {
+    const { getAllByLabelText } = render(DatasetForm);
+    const inputs = getAllByLabelText(/Contact \d/) as HTMLInputElement[];
+    expect(inputs.length).toBe(1);
+    await fireEvent.input(inputs[0], { target: { value: "" } });
+    expect(inputs[0]).toBeRequired();
   });
 
   test('The "url" field is present', async () => {
@@ -124,7 +150,11 @@ describe("Test the dataset form", () => {
 
   test("The fields are initialized with initial values", async () => {
     const fakeTag = buildFakeTag({ name: "Architecture" });
-    const initial: DatasetFormData = {
+    const initial: DatasetFormInitial = {
+      catalogRecord: {
+        createdAt: new Date(),
+        organization: { name: "Fake", siret: "<siret>" },
+      },
       title: "Titre initial",
       description: "Description initiale",
       formats: ["website"],
@@ -206,7 +236,11 @@ describe("Test the dataset form", () => {
   });
 
   test("Null or empty fields are correctly submitted as null", async () => {
-    const initial: DatasetFormData = {
+    const initial: DatasetFormInitial = {
+      catalogRecord: {
+        createdAt: new Date(),
+        organization: { name: "Fake", siret: "<siret>" },
+      },
       title: "Titre initial",
       description: "Description initiale",
       formats: ["website"],
@@ -250,21 +284,5 @@ describe("Test the dataset form", () => {
     expect(submittedValue.producerEmail).toBe(null);
     expect(submittedValue.url).toBe(null);
     expect(submittedValue.license).toBe(null);
-  });
-
-  describe("Authenticated tests", () => {
-    beforeAll(() =>
-      login({ email: "john@domain.org", role: "USER" }, "abcd1234")
-    );
-
-    afterAll(() => logout());
-
-    test("User email is used as default contact email", () => {
-      const { getAllByLabelText } = render(DatasetForm);
-      const inputs = getAllByLabelText(/Contact \d/) as HTMLInputElement[];
-      expect(inputs.length).toBe(1);
-      expect(inputs[0].value).toBe("john@domain.org");
-      expect(inputs[0]).not.toBeRequired();
-    });
   });
 });

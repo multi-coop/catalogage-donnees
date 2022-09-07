@@ -1,11 +1,12 @@
 import type {
   PasswordLoginData,
   AuthenticatedUser,
+  Account,
 } from "src/definitions/auth";
 import type { ApiResponse, Fetch } from "src/definitions/fetch";
 import { getApiUrl, getHeaders, makeApiRequest } from "../fetch";
 import { toAccount } from "../transformers/auth";
-import type { Maybe } from "../util/maybe";
+import { Maybe } from "../util/maybe";
 
 type LoginWithPassword = (opts: {
   fetch: Fetch;
@@ -54,10 +55,19 @@ export const loginWithDataPass: LoginWithDataPass = async ({ params }) => {
   };
 };
 
-type CheckLogin = (opts: { fetch: Fetch; apiToken: string }) => Promise<void>;
+type GetMe = (opts: {
+  fetch: Fetch;
+  apiToken: string;
+}) => Promise<Maybe<Account>>;
 
-export const checkLogin: CheckLogin = async ({ fetch, apiToken }) => {
-  const url = `${getApiUrl()}/auth/check/`;
+export const getMe: GetMe = async ({ fetch, apiToken }) => {
+  const url = `${getApiUrl()}/auth/users/me/`;
   const request = new Request(url, { headers: getHeaders(apiToken) });
-  await makeApiRequest(fetch, request);
+
+  const response = await makeApiRequest(fetch, request);
+
+  return Maybe.map(response, async (resp) => {
+    const data = await resp.json();
+    return toAccount(data);
+  });
 };

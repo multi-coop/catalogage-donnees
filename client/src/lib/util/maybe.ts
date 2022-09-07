@@ -11,7 +11,15 @@ const map = <A, B>(a: Maybe<A>, f: (value: A) => B): Maybe<B> => {
   return Some(a) ? f(a) : null;
 };
 
+const expect = <T>(m: Maybe<T>, name: string): T => {
+  if (!Some(m)) {
+    throw new Error(`Expected ${name} (value: ${m}) to be Some`);
+  }
+  return m;
+};
+
 export const Maybe = {
   Some,
   map,
+  expect,
 };

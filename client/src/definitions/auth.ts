@@ -13,6 +13,7 @@ export interface PasswordLoginData {
 export type UserRole = "USER" | "ADMIN";
 
 export interface Account {
+  organizationSiret: string;
   email: string;
   role: UserRole;
 }

@@ -1,6 +1,5 @@
 import { test as base, expect, type APIRequestContext } from "@playwright/test";
 import type { Dataset } from "../../definitions/datasets.js";
-import { toPayload } from "../../lib/transformers/dataset.js";
 import { ADMIN_EMAIL, TEST_EMAIL, TEST_PASSWORD } from "./constants.js";
 
 /**
@@ -58,7 +57,7 @@ export const test = base.extend<AppTestArgs>({
     const headers = { Authorization: `Bearer ${adminApiToken}` };
 
     const data = {
-      id: "xxx-xxx-xxx",
+      organization_siret: "00000000000000",
       title: "Sample title",
       description: "Sample description",
       formats: ["api"],
@@ -69,10 +68,10 @@ export const test = base.extend<AppTestArgs>({
       update_frequency: "never",
       last_updated_at: new Date(),
       geographical_coverage: "Monde",
-      tagIds: ["ceb19363-1681-4052-813c-f771d4459295"],
+      tag_ids: ["ceb19363-1681-4052-813c-f771d4459295"],
     };
     let response = await apiContext.post("/datasets/", {
-      data: toPayload(data),
+      data,
       headers,
     });
 

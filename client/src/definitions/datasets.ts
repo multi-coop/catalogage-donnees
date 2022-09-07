@@ -43,10 +43,12 @@ export type Dataset = {
   tags: Tag[];
 };
 
+export type DatasetFormInitial = Omit<Dataset, "id">;
+
 export type DatasetFormData = Omit<
   Dataset,
   "id" | "catalogRecord" | "headlines"
->;
+> & { organizationSiret: string };
 
 export type DatasetCreateData = Omit<DatasetFormData, "tags"> & {
   tagIds: string[];

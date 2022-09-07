@@ -141,9 +141,17 @@ async def test_login_failed(
 
 
 @pytest.mark.asyncio
-async def test_check(client: httpx.AsyncClient, temp_user: TestPasswordUser) -> None:
-    response = await client.get("/auth/check/", auth=temp_user.auth)
+async def test_get_connected_user(
+    client: httpx.AsyncClient, temp_user: TestPasswordUser
+) -> None:
+    response = await client.get("/auth/users/me/", auth=temp_user.auth)
     assert response.status_code == 200
+    assert response.json() == {
+        "id": str(temp_user.account_id),
+        "organization_siret": str(LEGACY_ORGANIZATION.siret),
+        "email": temp_user.account.email,
+        "role": temp_user.account.role.value,
+    }
 
 
 @pytest.mark.asyncio
@@ -157,7 +165,7 @@ async def test_check(client: httpx.AsyncClient, temp_user: TestPasswordUser) -> 
         pytest.param({"Authorization": "Bearer badtoken"}, id="bad-token"),
     ],
 )
-async def test_check_failed(
+async def test_get_connected_user_failed(
     client: httpx.AsyncClient, temp_user: TestPasswordUser, headers: dict
 ) -> None:
     if "Authorization" in headers:
@@ -165,7 +173,7 @@ async def test_check_failed(
             api_token=temp_user.account.api_token
         )
 
-    response = await client.get("/auth/check/", headers=headers)
+    response = await client.get("/auth/users/me/", headers=headers)
     assert response.status_code == 401
     data = response.json()
     assert data["detail"] == "Invalid credentials"
