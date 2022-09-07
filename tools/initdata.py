@@ -51,6 +51,48 @@ def _parse_env_passwords(passwords_env: str) -> Dict[str, str]:
         raise ValueError(f"Malformed TOOLS_PASSWORDS: {exc}")
 
 
+async def handle_organizations(item: dict) -> None:
+    bus = resolve(MessageBus)
+    repository = resolve(OrganizationRepository)
+
+    siret = item["params"]["siret"]
+
+    existing_organization = await repository.get_by_siret(siret)
+
+    if existing_organization is not None:
+
+        organization_repr = (
+            f"Organization(siret={siret!r}, name={item['params']['name']!r}, ...)"
+        )
+        print(f"{info('ok')}: {organization_repr}")
+        return
+
+    create_command = CreateOrganization(**item["params"])
+
+    await bus.execute(create_command)
+    print(f"{success('created')}: {create_command!r}")
+
+
+async def handle_catalogs(item: dict) -> None:
+    bus = resolve(MessageBus)
+    repository = resolve(CatalogRepository)
+
+    siret = item["params"]["organization_siret"]
+
+    existing_organization = await repository.get_by_siret(siret)
+
+    if existing_organization is not None:
+
+        organization_repr = f"Catalog(siret={siret!r}, ...)"
+        print(f"{info('ok')}: {organization_repr}")
+        return
+
+    create_command = CreateCatalog(**item["params"])
+
+    await bus.execute(create_command)
+    print(f"{success('created')}: {create_command!r}")
+
+
 async def handle_user(
     item: dict, *, no_input: bool, env_passwords: Dict[str, str]
 ) -> None:
@@ -117,6 +159,7 @@ async def handle_dataset(item: dict, reset: bool = False) -> None:
         changed = any(
             getattr(update_command, k) != _get_dataset_attr(existing_dataset, k)
             for k in item["params"]
+            if k in UpdateDataset.__fields__
         )
 
         if changed and reset:
@@ -134,51 +177,19 @@ async def handle_dataset(item: dict, reset: bool = False) -> None:
     print(f"{success('created')}: {create_command!r}")
 
 
-async def handle_organizations(item: dict) -> None:
-    bus = resolve(MessageBus)
-    repository = resolve(OrganizationRepository)
-
-    siret = item["params"]["siret"]
-
-    existing_organization = await repository.get_by_siret(siret)
-
-    if existing_organization is not None:
-
-        organization_repr = (
-            f"Organization(siret={siret!r}, name={item['params']['name']!r}, ...)"
-        )
-        print(f"{info('ok')}: {organization_repr}")
-        return
-
-    create_command = CreateOrganization(**item["params"])
-
-    await bus.execute(create_command)
-    print(f"{success('created')}: {create_command!r}")
-
-
-async def handle_catalogs(item: dict) -> None:
-    bus = resolve(MessageBus)
-    repository = resolve(CatalogRepository)
-
-    siret = item["params"]["organization_siret"]
-
-    existing_organization = await repository.get_by_siret(siret)
-
-    if existing_organization is not None:
-
-        organization_repr = f"Catalog(siret={siret!r}, ...)"
-        print(f"{info('ok')}: {organization_repr}")
-        return
-
-    create_command = CreateCatalog(**item["params"])
-
-    await bus.execute(create_command)
-    print(f"{success('created')}: {create_command!r}")
-
-
 async def main(path: pathlib.Path, reset: bool = False, no_input: bool = False) -> None:
     with path.open() as f:
         spec = yaml.safe_load(f)
+
+    print("\n", ruler("Organizations"))
+
+    for item in spec["organizations"]:
+        await handle_organizations(item)
+
+    print("\n", ruler("Catalogs"))
+
+    for item in spec["catalogs"]:
+        await handle_catalogs(item)
 
     print("\n", ruler("Users"))
 
@@ -196,16 +207,6 @@ async def main(path: pathlib.Path, reset: bool = False, no_input: bool = False) 
 
     for item in spec["datasets"]:
         await handle_dataset(item, reset=reset)
-
-    print("\n", ruler("Organizations"))
-
-    for item in spec["organizations"]:
-        await handle_organizations(item)
-
-    print("\n", ruler("Catalogs"))
-
-    for item in spec["catalogs"]:
-        await handle_catalogs(item)
 
 
 if __name__ == "__main__":

@@ -1,11 +1,27 @@
+organizations:
+  - params:
+      name: "Ministère de la Culture"
+      siret: "11004601800013"
+
+catalogs:
+  - params:
+      organization_siret: "11004601800013"
+      extra_fields:
+        - name: referentiel
+          title: Référentiel ou norme
+          hint_text: Ce jeu de données contient-il un référentiel ou une norme ? Si oui, lequel ?
+          type: TEXT
+
 users:
   - id: "c33cc0bb-975c-45a1-ac2a-7fed9971ce6a"
     params:
+      organization_siret: "11004601800013"
       email: catalogue.demo@yopmail.com
       password: password1234
 
   - id: "4c2cefce-ea47-4e6e-8c79-8befd4495f45"
     params:
+      organization_siret: "11004601800013"
       email: admin@catalogue.data.gouv.fr
       password: __env__
     extras:
@@ -44,6 +60,7 @@ datasets:
   - # Mimicks: https://www.data.gouv.fr/fr/datasets/donnees-brutes-de-l-inventaire-forestier/
     id: "16b398af-f8c7-48b9-898a-18ad3404f528"
     params:
+      organization_siret: "11004601800013"
       title: Données brutes de l'inventaire forestier
       description: |
         Les données brutes de l'inventaire forestier correspondent à l'ensemble des données collectées en forêt (y compris en peupleraie) sur le territoire métropolitain par les agents forestiers de terrain de l'IGN. Ces données portent sur les caractéristiques des placettes d'inventaire (6000 par an), les mesures et observations sur les arbres (60 000 par an), les données éco-floristiques.
@@ -66,6 +83,7 @@ datasets:
   - # Mimicks: https://www.data.gouv.fr/fr/datasets/ensemble-des-lieux-de-restauration-des-crous-france-entiere-1/
     id: "4370d027-1447-4e1b-9452-781233be7f5a"
     params:
+      organization_siret: "11004601800013"
       title: Ensemble des lieux de restauration des CROUS
       description: |
         Les ressources ci-dessous recensent les restaurants, brasseries et cafétérias dans le réseau des CROUS.
@@ -86,6 +104,7 @@ datasets:
   - # Mimicks: https://www.data.gouv.fr/fr/datasets/restaurants-brasseries-et-cafeterias-des-crous/
     id: "3707e03b-d020-4a14-bb85-1ad0545b1578"
     params:
+      organization_siret: "11004601800013"
       title: Restaurants, brasseries et cafétérias des CROUS
       description: |
         Par région, les ressources ci-dessous recensent les restaurants, brasseries et cafétérias dans le réseau des CROUS.
@@ -107,6 +126,7 @@ datasets:
   - # Mimicks: https://www.data.gouv.fr/fr/datasets/catalogue-des-enquetes-realisees-par-la-dares-2012-572205/
     id: "40abb40f-af83-4a3b-b926-78428402688f"
     params:
+      organization_siret: "11004601800013"
       title: Catalogue des enquêtes réalisées par la DARES
       description: |
         Présentation sous forme de fiches répertoriées par thèmes des enquêtes menées par la DARES avec reprise des objectifs, de la périodicité, de la taille de l'échantillon, des publications.
@@ -123,17 +143,3 @@ datasets:
       license: Licence Ouverte
       tag_ids: []
       extra_field_values: []
-
-organizations:
-  - params:
-      name: "Ministère de la Culture"
-      siret: "11004601800013"
-
-catalogs:
-  - params:
-      organization_siret: "11004601800013"
-      extra_fields:
-        - name: referentiel
-          title: Référentiel ou norme
-          hint_text: Ce jeu de données contient-il un référentiel ou une norme ? Si oui, lequel ?
-          type: TEXT
