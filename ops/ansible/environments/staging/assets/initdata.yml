@@ -100,6 +100,7 @@ datasets:
       license: Autre (Open)
       tag_ids:
         - "ceb19363-1681-4052-813c-f771d4459295"
+      extra_field_values: []
 
   - # Mimicks: https://www.data.gouv.fr/fr/datasets/restaurants-brasseries-et-cafeterias-des-crous/
     id: "3707e03b-d020-4a14-bb85-1ad0545b1578"
