@@ -14,6 +14,29 @@ catalogs:
           title: Référentiel ou norme
           hint_text: Ce jeu de données contient-il un référentiel ou une norme ? Si oui, lequel ?
           type: TEXT
+        - name: donnees_pi
+          title: Propriété intellectuelle
+          hint_text: |
+            L'organisation peut-elle se prévaloir d'un
+            [droit de propriété intellectuelle](https://guides.etalab.gouv.fr/juridique/reutilisation/#le-cas-de-la-propriete-intellectuelle)
+            sur le jeu de données ?
+          type: BOOL
+          data:
+            true_value: Oui
+            false_value: Non
+        - name: sous_domaine
+          title: Sous-domaine
+          hint_text: Nom du sous-domaine associé au jeu de données.
+          type: ENUM
+          data:
+            values:
+              - Archéologie
+              - Arts plastiques
+              - Danse
+              - Autre spectacle vivant
+              - Radio
+              - Presse
+              - Télévision
 
 users:
   - id: "c33cc0bb-975c-45a1-ac2a-7fed9971ce6a"

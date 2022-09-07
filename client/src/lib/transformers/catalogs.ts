@@ -2,9 +2,20 @@ import type { Catalog, ExtraField } from "src/definitions/catalogs";
 
 const toExtraField = (data: any): ExtraField => {
   const { hint_text, ...rest } = data;
+
+  let { data: fieldData } = data;
+
+  if (data.type === "BOOL") {
+    fieldData = {
+      trueValue: fieldData.true_value,
+      falseValue: fieldData.false_value,
+    };
+  }
+
   return {
-    hintText: hint_text,
     ...rest,
+    hintText: hint_text,
+    data: fieldData,
   };
 };
 

@@ -25,6 +25,7 @@
   import TagSelector from "../TagSelector/TagSelector.svelte";
   import LicenseField from "./_LicenseField.svelte";
   import type { Catalog, ExtraFieldValue } from "src/definitions/catalogs";
+  import ExtraField from "./_ExtraField.svelte";
 
   export let submitLabel = "Publier la fiche de données";
   export let loadingLabel = "Publication en cours...";
@@ -225,7 +226,7 @@
   };
 
   const handleExtraFieldChange = (event: Event, index: number) => {
-    const { value } = event.target as HTMLInputElement;
+    const { value } = event.target as HTMLInputElement | HTMLSelectElement;
     const v = $form.extraFieldValues;
     v[index] = value;
     updateValidateField("extraFieldValues", v);
@@ -453,12 +454,11 @@
 
   <div class="form--content fr-mb-8w">
     {#each catalog.extraFields as extraField, index (extraField.id)}
-      <InputField
-        name={extraField.name}
-        label={extraField.title}
-        hintText={extraField.hintText}
+      <ExtraField
+        {extraField}
         value={$form.extraFieldValues[index]}
         on:input={(ev) => handleExtraFieldChange(ev, index)}
+        on:change={(ev) => handleExtraFieldChange(ev, index)}
         on:blur={(ev) => handleExtraFieldChange(ev, index)}
       />
     {/each}
