@@ -105,3 +105,16 @@ export async function makeApiRequest(
 
   return response;
 }
+
+export async function makeApiRequestOrFail(
+  fetch: Fetch,
+  request: Request
+): Promise<Maybe<Response>> {
+  const response = await fetch(request);
+
+  if (!response.ok) {
+    pushApiError(response);
+    return Promise.reject(response);
+  }
+  return response;
+}
