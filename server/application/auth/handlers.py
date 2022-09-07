@@ -93,8 +93,22 @@ async def create_datapass_user(command: CreateDataPassUser) -> ID:
 
     email = command.email
 
-    # Reuse an existing account (e.g. tied to an existing PasswordUser), or create one.
+    # Reuse an existing account tied to an existing PasswordUser, or create one.
     account = await account_repository.get_by_email(email)
+
+    # Ensure the existing account is linked to the same organization.
+    # A misconfigured initdata.yml used to allow different organizations.
+    # See: https://github.com/etalab/catalogage-donnees/issues/414
+    if account is not None and account.organization_siret != command.organization_siret:
+        raise RuntimeError(
+            f"Found account for {email=!r} "
+            f"in organization {account.organization_siret!r}, "
+            "but requested to create a DataPassUser "
+            f"in different organization {command.organization_siret!r}. "
+            "HINT: This is most likely a data setup issue on the developer side. "
+            "Did you set up a PasswordUser for this email "
+            f"in organization {account.organization_siret}? "
+        )
 
     if account is None:
         account = Account(

@@ -50,15 +50,14 @@ async def test_initdata_env_password_invalid(
     path = tmp_path / "initdata.yml"
     path.write_text(
         """
+        organizations: []
+        catalogs: []
         users:
           - id: 9c2cefce-ea47-4e6e-8c79-8befd4495f45
             params:
               email: test@admin.org
               password: __env__
         datasets: []
-        organizations: []
-        catalogs: []
-
         """
     )
 
@@ -124,9 +123,11 @@ async def test_repo_initdata(
     num_users = 2
     num_tags = 7
     num_datasets = 4
-    num_organization = 1
-    num_catalog = 1
-    num_entities = num_users + num_tags + num_datasets + num_catalog + num_organization
+    num_organizations = 1
+    num_catalogs = 1
+    num_entities = (
+        num_users + num_tags + num_datasets + num_catalogs + num_organizations
+    )
 
     await initdata.main(path, no_input=True)
     captured = capsys.readouterr()

@@ -13,7 +13,11 @@ from .factories import CreatePasswordUserFactory
 
 
 def create_client(app: Callable) -> httpx.AsyncClient:
-    return httpx.AsyncClient(app=app, base_url="http://testserver")
+    transport = httpx.ASGITransport(
+        app,
+        raise_app_exceptions=True,  # We explicitly want this.
+    )
+    return httpx.AsyncClient(transport=transport, base_url="http://testserver")
 
 
 def to_payload(obj: BaseModel) -> dict:

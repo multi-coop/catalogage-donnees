@@ -52,6 +52,16 @@ class CreateTagFactory(Factory[CreateTag]):
     __model__ = CreateTag
 
 
+_FAKE_GEOGRAPHICAL_COVERAGES = [
+    "Ville d'Angers",
+    "Métropole Européenne de Lille",
+    "Région Île-de-France",
+    "Région Nouvelle-Aquitaine",
+    "France métropolitaine",
+    "Monde",
+]
+
+
 class CreateDatasetFactory(Factory[CreateDataset]):
     __model__ = CreateDataset
 
@@ -59,6 +69,7 @@ class CreateDatasetFactory(Factory[CreateDataset]):
     title = Use(fake.sentence)
     description = Use(fake.text)
     service = Use(fake.company)
+    geographical_coverage = Use(lambda: random.choice(_FAKE_GEOGRAPHICAL_COVERAGES))
     formats = Use(lambda: random.choices(list(DataFormat), k=random.randint(1, 3)))
     technical_source = Use(
         lambda: fake.sentence(nb_words=3) if random.random() < 0.5 else None
