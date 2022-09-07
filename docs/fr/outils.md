@@ -120,6 +120,20 @@ N.B. : Avant de créer chaque entité, le script s'assure qu'elle n'existe pas d
 
 Pour plus de détails, lire le code source.
 
+### Jeux de données aléatoires
+
+Il est possible d'ajouter un paquet de jeux de données aléatoires au catalogue d'une organisation de cette façon:
+
+```bash
+siret=... make randomdatasets
+```
+
+Par défaut 500 jeux de données sont ajoutés. Pour en ajouter une autre quantité, utiliser :
+
+```bash
+siret=... n=... make randomdatasets
+```
+
 ## Générer un UUID
 
 Pour générer un UUID d'entité, lancer :
