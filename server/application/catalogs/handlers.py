@@ -25,7 +25,7 @@ async def get_catalog_by_siret(query: GetCatalogBySiret) -> CatalogView:
 
 
 async def create_catalog(
-    command: CreateCatalog, extra_field_ids_by_name: Dict[str, ID] = None
+    command: CreateCatalog, *, extra_field_ids_by_name: Dict[str, ID] = None
 ) -> Siret:
     repository = resolve(CatalogRepository)
 

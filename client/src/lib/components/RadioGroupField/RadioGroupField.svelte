@@ -11,7 +11,7 @@
 </script>
 
 <div class="fr-form-group">
-  <fieldset class="fr-fieldset fr-fieldset--inline">
+  <fieldset class="fr-fieldset fr-fieldset--inline" role="radiogroup">
     <legend class="fr-fieldset__legend fr-text--regular" id="{name}-legend">
       {label}
       {#if hintText}

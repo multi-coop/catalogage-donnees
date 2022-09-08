@@ -22,7 +22,7 @@ const getAdminTestPassword = (): string => {
 const config: PlaywrightTestConfig<AppTestArgs> = {
   testDir: "./tests/e2e/",
   globalSetup: "./tests/e2e/global-setup.ts",
-  retries: 1,
+  retries: 3,
   use: {
     baseURL: "http://localhost:3000",
     browserName: "firefox",
