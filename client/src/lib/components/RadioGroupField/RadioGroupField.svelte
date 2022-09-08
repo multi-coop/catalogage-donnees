@@ -16,7 +16,7 @@
 
 <div class="fr-form-group">
   <fieldset class="fr-fieldset fr-fieldset--inline">
-    <legend class="fr-fieldset__legend fr-text--regular" id="radio-legend">
+    <legend class="fr-fieldset__legend fr-text--regular" id="{name}-legend">
       {label}
       {#if hintText}
         <span class="fr-hint-text" id="select-hint-{name}-hint">

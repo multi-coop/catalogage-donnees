@@ -10,11 +10,13 @@ catalogs:
   - params:
       organization_siret: "11004601800013"
       extra_fields:
-        - name: referentiel
+        - id: "bd13b1fc-0bd3-42ed-b1f5-58cc1a213832"
+          name: referentiel
           title: Référentiel ou norme
           hint_text: Ce jeu de données contient-il un référentiel ou une norme ? Si oui, lequel ?
           type: TEXT
-        - name: donnees_pi
+        - id: "97668c15-5cd3-4efa-9ded-89a47eae6e99"
+          name: donnees_pi
           title: Propriété intellectuelle
           hint_text: |
             L'organisation peut-elle se prévaloir d'un
@@ -24,7 +26,8 @@ catalogs:
           data:
             true_value: Oui
             false_value: Non
-        - name: sous_domaine
+        - id: "751e813a-c130-4aa3-b01c-11ed67d52dbe"
+          name: sous_domaine
           title: Sous-domaine
           hint_text: Nom du sous-domaine associé au jeu de données.
           type: ENUM

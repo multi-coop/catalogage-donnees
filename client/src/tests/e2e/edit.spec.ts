@@ -20,6 +20,12 @@ test.describe("Edit dataset", () => {
 
     expect(await page.isChecked("input[value='api']")).toBeTruthy();
 
+    expect(dataset.extraFieldValues).toHaveLength(1);
+    const extraReferentiel = page.locator("form [name=referentiel]");
+    expect(await extraReferentiel.inputValue()).toBe(
+      dataset.extraFieldValues[0].value
+    );
+
     // Make and submit changes
 
     const newTitleText = "Other title";
@@ -53,6 +59,11 @@ test.describe("Edit dataset", () => {
       label: "environnement",
     });
 
+    const newExtraFeferentiel = "Standard MC2019";
+    expect(newExtraFeferentiel).not.toBe(dataset.extraFieldValues[0].value);
+    await extraReferentiel.fill(newExtraFeferentiel);
+    expect(await extraReferentiel.inputValue()).toBe(newExtraFeferentiel);
+
     const button = page.locator("button[type='submit']");
     const [request, response] = await Promise.all([
       page.waitForRequest(`**/datasets/${dataset.id}/`),
@@ -66,10 +77,10 @@ test.describe("Edit dataset", () => {
     expect(json.title).toBe(newTitleText);
     expect(json.description).toBe(newDescriptionText);
     expect(json.formats).toStrictEqual(["database", "website"]);
-
     expect(
       json.tags.findIndex((item) => item.name === "environnement") !== -1
     ).toBeTruthy();
+    expect(json.extra_field_values[0].value).toBe(newExtraFeferentiel);
   });
 
   test("Does not see delete button", async ({ page, dataset }) => {

@@ -89,7 +89,11 @@ async def handle_catalogs(item: dict) -> None:
 
     create_command = CreateCatalog(**item["params"])
 
-    await bus.execute(create_command)
+    extra_field_ids_by_name = {
+        field["name"]: field["id"] for field in item["params"]["extra_fields"]
+    }
+
+    await bus.execute(create_command, extra_field_ids_by_name=extra_field_ids_by_name)
     print(f"{success('created')}: {create_command!r}")
 
 

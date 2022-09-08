@@ -3,7 +3,7 @@ import type {
   DatasetCreateData,
   DatasetUpdateData,
 } from "src/definitions/datasets";
-import { omit } from "../util/object";
+import { omit } from "../util/object.js";
 
 export const camelToUnderscore = (key: string): string => {
   return key.replace(/([A-Z])/g, "_$1").toLowerCase();
