@@ -179,6 +179,12 @@ Il sont soit exécutés en mode _ci_ (continuous integration, par exemple dans
 notre cas avec github actions), et donc en _headless_, soit de manière
 interactive (en dev).
 
+#### Astuces
+
+* Pour lancer Playwright en mode _headed_ (affichage du navigateur au fur et à mesure des tests), modifier temporairement `headless: false` dans le fichier `client/playwright.config.ts`. Voir [Headed mode](https://playwright.dev/docs/debug#headed-mode).
+* Pour lancer Playwright en mod _debug_ (affichage du navigateur + console de débogage), lancer `PWDEBUG=1 make test-client-e2e-ci`. Il sera peut-être demandé d'installer Chromium : utiliser `cd client && npx playwright install chromium`. Voir aussi [Debugging tests](https://playwright.dev/docs/debug).
+* Pour lancer un test en particulier, modifier temporairement `test(...)` en `test.only(...)`. Voir [Focus a test](https://playwright.dev/docs/test-annotations#focus-a-test).
+
 ### Tests unitaires - Client
 
 Les tests unitaires côté client utilisent [`svelte-testing-library`](https://github.com/testing-library/svelte-testing-library).
@@ -187,6 +193,10 @@ Autres ressources pour démarrer :
 
 - [Svelte Testing Library: Example](https://testing-library.com/docs/svelte-testing-library/example)
 - [Unit Testing Svelte Components](https://sveltesociety.dev/recipes/testing-and-debugging/unit-testing-svelte-component/)
+
+#### Astuces
+
+* Utiliser `cd client && npm run test:watch` pour lancer les tests en mode "watch" : les tests seront relancés automatiquement au fur et à mesure que vous modifiez le code. Très pratique pour itérer rapidement sur des tests unitaires.
 
 ## DSFR
 
