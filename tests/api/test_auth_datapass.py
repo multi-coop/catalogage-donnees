@@ -241,3 +241,31 @@ class TestCallback:
             user = await datapass_user_repository.get_by_email("johndoe@mydomain.org")
             assert user is not None
             assert user.account == existing_account
+
+    async def test_existing_password_user_in_different_org_is_error(
+        self, client: httpx.AsyncClient, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        bus = resolve(MessageBus)
+
+        email = "johndoe@mydomain.org"
+        siret_1 = "11122233344441"
+        siret_2 = "11122233344442"
+
+        userinfo: DataPassUserInfo = {
+            "email": email,
+            "organizations": [{"siret": siret_2, "label": "Organization 2"}],
+        }
+
+        async with self._mock_openid_client(monkeypatch, userinfo):
+            await bus.execute(CreateOrganizationFactory.build(siret=siret_1))
+            await bus.execute(CreateOrganizationFactory.build(siret=siret_2))
+
+            await bus.execute(
+                CreatePasswordUserFactory.build(organization_siret=siret_1, email=email)
+            )
+
+            with pytest.raises(
+                RuntimeError,
+                match="requested to create a DataPassUser in different organization",
+            ):
+                await client.get("/auth/datapass/callback/")
