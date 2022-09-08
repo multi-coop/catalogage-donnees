@@ -8,10 +8,6 @@
   export let hintText: MaybeHtmlString = "";
   export let options: SelectOption<string>[];
   export let value: string;
-
-  const clear = () => {
-    value = "";
-  };
 </script>
 
 <div class="fr-form-group">
@@ -37,19 +33,9 @@
             on:change
             on:blur
           />
-          <label class="fr-label" for={id}>{option.label} </label>
+          <label class="fr-label" for={id}>{option.label}</label>
         </div>
       {/each}
-
-      {#if value}
-        <button
-          type="button"
-          class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
-          on:click={clear}
-        >
-          Effacer
-        </button>
-      {/if}
     </div>
   </fieldset>
 </div>
