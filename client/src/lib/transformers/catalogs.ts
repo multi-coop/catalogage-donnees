@@ -20,9 +20,9 @@ const toExtraField = (data: any): ExtraField => {
 };
 
 export const toCatalog = (data: any): Catalog => {
-  const { organization_siret, extra_fields } = data;
+  const { organization, extra_fields } = data;
   return {
-    organizationSiret: organization_siret,
+    organization,
     extraFields: extra_fields.map((v: any) => toExtraField(v)),
   };
 };

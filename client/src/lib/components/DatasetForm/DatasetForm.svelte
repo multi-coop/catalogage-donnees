@@ -62,8 +62,7 @@
   );
 
   const initialValues: DatasetFormValues = {
-    organizationSiret:
-      initial?.catalogRecord.organization.siret || catalog.organizationSiret,
+    organizationSiret: catalog.organization.siret,
     title: initial?.title || "",
     description: initial?.description || "",
     service: initial?.service || "",

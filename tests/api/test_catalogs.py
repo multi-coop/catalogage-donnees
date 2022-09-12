@@ -8,27 +8,31 @@ from server.application.catalogs.queries import GetCatalogBySiret
 from server.application.datasets.queries import GetDatasetByID
 from server.config.di import resolve
 from server.domain.catalogs.entities import ExtraFieldType, TextExtraField
+from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 
-from ..factories import CreateDatasetFactory, CreateOrganizationFactory
+from ..factories import CreateDatasetFactory, CreateOrganizationFactory, fake
 from ..helpers import TestPasswordUser, api_key_auth
 
 
 @pytest.mark.asyncio
 async def test_catalog_create(client: httpx.AsyncClient) -> None:
     bus = resolve(MessageBus)
-    siret = await bus.execute(CreateOrganizationFactory.build())
+    siret = await bus.execute(CreateOrganizationFactory.build(name="Org 1"))
 
     response = await client.post(
         "/catalogs/", json={"organization_siret": str(siret)}, auth=api_key_auth
     )
     assert response.status_code == 201
     assert response.json() == {
-        "organization_siret": str(siret),
+        "organization": {
+            "siret": str(siret),
+            "name": "Org 1",
+        },
         "extra_fields": [],
     }
     catalog = await bus.execute(GetCatalogBySiret(siret=siret))
-    assert catalog.organization_siret == siret
+    assert catalog.organization.siret == siret
 
     dataset_id = await bus.execute(CreateDatasetFactory.build(organization_siret=siret))
     dataset = await bus.execute(GetDatasetByID(id=dataset_id))
@@ -38,7 +42,7 @@ async def test_catalog_create(client: httpx.AsyncClient) -> None:
 @pytest.mark.asyncio
 async def test_catalog_create_already_exists(client: httpx.AsyncClient) -> None:
     bus = resolve(MessageBus)
-    siret = await bus.execute(CreateOrganizationFactory.build())
+    siret = await bus.execute(CreateOrganizationFactory.build(name="Org 1"))
     await bus.execute(CreateCatalog(organization_siret=siret))
 
     response = await client.post(
@@ -46,9 +50,21 @@ async def test_catalog_create_already_exists(client: httpx.AsyncClient) -> None:
     )
     assert response.status_code == 200
     assert response.json() == {
-        "organization_siret": str(siret),
+        "organization": {
+            "siret": str(siret),
+            "name": "Org 1",
+        },
         "extra_fields": [],
     }
+
+
+@pytest.mark.asyncio
+async def test_catalog_invalid_org_does_not_exist(client: httpx.AsyncClient) -> None:
+    siret = Siret(fake.siret())
+    response = await client.post(
+        "/catalogs/", json={"organization_siret": str(siret)}, auth=api_key_auth
+    )
+    assert response.status_code == 400
 
 
 @pytest.mark.asyncio
@@ -172,7 +188,7 @@ async def test_create_catalog_invalid_extra_fields(
 @pytest.mark.asyncio
 async def test_create_catalog_with_extra_fields(client: httpx.AsyncClient) -> None:
     bus = resolve(MessageBus)
-    siret = await bus.execute(CreateOrganizationFactory.build())
+    siret = await bus.execute(CreateOrganizationFactory.build(name="Org 1"))
 
     extra_fields: List[dict] = [
         {
@@ -217,7 +233,10 @@ async def test_create_catalog_with_extra_fields(client: httpx.AsyncClient) -> No
     data = response.json()
 
     assert data == {
-        "organization_siret": str(siret),
+        "organization": {
+            "siret": str(siret),
+            "name": "Org 1",
+        },
         "extra_fields": [
             {
                 "id": data["extra_fields"][0]["id"],
@@ -281,7 +300,7 @@ async def test_get_catalog(
 ) -> None:
     bus = resolve(MessageBus)
 
-    siret = await bus.execute(CreateOrganizationFactory.build())
+    siret = await bus.execute(CreateOrganizationFactory.build(name="Org 1"))
     response = await client.get(f"/catalogs/{siret}/", auth=temp_user.auth)
     assert response.status_code == 404
 
@@ -302,7 +321,10 @@ async def test_get_catalog(
     assert response.status_code == 200
     data = response.json()
     assert data == {
-        "organization_siret": siret,
+        "organization": {
+            "siret": siret,
+            "name": "Org 1",
+        },
         "extra_fields": [
             {
                 "id": data["extra_fields"][0]["id"],

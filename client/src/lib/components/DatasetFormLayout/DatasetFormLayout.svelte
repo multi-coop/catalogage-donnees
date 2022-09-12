@@ -97,6 +97,6 @@
 <style>
   nav {
     /* A bit hacky but ... it makes sure that this menu stays below the header */
-    top: 10vh;
+    top: 12vh;
   }
 </style>

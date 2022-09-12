@@ -24,6 +24,8 @@ test.describe("Basic form submission", () => {
 
     await page.goto("/contribuer");
 
+    await page.locator("text=Ministère de la Culture").waitFor();
+
     // "Information Générales" section
 
     expect(

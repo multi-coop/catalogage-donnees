@@ -13,6 +13,7 @@ import type {
 import { login, logout } from "$lib/stores/auth";
 import { buildFakeTag } from "src/tests/factories/tags";
 import type { Catalog, ExtraField } from "src/definitions/catalogs";
+import type { Organization } from "src/definitions/organizations";
 
 describe("Test the dataset form", () => {
   beforeAll(() =>
@@ -28,7 +29,12 @@ describe("Test the dataset form", () => {
 
   afterAll(() => logout());
 
-  const catalog: Catalog = { organizationSiret: "<siret1>", extraFields: [] };
+  const organization: Organization = {
+    siret: "<siret>",
+    name: "Org 1",
+  };
+
+  const catalog: Catalog = { organization, extraFields: [] };
 
   const extraField: ExtraField = {
     id: "<extraField1Id>",
@@ -40,7 +46,7 @@ describe("Test the dataset form", () => {
   };
 
   const catalogWithExtraFields: Catalog = {
-    organizationSiret: "<siret2>",
+    organization,
     extraFields: [extraField],
   };
 
