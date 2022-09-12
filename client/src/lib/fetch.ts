@@ -109,7 +109,7 @@ export async function makeApiRequest(
 export async function makeApiRequestOrFail(
   fetch: Fetch,
   request: Request
-): Promise<Maybe<Response>> {
+): Promise<Response> {
   const response = await fetch(request);
 
   if (!response.ok) {

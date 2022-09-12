@@ -17,7 +17,9 @@ import type { AppTestArgs } from "./fixtures.js";
 export default async function globalSetup(
   config: FullConfig<AppTestArgs>
 ): Promise<void> {
-  const browser = await firefox.launch();
+  const browser = await firefox.launch({
+    headless: true,
+  });
 
   await saveAuthenticatedState(browser, config, {
     email: TEST_EMAIL,

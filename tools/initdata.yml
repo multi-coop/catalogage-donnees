@@ -2,6 +2,9 @@ organizations:
   - params:
       name: "Ministère de la Culture"
       siret: "11004601800013"
+  - params:
+      name: "Ministère de la Santé"
+      siret: "13001653800014"
 
 catalogs:
   - params:
@@ -17,6 +20,11 @@ users:
     params:
       organization_siret: "11004601800013"
       email: catalogue.demo@yopmail.com
+      password: password1234
+
+  - id: "2753fcf9-ab6a-426e-b1d1-e4e16470a5d0"
+    params:
+      email: catalogue.demo2@yopmail.com # This user is linked to two organizations
       password: password1234
 
   - id: "4c2cefce-ea47-4e6e-8c79-8befd4495f45"

@@ -4,6 +4,7 @@ export const STATIC_PAGES = [
   "/login",
   "/auth/datapass/create-organization",
   "/auth/datapass/login",
+  "/auth/datapass/pick-organization",
 ];
 
 export const NON_AUTH_GUARDED_PAGES = [...STATIC_PAGES, "/"];
