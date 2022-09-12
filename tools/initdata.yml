@@ -25,7 +25,7 @@ users:
   - id: "2753fcf9-ab6a-426e-b1d1-e4e16470a5d0"
     params:
       organization_siret: "13001653800014"
-      # In MonComptePro, a user linked to two organizations was created with this email.
+      # In auth-staging.api.gouv.fr, a user linked to two organizations was created with this email.
       email: catalogue.demo2@yopmail.com
       password: password1234
 
