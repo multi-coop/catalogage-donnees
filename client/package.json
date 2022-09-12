@@ -47,6 +47,7 @@
   "dependencies": {
     "@gouvfr/dsfr": "^1.5.1",
     "date-fns": "^2.28.0",
+    "snarkdown": "^2.0.0",
     "svelte-forms-lib": "^2.0.1",
     "yup": "^0.32.11"
   }

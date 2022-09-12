@@ -23,10 +23,13 @@
   import { Maybe } from "$lib/util/maybe";
   import TagSelector from "../TagSelector/TagSelector.svelte";
   import LicenseField from "./_LicenseField.svelte";
+  import type { Catalog, ExtraFieldValue } from "src/definitions/catalogs";
+  import ExtraField from "./_ExtraField.svelte";
 
   export let submitLabel = "Publier la fiche de données";
   export let loadingLabel = "Publication en cours...";
   export let loading = false;
+  export let catalog: Catalog;
   export let tags: Tag[] = [];
   export let licenses: string[] = [];
   export let geographicalCoverages: string[] = [];
@@ -51,6 +54,7 @@
     url: string | null;
     license: string;
     tags: Tag[];
+    extraFieldValues: string[];
   };
 
   const dataFormatChoices = Object.entries(DATA_FORMAT_LABELS).map(
@@ -59,8 +63,7 @@
 
   const initialValues: DatasetFormValues = {
     organizationSiret:
-      initial?.catalogRecord.organization.siret ||
-      Maybe.expect($account, "$account").organizationSiret,
+      initial?.catalogRecord.organization.siret || catalog.organizationSiret,
     title: initial?.title || "",
     description: initial?.description || "",
     service: initial?.service || "",
@@ -78,6 +81,12 @@
     url: initial?.url || null,
     license: initial?.license || "",
     tags: initial?.tags || [],
+    extraFieldValues: catalog.extraFields.map((f) => {
+      const fieldValue = (initial?.extraFieldValues || []).find(
+        ({ extraFieldId }) => f.id === extraFieldId
+      );
+      return fieldValue?.value || "";
+    }),
   };
 
   // Handle this value manually.
@@ -119,6 +128,7 @@
             })
           )
           .min(1, "Veuillez séléctionner au moins 1 mot-clé"),
+        extraFieldValues: yup.array().of(yup.string()),
       }),
       onSubmit: (values: DatasetFormValues) => {
         const formats = values.dataFormats
@@ -142,6 +152,17 @@
         const url = values.url ? values.url : null;
         const license = values.license ? values.license : null;
 
+        let extraFieldValues: ExtraFieldValue[] = [];
+
+        values.extraFieldValues.forEach((value, index) => {
+          if (value) {
+            extraFieldValues.push({
+              extraFieldId: catalog.extraFields[index].id,
+              value,
+            });
+          }
+        });
+
         const data: DatasetFormData = {
           ...values,
           formats,
@@ -150,6 +171,7 @@
           lastUpdatedAt,
           url,
           license,
+          extraFieldValues,
         };
 
         dispatch("save", data);
@@ -199,6 +221,14 @@
 
   const handleTagsChange = async (event: CustomEvent<Tag[]>) => {
     updateValidateField("tags", event.detail);
+    dispatch("touched");
+  };
+
+  const handleExtraFieldChange = (event: Event, index: number) => {
+    const { value } = event.target as HTMLInputElement | HTMLSelectElement;
+    const v = $form.extraFieldValues;
+    v[index] = value;
+    updateValidateField("extraFieldValues", v);
     dispatch("touched");
   };
 </script>
@@ -416,6 +446,24 @@
       on:input={(ev) => updateValidateField("license", ev.detail)}
     />
   </div>
+
+  {#if catalog.extraFields.length > 0}
+    <h2 id="informations-complementaires" class="fr-mt-6w fr-mb-5w">
+      Informations complémentaires
+    </h2>
+
+    <div class="form--content fr-mb-8w">
+      {#each catalog.extraFields as extraField, index (extraField.id)}
+        <ExtraField
+          {extraField}
+          value={$form.extraFieldValues[index]}
+          on:input={(ev) => handleExtraFieldChange(ev, index)}
+          on:change={(ev) => handleExtraFieldChange(ev, index)}
+          on:blur={(ev) => handleExtraFieldChange(ev, index)}
+        />
+      {/each}
+    </div>
+  {/if}
 
   <div class="fr-input-group button--container fr-mb-6w">
     <button

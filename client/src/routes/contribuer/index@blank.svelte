@@ -1,15 +1,19 @@
 <script context="module" lang="ts">
   import type { Load } from "@sveltejs/kit";
   export const prerender = true;
+  import { getCatalogBySiret } from "src/lib/repositories/catalogs";
   import { getTags } from "src/lib/repositories/tags";
   import { getLicenses } from "src/lib/repositories/licenses";
   import { getDatasetFiltersInfo } from "src/lib/repositories/datasetFilters";
   import { get } from "svelte/store";
+  import { account } from "src/lib/stores/auth";
 
   export const load: Load = async ({ fetch }) => {
     const apiToken = get(apiTokenStore);
+    const siret = Maybe.expect(get(account), "$account").organizationSiret;
 
-    const [tags, licenses, filtersInfo] = await Promise.all([
+    const [catalog, tags, licenses, filtersInfo] = await Promise.all([
+      getCatalogBySiret({ fetch, apiToken, siret }),
       getTags({ fetch, apiToken }),
       getLicenses({ fetch, apiToken }),
       getDatasetFiltersInfo({ fetch, apiToken }),
@@ -17,6 +21,7 @@
 
     return {
       props: {
+        catalog,
         tags,
         licenses,
         filtersInfo,
@@ -34,6 +39,7 @@
   import { createDataset } from "$lib/repositories/datasets";
   import { Maybe } from "$lib/util/maybe";
   import DatasetFormLayout from "src/lib/components/DatasetFormLayout/DatasetFormLayout.svelte";
+  import type { Catalog } from "src/definitions/catalogs";
   import type { Tag } from "src/definitions/tag";
   import ModalExitFormConfirmation from "src/lib/components/ModalExitFormConfirmation/ModalExitFormConfirmation.svelte";
   import type { DatasetFiltersInfo } from "src/definitions/datasetFilters";
@@ -44,6 +50,7 @@
 
   let formHasBeenTouched = false;
 
+  export let catalog: Maybe<Catalog>;
   export let tags: Maybe<Tag[]>;
   export let licenses: Maybe<string[]>;
   export let filtersInfo: Maybe<DatasetFiltersInfo>;
@@ -94,7 +101,7 @@
   {/if}
 </header>
 
-{#if Maybe.Some(tags) && Maybe.Some(licenses) && Maybe.Some(filtersInfo)}
+{#if Maybe.Some(catalog) && Maybe.Some(tags) && Maybe.Some(licenses) && Maybe.Some(filtersInfo)}
   <ModalExitFormConfirmation
     on:confirm={handleExitForm}
     controlId={modalControlId}
@@ -102,6 +109,7 @@
 
   <DatasetFormLayout>
     <DatasetForm
+      {catalog}
       {tags}
       {licenses}
       geographicalCoverages={filtersInfo.geographicalCoverage}

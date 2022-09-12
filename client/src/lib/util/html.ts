@@ -9,3 +9,6 @@ export const getPageY = (element: HTMLElement): number => {
   }
   return y;
 };
+
+// Wrap trusted HTML into a type we can discriminate against.
+export type TrustedHtml = { content: string; isHtml: boolean };

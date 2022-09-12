@@ -12,6 +12,7 @@ import type {
 } from "src/definitions/datasets";
 import { login, logout } from "$lib/stores/auth";
 import { buildFakeTag } from "src/tests/factories/tags";
+import type { Catalog, ExtraField } from "src/definitions/catalogs";
 
 describe("Test the dataset form", () => {
   beforeAll(() =>
@@ -27,28 +28,44 @@ describe("Test the dataset form", () => {
 
   afterAll(() => logout());
 
+  const catalog: Catalog = { organizationSiret: "<siret1>", extraFields: [] };
+
+  const extraField: ExtraField = {
+    id: "<extraField1Id>",
+    name: "referentiel",
+    title: "Référentiel",
+    hintText: "Remplissez cette information SVP",
+    type: "TEXT",
+    data: {},
+  };
+
+  const catalogWithExtraFields: Catalog = {
+    organizationSiret: "<siret2>",
+    extraFields: [extraField],
+  };
+
   test('The "title" field is present', () => {
-    const { getByLabelText } = render(DatasetForm);
+    const { getByLabelText } = render(DatasetForm, { catalog });
     const title = getByLabelText("Nom du jeu de données", { exact: false });
     expect(title).toBeInTheDocument();
     expect(title).toBeRequired();
   });
 
   test('The "description" field is present', () => {
-    const { getByLabelText } = render(DatasetForm);
+    const { getByLabelText } = render(DatasetForm, { catalog });
     const description = getByLabelText("Description", { exact: false });
     expect(description).toBeInTheDocument();
     expect(description).toBeRequired();
   });
 
   test('The "formats" field is present', async () => {
-    const { getAllByRole } = render(DatasetForm);
+    const { getAllByRole } = render(DatasetForm, { catalog });
     const checkboxes = getAllByRole("checkbox");
     expect(checkboxes.length).toBeGreaterThan(0);
   });
 
   test('The "geographicalCoverage" field is present', async () => {
-    const { getByLabelText } = render(DatasetForm);
+    const { getByLabelText } = render(DatasetForm, { catalog });
     const geographicalCoverage = getByLabelText("Couverture géographique", {
       exact: false,
     });
@@ -57,7 +74,7 @@ describe("Test the dataset form", () => {
   });
 
   test('The "technicalSource" field is present', async () => {
-    const { getByLabelText } = render(DatasetForm);
+    const { getByLabelText } = render(DatasetForm, { catalog });
     const technicalSource = getByLabelText("Système d'information source", {
       exact: false,
     });
@@ -66,7 +83,7 @@ describe("Test the dataset form", () => {
   });
 
   test('The "tags" field is present', async () => {
-    const { getByLabelText } = render(DatasetForm);
+    const { getByLabelText } = render(DatasetForm, { catalog });
     const tags = getByLabelText("Mot-clés", {
       exact: false,
     });
@@ -74,7 +91,7 @@ describe("Test the dataset form", () => {
   });
 
   test("At least one format is required", async () => {
-    const { getAllByRole } = render(DatasetForm);
+    const { getAllByRole } = render(DatasetForm, { catalog });
     const checkboxes = getAllByRole("checkbox", { checked: false });
     checkboxes.forEach((checkbox) => expect(checkbox).toBeRequired());
     await fireEvent.click(checkboxes[0]);
@@ -86,7 +103,7 @@ describe("Test the dataset form", () => {
   });
 
   test('The "producerEmail" field is present', () => {
-    const { getByLabelText } = render(DatasetForm);
+    const { getByLabelText } = render(DatasetForm, { catalog });
     const producerEmail = getByLabelText(
       "Adresse e-mail du service producteur",
       {
@@ -99,7 +116,7 @@ describe("Test the dataset form", () => {
   });
 
   test('The "contact emails" field is present', () => {
-    const { getAllByLabelText } = render(DatasetForm);
+    const { getAllByLabelText } = render(DatasetForm, { catalog });
     const inputs = getAllByLabelText(/Contact \d/) as HTMLInputElement[];
     expect(inputs.length).toBe(1);
     expect(inputs[0]).toHaveAttribute("type", "email");
@@ -108,7 +125,7 @@ describe("Test the dataset form", () => {
   });
 
   test('The "contact emails" field requires at least one value', async () => {
-    const { getAllByLabelText } = render(DatasetForm);
+    const { getAllByLabelText } = render(DatasetForm, { catalog });
     const inputs = getAllByLabelText(/Contact \d/) as HTMLInputElement[];
     expect(inputs.length).toBe(1);
     await fireEvent.input(inputs[0], { target: { value: "" } });
@@ -116,7 +133,7 @@ describe("Test the dataset form", () => {
   });
 
   test('The "url" field is present', async () => {
-    const { getByLabelText } = render(DatasetForm);
+    const { getByLabelText } = render(DatasetForm, { catalog });
     const url = getByLabelText("Lien vers les données", {
       exact: false,
     });
@@ -125,7 +142,7 @@ describe("Test the dataset form", () => {
   });
 
   test('The "license" field is present', async () => {
-    const { getByLabelText } = render(DatasetForm);
+    const { getByLabelText } = render(DatasetForm, { catalog });
     const license = getByLabelText("Licence de réutilisation", {
       exact: false,
     });
@@ -133,13 +150,26 @@ describe("Test the dataset form", () => {
     expect(license).not.toBeRequired();
   });
 
+  test("Extra fields are present", () => {
+    const { getByLabelText } = render(DatasetForm, {
+      catalog: catalogWithExtraFields,
+    });
+    const extraReferentiel = getByLabelText("Référentiel", { exact: false });
+    expect(extraReferentiel).toBeInTheDocument();
+    expect(extraReferentiel).not.toBeRequired();
+  });
+
   test("The submit button is present", () => {
-    const { getByRole } = render(DatasetForm);
+    const { getByRole } = render(DatasetForm, { catalog });
     expect(getByRole("button", { name: /Publier/i })).toBeInTheDocument();
   });
 
   test("The submit button displays a loading text when loading", async () => {
-    const props = { submitLabel: "Envoyer", loadingLabel: "Ça charge..." };
+    const props = {
+      catalog,
+      submitLabel: "Envoyer",
+      loadingLabel: "Ça charge...",
+    };
 
     const { getByRole, rerender } = render(DatasetForm, { props });
     expect(getByRole("button", { name: "Envoyer" })).toBeInTheDocument();
@@ -168,8 +198,9 @@ describe("Test the dataset form", () => {
       url: "https://data.gouv.fr/datasets/example",
       license: "Licence Ouverte",
       tags: [fakeTag],
+      extraFieldValues: [{ extraFieldId: "<extraField1Id>", value: "Réponse" }],
     };
-    const props = { initial };
+    const props = { catalog: catalogWithExtraFields, initial };
 
     const { getByLabelText, getAllByLabelText, container, getAllByText } =
       render(DatasetForm, { props });
@@ -233,6 +264,11 @@ describe("Test the dataset form", () => {
       exact: false,
     }) as HTMLInputElement;
     expect(license.value).toBe("Licence Ouverte");
+
+    const extraReferentiel = getByLabelText("Référentiel", {
+      exact: false,
+    }) as HTMLInputElement;
+    expect(extraReferentiel.value).toBe("Réponse");
   });
 
   test("Null or empty fields are correctly submitted as null", async () => {
@@ -254,8 +290,9 @@ describe("Test the dataset form", () => {
       url: "",
       license: null,
       tags: [buildFakeTag()],
+      extraFieldValues: [{ extraFieldId: "<extraField1Id>", value: "" }],
     };
-    const props = { initial };
+    const props = { catalog, initial };
     const { getByLabelText, getByRole, component } = render(DatasetForm, {
       props,
     });
@@ -284,5 +321,6 @@ describe("Test the dataset form", () => {
     expect(submittedValue.producerEmail).toBe(null);
     expect(submittedValue.url).toBe(null);
     expect(submittedValue.license).toBe(null);
+    expect(submittedValue.extraFieldValues).toEqual([]);
   });
 });

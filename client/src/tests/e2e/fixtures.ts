@@ -1,5 +1,6 @@
 import { test as base, expect, type APIRequestContext } from "@playwright/test";
 import type { Dataset } from "../../definitions/datasets.js";
+import { toDataset } from "../../lib/transformers/dataset.js";
 import { ADMIN_EMAIL, TEST_EMAIL, TEST_PASSWORD } from "./constants.js";
 
 /**
@@ -57,7 +58,7 @@ export const test = base.extend<AppTestArgs>({
     const headers = { Authorization: `Bearer ${adminApiToken}` };
 
     const data = {
-      organization_siret: "00000000000000",
+      organization_siret: "11004601800013",
       title: "Sample title",
       description: "Sample description",
       formats: ["api"],
@@ -69,6 +70,12 @@ export const test = base.extend<AppTestArgs>({
       last_updated_at: new Date(),
       geographical_coverage: "Monde",
       tag_ids: ["ceb19363-1681-4052-813c-f771d4459295"],
+      extra_field_values: [
+        {
+          extra_field_id: "bd13b1fc-0bd3-42ed-b1f5-58cc1a213832",
+          value: "XVB MUSEO 2012",
+        },
+      ],
     };
     let response = await apiContext.post("/datasets/", {
       data,
@@ -78,7 +85,7 @@ export const test = base.extend<AppTestArgs>({
     expect(response.ok()).toBeTruthy();
     const dataset = await response.json();
 
-    await use(dataset);
+    await use(toDataset(dataset));
 
     response = await apiContext.delete(`/datasets/${dataset.id}/`, {
       headers,

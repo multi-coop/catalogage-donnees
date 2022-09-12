@@ -1,14 +1,16 @@
 <script lang="ts">
   import type { SelectOption } from "src/definitions/form";
-
+  import type { TrustedHtml } from "src/lib/util/html";
+  import TextOrHtml from "../TextOrHtml/TextOrHtml.svelte";
   import RequiredMarker from "../RequiredMarker/RequiredMarker.svelte";
+
   export let label: string;
   export let id: string;
   export let name: string;
   export let options: SelectOption[];
 
   export let placeholder = "";
-  export let hintText = "";
+  export let hintText: string | TrustedHtml = "";
   export let required = false;
   export let error = "";
   export let value: string | null = null;
@@ -23,7 +25,7 @@
 
     {#if hintText}
       <span class="fr-hint-text" id="{name}-desc-hint">
-        {hintText}
+        <TextOrHtml value={hintText} />
       </span>
     {/if}
   </label>

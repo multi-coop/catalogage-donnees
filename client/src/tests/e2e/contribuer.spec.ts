@@ -18,6 +18,9 @@ test.describe("Basic form submission", () => {
     const urlText = "https://data.gouv.fr/datasets/example";
     const tagName = "services des eaux";
     const licenseText = "Licence Ouverte";
+    const extraReferentielOption = "XVB MUSEO 2012";
+    const extraDonneesPiOption = "Oui";
+    const extraSousDomaineOption = "Danse";
 
     await page.goto("/contribuer");
 
@@ -107,17 +110,30 @@ test.describe("Basic form submission", () => {
     );
     await selectedTag.waitFor();
 
+    // "Informations complémentaires" section
+
+    const referentiel = page.locator("form [name=referentiel]");
+    await referentiel.fill(extraReferentielOption);
+    expect(await referentiel.inputValue()).toBe(extraReferentielOption);
+
+    const donnees_pi_option = page.locator(
+      `label[for=donnees_pi-${extraDonneesPiOption}]`
+    );
+    await donnees_pi_option.check();
+    expect(
+      await page.isChecked(`input[value=${extraDonneesPiOption}]`)
+    ).toBeTruthy();
+
+    const sous_domaine = page.locator("form [name=sous_domaine]");
+    await sous_domaine.selectOption({ label: extraSousDomaineOption });
+    expect(await sous_domaine.inputValue()).toBe(extraSousDomaineOption);
+
     const button = page.locator("button[type='submit']");
     const [request, response] = await Promise.all([
       page.waitForRequest("**/datasets/"),
       page.waitForResponse("**/datasets/"),
       button.click(),
     ]);
-    expect(
-      page
-        .locator("a.fr-sidemenu__link", { hasText: "Accès aux données" })
-        .first()
-    ).toHaveAttribute("aria-current", "page");
     expect(request.method()).toBe("POST");
     expect(response.status()).toBe(201);
     const json = await response.json();
@@ -134,9 +150,22 @@ test.describe("Basic form submission", () => {
     expect(json.service).toBe(serviceText);
     expect(json.url).toBe(urlText);
     expect(json.license).toBe(licenseText);
-
     const hasTag = json.tags.findIndex((item) => item.name === tagName) !== -1;
     expect(hasTag).toBeTruthy();
+    expect(json.extra_field_values).toEqual([
+      {
+        extra_field_id: "bd13b1fc-0bd3-42ed-b1f5-58cc1a213832",
+        value: extraReferentielOption,
+      },
+      {
+        extra_field_id: "97668c15-5cd3-4efa-9ded-89a47eae6e99",
+        value: extraDonneesPiOption,
+      },
+      {
+        extra_field_id: "751e813a-c130-4aa3-b01c-11ed67d52dbe",
+        value: extraSousDomaineOption,
+      },
+    ]);
 
     await page.locator("text='Modifier'").waitFor();
   });
@@ -155,7 +184,7 @@ test.describe("Basic form submission", () => {
 
     // Scroll to bottom.
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await expect(activeSidebarItem).toHaveText("Accès aux données");
+    await expect(activeSidebarItem).toHaveText("Informations complémentaires");
 
     // Move to a particular section using click.
     // Purposefully test a small-size section: it should become active

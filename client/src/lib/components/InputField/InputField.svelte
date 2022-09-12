@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { TrustedHtml } from "src/lib/util/html";
+  import TextOrHtml from "../TextOrHtml/TextOrHtml.svelte";
   import RequiredMarker from "../RequiredMarker/RequiredMarker.svelte";
 
   // If support for other input types is added, add it here.
@@ -6,7 +8,7 @@
 
   export let name: string;
   export let label: string;
-  export let hintText = "";
+  export let hintText: string | TrustedHtml = "";
   export let type: SupportedInputType = "text";
   export let required = false;
   export let value: string | null;
@@ -25,7 +27,7 @@
     {/if}
     {#if hintText}
       <span class="fr-hint-text" id={hintTextId}>
-        {hintText}
+        <TextOrHtml value={hintText} />
       </span>
     {/if}
   </label>

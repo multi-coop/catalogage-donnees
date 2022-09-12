@@ -1,6 +1,7 @@
 <script context="module" lang="ts">
   import type { Load } from "@sveltejs/kit";
   import { get } from "svelte/store";
+  import { getCatalogBySiret } from "src/lib/repositories/catalogs";
   import { getDatasetByID, updateDataset } from "$lib/repositories/datasets";
   import type { Tag } from "src/definitions/tag";
   import { getTags } from "src/lib/repositories/tags";
@@ -9,8 +10,10 @@
 
   export const load: Load = async ({ fetch, params }) => {
     const apiToken = get(apiTokenStore);
+    const siret = Maybe.expect(get(account), "$account").organizationSiret;
 
-    const [dataset, tags, licenses, filtersInfo] = await Promise.all([
+    const [catalog, dataset, tags, licenses, filtersInfo] = await Promise.all([
+      getCatalogBySiret({ fetch, apiToken, siret }),
       getDatasetByID({ fetch, apiToken, id: params.id }),
       getTags({ fetch, apiToken }),
       getLicenses({ fetch, apiToken }),
@@ -19,6 +22,7 @@
 
     return {
       props: {
+        catalog,
         dataset,
         tags,
         licenses,
@@ -30,16 +34,22 @@
 
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import type { Catalog } from "src/definitions/catalogs";
   import type { Dataset, DatasetFormData } from "src/definitions/datasets";
   import DatasetForm from "$lib/components/DatasetForm/DatasetForm.svelte";
   import paths from "$lib/paths";
-  import { isAdmin, apiToken as apiTokenStore } from "$lib/stores/auth";
+  import {
+    isAdmin,
+    apiToken as apiTokenStore,
+    account,
+  } from "$lib/stores/auth";
   import { deleteDataset } from "$lib/repositories/datasets";
   import { Maybe } from "$lib/util/maybe";
   import DatasetFormLayout from "src/lib/components/DatasetFormLayout/DatasetFormLayout.svelte";
   import ModalExitFormConfirmation from "src/lib/components/ModalExitFormConfirmation/ModalExitFormConfirmation.svelte";
   import type { DatasetFiltersInfo } from "src/definitions/datasetFilters";
 
+  export let catalog: Maybe<Catalog>;
   export let dataset: Maybe<Dataset>;
   export let tags: Maybe<Tag[]>;
   export let licenses: Maybe<string[]>;
@@ -100,7 +110,7 @@
   };
 </script>
 
-{#if Maybe.Some(dataset) && Maybe.Some(tags) && Maybe.Some(licenses) && Maybe.Some(filtersInfo)}
+{#if Maybe.Some(catalog) && Maybe.Some(dataset) && Maybe.Some(tags) && Maybe.Some(licenses) && Maybe.Some(filtersInfo)}
   <header class="fr-p-4w">
     <h5>Modifier la fiche de jeu de données</h5>
 
@@ -131,6 +141,7 @@
 
   <DatasetFormLayout>
     <DatasetForm
+      {catalog}
       {tags}
       {licenses}
       geographicalCoverages={filtersInfo.geographicalCoverage}
