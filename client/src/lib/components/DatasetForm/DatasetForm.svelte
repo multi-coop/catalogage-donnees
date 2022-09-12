@@ -447,21 +447,23 @@
     />
   </div>
 
-  <h2 id="champs-complementaires" class="fr-mt-6w fr-mb-5w">
-    Champs complémentaires
-  </h2>
+  {#if catalog.extraFields.length > 0}
+    <h2 id="informations-complementaires" class="fr-mt-6w fr-mb-5w">
+      Informations complémentaires
+    </h2>
 
-  <div class="form--content fr-mb-8w">
-    {#each catalog.extraFields as extraField, index (extraField.id)}
-      <ExtraField
-        {extraField}
-        value={$form.extraFieldValues[index]}
-        on:input={(ev) => handleExtraFieldChange(ev, index)}
-        on:change={(ev) => handleExtraFieldChange(ev, index)}
-        on:blur={(ev) => handleExtraFieldChange(ev, index)}
-      />
-    {/each}
-  </div>
+    <div class="form--content fr-mb-8w">
+      {#each catalog.extraFields as extraField, index (extraField.id)}
+        <ExtraField
+          {extraField}
+          value={$form.extraFieldValues[index]}
+          on:input={(ev) => handleExtraFieldChange(ev, index)}
+          on:change={(ev) => handleExtraFieldChange(ev, index)}
+          on:blur={(ev) => handleExtraFieldChange(ev, index)}
+        />
+      {/each}
+    </div>
+  {/if}
 
   <div class="fr-input-group button--container fr-mb-6w">
     <button

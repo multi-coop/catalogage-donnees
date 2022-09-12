@@ -110,7 +110,7 @@ test.describe("Basic form submission", () => {
     );
     await selectedTag.waitFor();
 
-    // "Champs complémentaires" section
+    // "Informations complémentaires" section
 
     const referentiel = page.locator("form [name=referentiel]");
     await referentiel.fill(extraReferentielOption);
@@ -184,7 +184,7 @@ test.describe("Basic form submission", () => {
 
     // Scroll to bottom.
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await expect(activeSidebarItem).toHaveText("Champs complémentaires");
+    await expect(activeSidebarItem).toHaveText("Informations complémentaires");
 
     // Move to a particular section using click.
     // Purposefully test a small-size section: it should become active
