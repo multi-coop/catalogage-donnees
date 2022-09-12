@@ -5,10 +5,11 @@
   import { formatFullDate, splitParagraphs } from "src/lib/util/format";
   import { Maybe } from "$lib/util/maybe";
   import AsideItem from "./_AsideItem.svelte";
+  import ExtraFieldsList from "./_ExtraFieldsList.svelte";
 
   export let data: PageData;
 
-  $: ({ dataset } = data);
+  $: ({ catalog, dataset } = data);
 
   $: editUrl = Maybe.map(dataset, (dataset) =>
     paths.datasetEdit({ id: dataset.id })
@@ -16,7 +17,7 @@
 </script>
 
 <section class="fr-container">
-  {#if Maybe.Some(dataset) && Maybe.Some(editUrl)}
+  {#if Maybe.Some(catalog) && Maybe.Some(dataset) && Maybe.Some(editUrl)}
     <header class="fr-mt-5w">
       <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle">
         <div class="fr-col-sm-4 fr-col-md-3 fr-col-lg-2">
@@ -119,17 +120,24 @@
         />
       </aside>
 
-      <section
-        class="fr-col-md-8 fr-text--sm"
-        aria-label="Description du jeu de données"
-        data-testid="dataset-description"
-      >
-        {#each splitParagraphs(dataset.description) as text}
-          <p class="fr-text--lg">
-            {text}
-          </p>
-        {/each}
-      </section>
+      <div class="fr-col-md-8">
+        <div class="fr-text--sm fr-mb-4w" data-testid="dataset-description">
+          {#each splitParagraphs(dataset.description) as text}
+            <p class="fr-text--lg">
+              {text}
+            </p>
+          {/each}
+        </div>
+
+        {#if catalog.extraFields.length > 0}
+          <h6 class="fr-mb-2w">Informations complémentaires</h6>
+
+          <ExtraFieldsList
+            extraFields={catalog.extraFields}
+            extraFieldValues={dataset.extraFieldValues}
+          />
+        {/if}
+      </div>
     </div>
   {/if}
 </section>
