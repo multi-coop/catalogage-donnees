@@ -1,4 +1,5 @@
 organizations:
+  # Those two organizations has been registered in Datapass (staging env)
   - params:
       name: "Ministère de la Culture"
       siret: "11004601800013"
@@ -24,8 +25,9 @@ users:
 
   - id: "2753fcf9-ab6a-426e-b1d1-e4e16470a5d0"
     params:
-      email: catalogue.demo2@yopmail.com # This user is linked to two organizations
+      email: catalogue.demo2@yopmail.com
       password: password1234
+      organization_siret: "11004601800013"
 
   - id: "4c2cefce-ea47-4e6e-8c79-8befd4495f45"
     params:
