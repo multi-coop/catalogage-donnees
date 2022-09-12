@@ -12,7 +12,7 @@
   // NOTE: hint texts of extra fields are considered TRUSTED as catalogs can
   // only be created via an approved PR on https://github.com/etalab/catalogage-donnees-config.
   $: hintTextHtml = {
-    isHTML: true,
+    isHtml: true,
     content: renderMarkdown(extraField.hintText),
   };
 

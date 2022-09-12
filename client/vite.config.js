@@ -34,7 +34,6 @@ export const config = {
     alias: {
       src: path.resolve("./src"),
       $lib: path.resolve("./src/lib"),
-      "@js": path.resolve("./src/lib/js"),
     },
   },
   css: {

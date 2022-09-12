@@ -18,8 +18,6 @@ const expect = <T>(m: Maybe<T>, name: string): T => {
   return m;
 };
 
-export type MaybeHtmlString = string | { content: string; isHTML: boolean };
-
 export const Maybe = {
   Some,
   map,

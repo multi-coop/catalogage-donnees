@@ -1,11 +1,11 @@
 <script lang="ts">
-  import MaybeHtml from "../MaybeHtml/MaybeHtml.svelte";
-  import type { MaybeHtmlString } from "src/lib/util/maybe";
+  import TextOrHtml from "../TextOrHtml/TextOrHtml.svelte";
+  import type { TrustedHtml } from "src/lib/util/html";
   import type { SelectOption } from "src/definitions/form";
 
   export let name: string;
   export let label: string;
-  export let hintText: MaybeHtmlString = "";
+  export let hintText: string | TrustedHtml = "";
   export let options: SelectOption<string>[];
   export let value: string;
 </script>
@@ -16,7 +16,7 @@
       {label}
       {#if hintText}
         <span class="fr-hint-text" id="select-hint-{name}-hint">
-          <MaybeHtml text={hintText} />
+          <TextOrHtml value={hintText} />
         </span>
       {/if}
     </legend>
