@@ -30,6 +30,9 @@ if (process.env.NODE_ENV === "production") {
  */
 export const config = {
   envDir: path.resolve(".."),
+  server: {
+    port: 3000,
+  },
   resolve: {
     alias: {
       src: path.resolve("./src"),
