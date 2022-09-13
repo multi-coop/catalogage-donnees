@@ -12,10 +12,6 @@ const config = {
   kit: {
     adapter: adapter(),
 
-    // methodOverride: {
-    //   allowed: ["PATCH", "DELETE"],
-    // },
-
     csp: {
       directives: {
         "default-src": ["self"],

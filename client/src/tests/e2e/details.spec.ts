@@ -15,7 +15,7 @@ test.describe("Dataset details", () => {
     expect(description).toHaveText(dataset.description);
 
     const editUrl = page.locator("text=Modifier");
-    await page.pause();
+
     expect(await editUrl.getAttribute("href")).toBe(
       `/fiches/${dataset.id}/edit`
     );
