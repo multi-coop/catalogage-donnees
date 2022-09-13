@@ -8,8 +8,6 @@ import { account } from "src/lib/stores/auth";
 import { apiToken as apiTokenStore } from "$lib/stores/auth";
 import { Maybe } from "$lib/util/maybe";
 
-export const prerender = true;
-
 export const load: PageLoad = async ({ fetch }) => {
   const apiToken = get(apiTokenStore);
   const siret = Maybe.expect(get(account), "$account").organizationSiret;

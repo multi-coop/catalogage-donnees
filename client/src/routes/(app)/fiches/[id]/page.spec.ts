@@ -16,22 +16,24 @@ const dataset = getFakeDataset({
   contactEmails: ["service@mydomain.org"],
 });
 
+const data = { dataset };
+
 describe("Dataset detail page header", () => {
   test("The dataset title is present", () => {
-    const { getByRole } = render(index, { dataset });
+    const { getByRole } = render(index, { data });
     expect(getByRole("heading", { level: 1 })).toHaveTextContent(dataset.title);
   });
 });
 
 describe("Dataset detail page action buttons", () => {
   test("The button to modify the dataset is present", () => {
-    const { getByText } = render(index, { dataset });
+    const { getByText } = render(index, { data });
     const modifyButton = getByText("Modifier");
     expect(modifyButton).toBeInTheDocument();
     expect(modifyButton.getAttribute("href")).toContain(dataset.id);
   });
   test("The button to contact the author is present", () => {
-    const { getByText } = render(index, { dataset });
+    const { getByText } = render(index, { data });
     const contactButton = getByText("Contacter le producteur");
     expect(contactButton).toBeInTheDocument();
     expect(contactButton.getAttribute("href")).toContain(dataset.producerEmail);
@@ -40,19 +42,19 @@ describe("Dataset detail page action buttons", () => {
 
 describe("Dataset detail description", () => {
   test("The description is shown", async () => {
-    const { getByTestId } = render(index, { dataset });
+    const { getByTestId } = render(index, { data });
     const description = getByTestId("dataset-description");
     expect(description).toHaveTextContent(dataset.description);
   });
 
   test("The url link button is present if a url is set", async () => {
     const { getByText, queryByText, rerender } = render(index, {
-      dataset: { ...dataset, url: null },
+      data: { dataset: { ...dataset, url: null } },
     });
     let urlLink = queryByText("Voir les données", { exact: false });
     expect(urlLink).not.toBeInTheDocument();
     rerender({
-      props: { dataset: { ...dataset, url: "https://example.org" } },
+      data: { dataset: { ...dataset, url: "https://example.org" } },
     });
     urlLink = getByText("Voir les données", { exact: false });
     expect(urlLink).toBeInTheDocument();
@@ -61,12 +63,12 @@ describe("Dataset detail description", () => {
 
   test("The license is shown if it is set", async () => {
     const { getByText, queryByText, rerender } = render(index, {
-      dataset: { ...dataset, license: null },
+      data: { dataset: { ...dataset, license: null } },
     });
     let license = queryByText("Licence Ouverte", { exact: false });
     expect(license).not.toBeInTheDocument();
     rerender({
-      props: { dataset: { ...dataset, license: "Licence Ouverte" } },
+      data: { dataset: { ...dataset, license: "Licence Ouverte" } },
     });
     license = getByText("Licence Ouverte", { exact: false });
     expect(license).toBeInTheDocument();

@@ -55,6 +55,7 @@ async function saveAuthenticatedState(
   await page.fill("input[name='password']", password);
   await page.locator("button[type='submit']").click();
   const response = await page.waitForResponse("**/auth/login/");
+  await page.pause();
   expect(response.status()).toBe(200); // If this fails, ensure you ran `make initdata`.
   await page.waitForURL("/");
   await page.context().storageState({ path });

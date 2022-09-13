@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import { sveltekit } from '@sveltejs/kit/vite';
+import { sveltekit } from "@sveltejs/kit/vite";
 import path from "path";
 import dotenv from "dotenv";
 import purgecss from "@fullhuman/postcss-purgecss";
@@ -33,6 +33,9 @@ export const config = {
   plugins: [sveltekit()],
   envDir: path.resolve(".."),
   server: {
+    port: 3000,
+  },
+  preview: {
     port: 3000,
   },
   resolve: {

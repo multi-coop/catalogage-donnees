@@ -3,9 +3,8 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "vite dev",
-    "build": "svelte-kit build",
-    "package": "svelte-kit package",
-    "preview": "svelte-kit preview",
+    "build": "vite build",
+    "preview": "vite preview",
     "start": "node ./build",
     "check": "svelte-check --tsconfig ./tsconfig.json --compiler-warnings 'a11y-no-redundant-roles:ignore'",
     "check:watch": "npm run check -- --watch",
@@ -21,12 +20,13 @@
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^4.1.3",
     "@playwright/test": "^1.25.1",
-    "@sveltejs/adapter-node": "next",
+    "@sveltejs/adapter-node": "^1.0.0-next.90",
     "@sveltejs/kit": "^1.0.0-next.481",
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/svelte": "^3.1.1",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/svelte": "^3.2.1",
     "@typescript-eslint/eslint-plugin": "^4.31.1",
     "@typescript-eslint/parser": "^4.31.1",
+    "@vitest/coverage-c8": "^0.23.2",
     "cssnano": "^5.1.13",
     "dotenv": "^16.0.0",
     "eslint": "^7.32.0",
@@ -42,7 +42,7 @@
     "tslib": "^2.3.1",
     "typescript": "^4.4.3",
     "vite": "^3.1.0",
-    "vitest": "^0.2.6"
+    "vitest": "^0.23.2"
   },
   "type": "module",
   "dependencies": {
