@@ -1,7 +1,7 @@
 import type { Handle } from "@sveltejs/kit";
 import { maybePatchDataUrl } from "$lib/fetch";
 
-// See: https://kit.svelte.dev/docs/hooks#handle
+// See: https://kit.svelte.dev/docs/hooks#server-hooks-handle
 export const handle: Handle = async ({ event, resolve }) => {
   let response = await resolve(event);
 
