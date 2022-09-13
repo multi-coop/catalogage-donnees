@@ -1,25 +1,29 @@
 <script context="module" lang="ts">
-  import type { Load } from "@sveltejs/kit";
-  import { get } from "svelte/store";
-  import { getDatasetByID } from "$lib/repositories/datasets";
-  import { apiToken } from "$lib/stores/auth";
+  throw new Error("@migration task: Check code was safely removed (https://github.com/sveltejs/kit/discussions/5774#discussioncomment-3292722)");
 
-  export const load: Load = async ({ fetch, params }) => {
-    const dataset = await getDatasetByID({
-      fetch,
-      apiToken: get(apiToken),
-      id: params.id,
-    });
+  // import type { Load } from "@sveltejs/kit";
+  // import { get } from "svelte/store";
+  // import { getDatasetByID } from "$lib/repositories/datasets";
+  // import { apiToken } from "$lib/stores/auth";
 
-    return {
-      props: {
-        dataset,
-      },
-    };
-  };
+  // export const load: Load = async ({ fetch, params }) => {
+  //   const dataset = await getDatasetByID({
+  //     fetch,
+  //     apiToken: get(apiToken),
+  //     id: params.id,
+  //   });
+
+  //   return {
+  //     props: {
+  //       dataset,
+  //     },
+  //   };
+  // };
 </script>
 
 <script lang="ts">
+  throw new Error("@migration task: Add data prop (https://github.com/sveltejs/kit/discussions/5774#discussioncomment-3292707)");
+
   import paths from "$lib/paths";
   import { UPDATE_FREQUENCY_LABELS } from "src/constants";
   import type { Dataset } from "src/definitions/datasets";

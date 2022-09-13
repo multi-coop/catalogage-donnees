@@ -1,36 +1,40 @@
 <script context="module" lang="ts">
-  import type { Load } from "@sveltejs/kit";
-  export const prerender = true;
-  import { getCatalogBySiret } from "src/lib/repositories/catalogs";
-  import { getTags } from "src/lib/repositories/tags";
-  import { getLicenses } from "src/lib/repositories/licenses";
-  import { getDatasetFiltersInfo } from "src/lib/repositories/datasetFilters";
-  import { get } from "svelte/store";
-  import { account } from "src/lib/stores/auth";
+  throw new Error("@migration task: Check code was safely removed (https://github.com/sveltejs/kit/discussions/5774#discussioncomment-3292722)");
 
-  export const load: Load = async ({ fetch }) => {
-    const apiToken = get(apiTokenStore);
-    const siret = Maybe.expect(get(account), "$account").organizationSiret;
+  // import type { Load } from "@sveltejs/kit";
+  // export const prerender = true;
+  // import { getCatalogBySiret } from "src/lib/repositories/catalogs";
+  // import { getTags } from "src/lib/repositories/tags";
+  // import { getLicenses } from "src/lib/repositories/licenses";
+  // import { getDatasetFiltersInfo } from "src/lib/repositories/datasetFilters";
+  // import { get } from "svelte/store";
+  // import { account } from "src/lib/stores/auth";
 
-    const [catalog, tags, licenses, filtersInfo] = await Promise.all([
-      getCatalogBySiret({ fetch, apiToken, siret }),
-      getTags({ fetch, apiToken }),
-      getLicenses({ fetch, apiToken }),
-      getDatasetFiltersInfo({ fetch, apiToken }),
-    ]);
+  // export const load: Load = async ({ fetch }) => {
+  //   const apiToken = get(apiTokenStore);
+  //   const siret = Maybe.expect(get(account), "$account").organizationSiret;
 
-    return {
-      props: {
-        catalog,
-        tags,
-        licenses,
-        filtersInfo,
-      },
-    };
-  };
+  //   const [catalog, tags, licenses, filtersInfo] = await Promise.all([
+  //     getCatalogBySiret({ fetch, apiToken, siret }),
+  //     getTags({ fetch, apiToken }),
+  //     getLicenses({ fetch, apiToken }),
+  //     getDatasetFiltersInfo({ fetch, apiToken }),
+  //   ]);
+
+  //   return {
+  //     props: {
+  //       catalog,
+  //       tags,
+  //       licenses,
+  //       filtersInfo,
+  //     },
+  //   };
+  // };
 </script>
 
 <script lang="ts">
+  throw new Error("@migration task: Add data prop (https://github.com/sveltejs/kit/discussions/5774#discussioncomment-3292707)");
+
   import { goto } from "$app/navigation";
   import type { DatasetFormData } from "src/definitions/datasets";
   import paths from "$lib/paths";

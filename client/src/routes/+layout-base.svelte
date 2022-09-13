@@ -1,10 +1,12 @@
 <script lang="ts" context="module">
-  import type { Load } from "@sveltejs/kit";
-  import { authGuard } from "$lib/auth/guard";
+  throw new Error("@migration task: Check code was safely removed (https://github.com/sveltejs/kit/discussions/5774#discussioncomment-3292722)");
 
-  export const load: Load = async ({ url }) => {
-    return authGuard(url);
-  };
+  // import type { Load } from "@sveltejs/kit";
+  // import { authGuard } from "$lib/auth/guard";
+
+  // export const load: Load = async ({ url }) => {
+  //   return authGuard(url);
+  // };
 </script>
 
 <script lang="ts">
