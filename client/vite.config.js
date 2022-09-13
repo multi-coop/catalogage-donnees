@@ -2,9 +2,9 @@ import { defineConfig } from "vite";
 import { sveltekit } from "@sveltejs/kit/vite";
 import path from "path";
 import dotenv from "dotenv";
+import gzip from "rollup-plugin-gzip";
 import purgecss from "@fullhuman/postcss-purgecss";
 import cssnano from "cssnano";
-
 // Vite loads .env contents into process.env for source files.
 // But this is the config file from where it all begins.
 // So, we need to load .env contents explicitly.
@@ -30,7 +30,7 @@ if (process.env.NODE_ENV === "production") {
  * @type {import('vite').UserConfig}
  */
 export const config = {
-  plugins: [sveltekit()],
+  plugins: [sveltekit(), gzip()],
   envDir: path.resolve(".."),
   server: {
     port: 3000,
