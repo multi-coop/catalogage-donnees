@@ -6,8 +6,8 @@
   import { Maybe } from "$lib/util/maybe";
   import DatasetList from "$lib/components/DatasetList/DatasetList.svelte";
   import SearchForm from "$lib/components/SearchForm/SearchForm.svelte";
+  import PaginationContainer from "$lib/components/PaginationContainer/PaginationContainer.svelte";
   import paths from "$lib/paths";
-  import PaginationContainer from "src/routes/fiches/_PaginationContainer.svelte";
 
   export let paginatedDatasets: Maybe<Paginated<Dataset>>;
   export let currentPage: number;
