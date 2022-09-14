@@ -1,35 +1,16 @@
-<script context="module" lang="ts">
-  import type { Load } from "@sveltejs/kit";
-  import { get } from "svelte/store";
-  import { getDatasetByID } from "$lib/repositories/datasets";
-  import { apiToken } from "$lib/stores/auth";
-
-  export const load: Load = async ({ fetch, params }) => {
-    const dataset = await getDatasetByID({
-      fetch,
-      apiToken: get(apiToken),
-      id: params.id,
-    });
-
-    return {
-      props: {
-        dataset,
-      },
-    };
-  };
-</script>
-
 <script lang="ts">
+  import type { PageData } from "./$types";
   import paths from "$lib/paths";
   import { UPDATE_FREQUENCY_LABELS } from "src/constants";
-  import type { Dataset } from "src/definitions/datasets";
   import { formatFullDate, splitParagraphs } from "src/lib/util/format";
   import { Maybe } from "$lib/util/maybe";
   import AsideItem from "./_AsideItem.svelte";
 
-  export let dataset: Maybe<Dataset>;
+  export let data: PageData;
 
-  const editUrl = Maybe.map(dataset, (dataset) =>
+  $: ({ dataset } = data);
+
+  $: editUrl = Maybe.map(dataset, (dataset) =>
     paths.datasetEdit({ id: dataset.id })
   );
 </script>

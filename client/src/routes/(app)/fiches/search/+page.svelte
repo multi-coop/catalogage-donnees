@@ -1,67 +1,21 @@
-<script context="module" lang="ts">
-  import type { Load } from "@sveltejs/kit";
-  import { get } from "svelte/store";
-  import { getDatasets } from "$lib/repositories/datasets";
-  import { apiToken } from "$lib/stores/auth";
-  import { getPageFromParams } from "$lib/util/pagination";
-  import { page as pageStore } from "$app/stores";
-  import { getDatasetFiltersInfo } from "src/lib/repositories/datasetFilters";
-  import { toFiltersValue } from "src/lib/transformers/datasetFilters";
-
-  export const load: Load = async ({ fetch, url }) => {
-    const page = getPageFromParams(url.searchParams);
-    const q = url.searchParams.get("q") || "";
-    const filtersValue = toFiltersValue(url.searchParams);
-
-    const token = get(apiToken);
-
-    const [paginatedDatasets, filtersInfo] = await Promise.all([
-      getDatasets({
-        fetch,
-        apiToken: token,
-        page,
-        q,
-        filters: filtersValue,
-      }),
-      getDatasetFiltersInfo({ fetch, apiToken: token }),
-    ]);
-
-    return {
-      props: {
-        paginatedDatasets,
-        filtersInfo,
-        filtersValue,
-        currentPage: page,
-        q,
-      },
-    };
-  };
-</script>
-
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import type { Dataset } from "src/definitions/datasets";
-  import type {
-    DatasetFiltersInfo,
-    DatasetFiltersValue,
-  } from "src/definitions/datasetFilters";
+  import type { DatasetFiltersValue } from "src/definitions/datasetFilters";
   import DatasetList from "$lib/components/DatasetList/DatasetList.svelte";
   import SearchForm from "$lib/components/SearchForm/SearchForm.svelte";
   import { patchQueryString } from "$lib/util/urls";
   import { Maybe } from "$lib/util/maybe";
   import { pluralize } from "src/lib/util/format";
-  import type { Paginated } from "src/definitions/pagination";
   import FilterPanel from "./_FilterPanel.svelte";
+  import PaginationContainer from "$lib/components/PaginationContainer/PaginationContainer.svelte";
   import { toFiltersParams } from "src/lib/transformers/datasetFilters";
   import { makePageParam } from "$lib/util/pagination";
-  import PaginationContainer from "./_PaginationContainer.svelte";
+  import { page as pageStore } from "$app/stores";
+  import type { PageData } from "./$types";
 
-  export let paginatedDatasets: Maybe<Paginated<Dataset>>;
-  export let q: string;
-  export let currentPage: number;
+  export let data: PageData;
 
-  export let filtersInfo: Maybe<DatasetFiltersInfo>;
-  export let filtersValue: DatasetFiltersValue;
+  $: ({ paginatedDatasets, q, currentPage, filtersInfo, filtersValue } = data);
 
   let displayFilters = false;
 

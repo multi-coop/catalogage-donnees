@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import padlock from "$lib/assets/padlock.svg";
 </script>
 

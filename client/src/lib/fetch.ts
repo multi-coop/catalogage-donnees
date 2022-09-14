@@ -1,4 +1,4 @@
-import { browser } from "$app/env";
+import { browser } from "$app/environment";
 import { API_BROWSER_URL, API_SSR_URL } from "src/env";
 import type { Fetch } from "src/definitions/fetch";
 import type { Maybe } from "./util/maybe";

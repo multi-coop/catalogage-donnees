@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page as pageStore } from "$app/stores";
-  import Pagination from "src/lib/components/Pagination/Pagination.svelte";
   import { makePageParam } from "$lib/util/pagination";
   import { patchQueryString } from "$lib/util/urls";
+  import Pagination from "../Pagination/Pagination.svelte";
 
   export let currentPage: number;
   export let totalPages: number;

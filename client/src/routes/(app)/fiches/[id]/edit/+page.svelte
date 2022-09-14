@@ -1,59 +1,18 @@
-<script context="module" lang="ts">
-  import type { Load } from "@sveltejs/kit";
-  import { get } from "svelte/store";
-  import { getCatalogBySiret } from "src/lib/repositories/catalogs";
-  import { getDatasetByID, updateDataset } from "$lib/repositories/datasets";
-  import type { Tag } from "src/definitions/tag";
-  import { getTags } from "src/lib/repositories/tags";
-  import { getLicenses } from "src/lib/repositories/licenses";
-  import { getDatasetFiltersInfo } from "src/lib/repositories/datasetFilters";
-
-  export const load: Load = async ({ fetch, params }) => {
-    const apiToken = get(apiTokenStore);
-    const siret = Maybe.expect(get(account), "$account").organizationSiret;
-
-    const [catalog, dataset, tags, licenses, filtersInfo] = await Promise.all([
-      getCatalogBySiret({ fetch, apiToken, siret }),
-      getDatasetByID({ fetch, apiToken, id: params.id }),
-      getTags({ fetch, apiToken }),
-      getLicenses({ fetch, apiToken }),
-      getDatasetFiltersInfo({ fetch, apiToken }),
-    ]);
-
-    return {
-      props: {
-        catalog,
-        dataset,
-        tags,
-        licenses,
-        filtersInfo,
-      },
-    };
-  };
-</script>
-
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import type { Catalog } from "src/definitions/catalogs";
-  import type { Dataset, DatasetFormData } from "src/definitions/datasets";
+  import type { DatasetFormData } from "src/definitions/datasets";
   import DatasetForm from "$lib/components/DatasetForm/DatasetForm.svelte";
   import paths from "$lib/paths";
-  import {
-    isAdmin,
-    apiToken as apiTokenStore,
-    account,
-  } from "$lib/stores/auth";
-  import { deleteDataset } from "$lib/repositories/datasets";
+  import { isAdmin, apiToken as apiTokenStore } from "$lib/stores/auth";
+  import { deleteDataset, updateDataset } from "$lib/repositories/datasets";
   import { Maybe } from "$lib/util/maybe";
   import DatasetFormLayout from "src/lib/components/DatasetFormLayout/DatasetFormLayout.svelte";
   import ModalExitFormConfirmation from "src/lib/components/ModalExitFormConfirmation/ModalExitFormConfirmation.svelte";
-  import type { DatasetFiltersInfo } from "src/definitions/datasetFilters";
+  import type { PageData } from "./$types";
 
-  export let catalog: Maybe<Catalog>;
-  export let dataset: Maybe<Dataset>;
-  export let tags: Maybe<Tag[]>;
-  export let licenses: Maybe<string[]>;
-  export let filtersInfo: Maybe<DatasetFiltersInfo>;
+  export let data: PageData;
+
+  $: ({ catalog, dataset, tags, licenses, filtersInfo } = data);
 
   let modalControlId = "stop-editing-form-modal";
 
