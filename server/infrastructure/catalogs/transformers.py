@@ -6,12 +6,13 @@ from server.domain.catalogs.entities import (
 )
 from server.domain.common.types import ID
 
+from ..organizations.transformers import make_entity as make_organization_entity
 from .models import CatalogModel, ExtraFieldModel, ExtraFieldValueModel
 
 
 def make_entity(instance: CatalogModel) -> Catalog:
     return Catalog(
-        organization_siret=instance.organization_siret,
+        organization=make_organization_entity(instance.organization),
         extra_fields=[
             _make_extra_field_entity(extra_field_instance)
             for extra_field_instance in instance.extra_fields
@@ -21,7 +22,13 @@ def make_entity(instance: CatalogModel) -> Catalog:
 
 def make_instance(entity: Catalog) -> CatalogModel:
     return CatalogModel(
-        **entity.dict(exclude={"extra_fields"}),
+        **entity.dict(
+            exclude={
+                "organization",
+                "extra_fields",
+            }
+        ),
+        organization_siret=entity.organization.siret,
         extra_fields=[
             ExtraFieldModel(**extra_field.dict()) for extra_field in entity.extra_fields
         ]

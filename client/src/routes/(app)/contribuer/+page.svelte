@@ -44,7 +44,16 @@
 </script>
 
 <header class="fr-p-4w">
-  <h5>Créer une fiche de jeu de données</h5>
+  <div class="fr-col">
+    <h5 class="fr-grid-row fr-text--regular">
+      Contribuer une fiche de jeu de données
+    </h5>
+    {#if Maybe.Some(catalog)}
+      <p class="fr-grid-row fr-text--sm fr-text-mention--grey">
+        Catalogue : {catalog.organization.name}
+      </p>
+    {/if}
+  </div>
 
   {#if formHasBeenTouched}
     <button
@@ -87,7 +96,7 @@
 
 <style>
   header {
-    height: 10vh;
+    height: 12vh;
     display: flex;
     position: sticky;
     justify-content: space-between;

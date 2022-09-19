@@ -20,8 +20,12 @@ class SqlCatalogRepository(CatalogRepository):
         async with self._db.session() as session:
             stmt = (
                 select(CatalogModel)
+                .join(CatalogModel.organization)
                 .join(CatalogModel.extra_fields, isouter=True)
-                .options(contains_eager(CatalogModel.extra_fields))
+                .options(
+                    contains_eager(CatalogModel.organization),
+                    contains_eager(CatalogModel.extra_fields),
+                )
                 .where(CatalogModel.organization_siret == siret)
             )
             result = await session.execute(stmt)

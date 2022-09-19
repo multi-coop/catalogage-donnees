@@ -13,7 +13,10 @@ import type {
 } from "src/definitions/catalogs";
 
 const catalog: Catalog = {
-  organizationSiret: "<siret>",
+  organization: {
+    siret: "<siret>",
+    name: "Org 1",
+  },
   extraFields: [],
 };
 

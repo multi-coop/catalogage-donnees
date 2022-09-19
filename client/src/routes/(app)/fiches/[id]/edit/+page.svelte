@@ -71,7 +71,14 @@
 
 {#if Maybe.Some(catalog) && Maybe.Some(dataset) && Maybe.Some(tags) && Maybe.Some(licenses) && Maybe.Some(filtersInfo)}
   <header class="fr-p-4w">
-    <h5>Modifier la fiche de jeu de données</h5>
+    <div class="fr-col">
+      <h5 class="fr-grid-row fr-text--regular">
+        Modifier la fiche de jeu de données
+      </h5>
+      <p class="fr-grid-row fr-text--sm fr-text-mention--grey">
+        Catalogue : {dataset.catalogRecord.organization.name}
+      </p>
+    </div>
 
     {#if formHasBeenTouched}
       <button
@@ -132,7 +139,7 @@
 
 <style>
   header {
-    height: 10vh;
+    height: 12vh;
     display: flex;
     position: sticky;
     justify-content: space-between;

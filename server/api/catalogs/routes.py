@@ -7,6 +7,7 @@ from server.application.catalogs.queries import GetCatalogBySiret
 from server.application.catalogs.views import CatalogView
 from server.config.di import resolve
 from server.domain.catalogs.exceptions import CatalogAlreadyExists, CatalogDoesNotExist
+from server.domain.organizations.exceptions import OrganizationDoesNotExist
 from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 
@@ -32,6 +33,8 @@ async def create_catalog(data: CatalogCreate) -> JSONResponse:
 
     try:
         siret = await bus.execute(command)
+    except OrganizationDoesNotExist as exc:
+        raise HTTPException(400, detail=str(exc))
     except CatalogAlreadyExists as exc:
         content = jsonable_encoder(CatalogView(**exc.catalog.dict()))
         return JSONResponse(content, status_code=200)

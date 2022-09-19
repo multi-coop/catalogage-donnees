@@ -1,3 +1,5 @@
+import type { Organization } from "./organizations";
+
 interface ExtraFieldBase {
   id: string;
   name: string;
@@ -28,7 +30,7 @@ interface EnumExtraField extends ExtraFieldBase {
 export type ExtraField = TextExtraField | BoolExtraField | EnumExtraField;
 
 export interface Catalog {
-  organizationSiret: string;
+  organization: Organization;
   extraFields: ExtraField[];
 }
 export interface ExtraFieldValue {
