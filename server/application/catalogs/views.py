@@ -4,7 +4,8 @@ from pydantic import BaseModel
 
 from server.domain.catalogs.entities import ExtraFieldType
 from server.domain.common.types import ID
-from server.domain.organizations.types import Siret
+
+from ..organizations.views import OrganizationView
 
 
 class ExtraFieldView(BaseModel):
@@ -17,5 +18,5 @@ class ExtraFieldView(BaseModel):
 
 
 class CatalogView(BaseModel):
-    organization_siret: Siret
+    organization: OrganizationView
     extra_fields: List[ExtraFieldView]

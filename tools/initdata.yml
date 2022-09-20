@@ -10,10 +10,36 @@ catalogs:
   - params:
       organization_siret: "11004601800013"
       extra_fields:
-        - name: referentiel
+        - id: "bd13b1fc-0bd3-42ed-b1f5-58cc1a213832"
+          name: referentiel
           title: Référentiel ou norme
           hint_text: Ce jeu de données contient-il un référentiel ou une norme ? Si oui, lequel ?
           type: TEXT
+        - id: "97668c15-5cd3-4efa-9ded-89a47eae6e99"
+          name: donnees_pi
+          title: Propriété intellectuelle
+          hint_text: |
+            L'organisation peut-elle se prévaloir d'un
+            [droit de propriété intellectuelle](https://guides.etalab.gouv.fr/juridique/reutilisation/#le-cas-de-la-propriete-intellectuelle)
+            sur le jeu de données ?
+          type: BOOL
+          data:
+            true_value: Oui
+            false_value: Non
+        - id: "751e813a-c130-4aa3-b01c-11ed67d52dbe"
+          name: sous_domaine
+          title: Sous-domaine
+          hint_text: Nom du sous-domaine associé au jeu de données.
+          type: ENUM
+          data:
+            values:
+              - Archéologie
+              - Arts plastiques
+              - Danse
+              - Autre spectacle vivant
+              - Radio
+              - Presse
+              - Télévision
 
 users:
   - id: "c33cc0bb-975c-45a1-ac2a-7fed9971ce6a"
@@ -24,7 +50,9 @@ users:
 
   - id: "2753fcf9-ab6a-426e-b1d1-e4e16470a5d0"
     params:
-      email: catalogue.demo2@yopmail.com # This user is linked to two organizations
+      organization_siret: "13001653800014"
+      # In auth-staging.api.gouv.fr, a user linked to two organizations was created with this email.
+      email: catalogue.demo2@yopmail.com
       password: password1234
 
   - id: "4c2cefce-ea47-4e6e-8c79-8befd4495f45"
@@ -150,5 +178,6 @@ datasets:
       last_updated_at: null
       url: "https://www.data.gouv.fr/fr/datasets/catalogue-des-enquetes-realisees-par-la-dares-2012-572205/"
       license: Licence Ouverte
-      tag_ids: []
+      tag_ids:
+        - "2b8f8d14-1ec5-4014-839d-d6dd3718d2b5"
       extra_field_values: []

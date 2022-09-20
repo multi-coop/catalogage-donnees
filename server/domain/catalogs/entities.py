@@ -7,6 +7,7 @@ from typing_extensions import Annotated, TypedDict
 from server.domain.common.types import ID, id_factory
 from server.seedwork.domain.entities import Entity
 
+from ..organizations.entities import Organization
 from ..organizations.types import Siret
 
 
@@ -66,5 +67,5 @@ class ExtraFieldValue(Entity):
 
 
 class Catalog(Entity):
-    organization_siret: Siret
+    organization: Organization
     extra_fields: List[Annotated[ExtraField, Field(discriminator="type")]]

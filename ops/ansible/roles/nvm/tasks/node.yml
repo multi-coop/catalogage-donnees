@@ -5,6 +5,21 @@
     executable: /bin/bash
     creates: "{{ nvm_root }}/versions/{{ nvm_node_version }}"
 
+# Update the version used by nvm and reflected in 'node' and 'npm' binaries.
+- name: Get current Node version
+  shell: nvm current
+  args:
+    executable: /bin/bash
+  register: nvm_current
+- name: Set current_node_version fact
+  set_fact:
+    current_node_version: "{{ nvm_current.stdout | trim() }}"
+- name: Default to newly installed Node version
+  shell: nvm alias default {{ nvm_node_version }}
+  args:
+    executable: /bin/bash
+  when: "current_node_version != nvm_node_version"
+
 # Get Node and npm bin paths, taking into account that Ansible does not run
 # commands as a user by default.
 # See: https://stackoverflow.com/a/58744872
