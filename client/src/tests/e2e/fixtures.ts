@@ -57,8 +57,9 @@ export const test = base.extend<AppTestArgs>({
   dataset: async ({ apiContext, adminApiToken }, use) => {
     const headers = { Authorization: `Bearer ${adminApiToken}` };
 
+    const siret = "11004601800013";
+
     const data = {
-      organization_siret: "11004601800013",
       title: "Sample title",
       description: "Sample description",
       formats: ["api"],
@@ -77,7 +78,8 @@ export const test = base.extend<AppTestArgs>({
         },
       ],
     };
-    let response = await apiContext.post("/datasets/", {
+
+    let response = await apiContext.post(`/catalogs/${siret}/datasets/`, {
       data,
       headers,
     });

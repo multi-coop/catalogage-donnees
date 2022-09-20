@@ -3,13 +3,13 @@ from server.application.tags.queries import GetAllTags
 from server.config.di import resolve
 from server.domain.catalog_records.entities import CatalogRecord
 from server.domain.catalog_records.repositories import CatalogRecordRepository
+from server.domain.catalogs.exceptions import CatalogDoesNotExist
+from server.domain.catalogs.repositories import CatalogRepository
 from server.domain.common.pagination import Pagination
 from server.domain.common.types import ID
 from server.domain.datasets.entities import DataFormat, Dataset
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.datasets.repositories import DatasetRepository
-from server.domain.organizations.exceptions import OrganizationDoesNotExist
-from server.domain.organizations.repositories import OrganizationRepository
 from server.domain.tags.repositories import TagRepository
 from server.seedwork.application.messages import MessageBus
 
@@ -20,24 +20,22 @@ from .views import DatasetFiltersView, DatasetView
 
 async def create_dataset(command: CreateDataset, *, id_: ID = None) -> ID:
     repository = resolve(DatasetRepository)
-    organization_repository = resolve(OrganizationRepository)
+    catalog_repository = resolve(CatalogRepository)
     catalog_record_repository = resolve(CatalogRecordRepository)
     tag_repository = resolve(TagRepository)
 
     if id_ is None:
         id_ = repository.make_id()
 
-    organization = await organization_repository.get_by_siret(
-        siret=command.organization_siret
-    )
+    catalog = await catalog_repository.get_by_siret(siret=command.organization_siret)
 
-    if organization is None:
-        raise OrganizationDoesNotExist(command.organization_siret)
+    if catalog is None:
+        raise CatalogDoesNotExist(command.organization_siret)
 
     catalog_record_id = await catalog_record_repository.insert(
         CatalogRecord(
             id=catalog_record_repository.make_id(),
-            organization=organization,
+            organization=catalog.organization,
         )
     )
     catalog_record = await catalog_record_repository.get_by_id(catalog_record_id)

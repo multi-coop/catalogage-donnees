@@ -27,6 +27,7 @@
       const dataset = await createDataset({
         fetch,
         apiToken: $apiTokenStore,
+        siret: Maybe.expect(catalog, "catalog").organization.siret,
         data: { tagIds, ...event.detail },
       });
 

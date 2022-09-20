@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
 from starlette.responses import Response
 
+from server.api.organizations.permissions import MatchesUserSiret
 from server.application.datasets.commands import (
     CreateDataset,
     DeleteDataset,
@@ -11,24 +12,25 @@ from server.application.datasets.queries import GetAllDatasets, GetDatasetByID
 from server.application.datasets.views import DatasetView
 from server.config.di import resolve
 from server.domain.auth.entities import UserRole
+from server.domain.catalogs.exceptions import CatalogDoesNotExist
 from server.domain.common.pagination import Page, Pagination
 from server.domain.common.types import ID
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.datasets.specifications import DatasetSpec
-from server.domain.organizations.exceptions import OrganizationDoesNotExist
+from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 
 from ..auth.permissions import HasRole, IsAuthenticated
 from . import filters
 from .schemas import DatasetCreate, DatasetListParams, DatasetUpdate
 
-router = APIRouter(prefix="/datasets", tags=["datasets"])
+router = APIRouter(tags=["datasets"])
 
-router.include_router(filters.router)
+router.include_router(filters.router, prefix="/datasets")
 
 
 @router.get(
-    "/",
+    "/datasets/",
     dependencies=[Depends(IsAuthenticated())],
     response_model=Pagination[DatasetView],
 )
@@ -56,7 +58,7 @@ async def list_datasets(
 
 
 @router.get(
-    "/{id}/",
+    "/datasets/{id}/",
     dependencies=[Depends(IsAuthenticated())],
     response_model=DatasetView,
     responses={404: {}},
@@ -72,19 +74,27 @@ async def get_dataset_by_id(id: ID) -> DatasetView:
 
 
 @router.post(
-    "/",
-    dependencies=[Depends(IsAuthenticated())],
+    "/catalogs/{siret}/datasets/",
+    dependencies=[
+        Depends(
+            IsAuthenticated()
+            & (
+                HasRole(UserRole.ADMIN)
+                | MatchesUserSiret(key=lambda r: r.path_params["siret"])
+            )
+        )
+    ],
     response_model=DatasetView,
     status_code=201,
 )
-async def create_dataset(data: DatasetCreate) -> DatasetView:
+async def create_dataset(siret: Siret, data: DatasetCreate) -> DatasetView:
     bus = resolve(MessageBus)
 
-    command = CreateDataset(**data.dict())
+    command = CreateDataset(organization_siret=siret, **data.dict())
 
     try:
         id = await bus.execute(command)
-    except OrganizationDoesNotExist as exc:
+    except CatalogDoesNotExist as exc:
         raise HTTPException(400, detail=str(exc))
 
     query = GetDatasetByID(id=id)
@@ -92,7 +102,7 @@ async def create_dataset(data: DatasetCreate) -> DatasetView:
 
 
 @router.put(
-    "/{id}/",
+    "/datasets/{id}/",
     dependencies=[Depends(IsAuthenticated())],
     response_model=DatasetView,
     responses={404: {}},
@@ -112,7 +122,7 @@ async def update_dataset(id: ID, data: DatasetUpdate) -> DatasetView:
 
 
 @router.delete(
-    "/{id}/",
+    "/datasets/{id}/",
     dependencies=[Depends(IsAuthenticated() & HasRole(UserRole.ADMIN))],
     status_code=204,
     response_class=Response,

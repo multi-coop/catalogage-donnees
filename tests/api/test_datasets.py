@@ -1,5 +1,5 @@
 import random
-from typing import Any, List
+from typing import Any, List, Tuple
 
 import httpx
 import pytest
@@ -8,6 +8,8 @@ from sqlalchemy import select
 from server.application.catalogs.commands import CreateCatalog
 from server.application.catalogs.queries import GetCatalogBySiret
 from server.application.datasets.queries import GetDatasetByID
+from server.application.organizations.queries import GetOrganizationBySiret
+from server.application.organizations.views import OrganizationView
 from server.application.tags.commands import CreateTag
 from server.application.tags.queries import GetTagByID
 from server.config.di import resolve
@@ -22,8 +24,31 @@ from server.infrastructure.database import Database
 from server.seedwork.application.messages import MessageBus
 from tests.factories import CreateDatasetFactory
 
-from ..factories import CreateOrganizationFactory, UpdateDatasetFactory, fake
-from ..helpers import TestPasswordUser, to_payload
+from ..factories import (
+    CreateOrganizationFactory,
+    CreatePasswordUserFactory,
+    UpdateDatasetFactory,
+    fake,
+)
+from ..helpers import TestPasswordUser, create_test_password_user, to_payload
+
+
+async def _setup(
+    skip_catalog: bool = False,
+) -> Tuple[OrganizationView, TestPasswordUser]:
+    bus = resolve(MessageBus)
+
+    siret = await bus.execute(CreateOrganizationFactory.build())
+    org = await bus.execute(GetOrganizationBySiret(siret=siret))
+
+    user = await create_test_password_user(
+        CreatePasswordUserFactory.build(organization_siret=siret)
+    )
+
+    if not skip_catalog:
+        await bus.execute(CreateCatalog(organization_siret=siret))
+
+    return org, user
 
 
 @pytest.mark.asyncio
@@ -83,11 +108,14 @@ from ..helpers import TestPasswordUser, to_payload
 )
 async def test_create_dataset_invalid(
     client: httpx.AsyncClient,
-    temp_user: TestPasswordUser,
     payload: dict,
     expected_errors_attrs: list,
 ) -> None:
-    response = await client.post("/datasets/", json=payload, auth=temp_user.auth)
+    org, user = await _setup()
+
+    response = await client.post(
+        f"/catalogs/{org.siret}/datasets/", json=payload, auth=user.auth
+    )
     assert response.status_code == 422
 
     data = response.json()
@@ -99,21 +127,26 @@ async def test_create_dataset_invalid(
 
 
 @pytest.mark.asyncio
-async def test_create_dataset_invalid_organization_does_not_exist(
-    client: httpx.AsyncClient, temp_user: TestPasswordUser
+async def test_create_dataset_invalid_catalog_does_not_exist(
+    client: httpx.AsyncClient,
 ) -> None:
-    siret = Siret(fake.siret())
-    payload = to_payload(CreateDatasetFactory.build(organization_siret=siret))
-    response = await client.post("/datasets/", json=payload, auth=temp_user.auth)
+    org, user = await _setup(skip_catalog=True)
+
+    payload = to_payload(CreateDatasetFactory.build())
+    response = await client.post(
+        f"/catalogs/{org.siret}/datasets/", json=payload, auth=user.auth
+    )
     assert response.status_code == 400
     data = response.json()
-    assert data["detail"] == f"Organization not found: '{siret}'"
+    assert data["detail"] == f"Catalog not found: '{org.siret}'"
 
 
 @pytest.mark.asyncio
 async def test_dataset_crud(
-    client: httpx.AsyncClient, temp_user: TestPasswordUser, admin_user: TestPasswordUser
+    client: httpx.AsyncClient, admin_user: TestPasswordUser
 ) -> None:
+    org, user = await _setup()
+
     last_updated_at = fake.date_time_tz()
 
     payload = to_payload(
@@ -134,7 +167,9 @@ async def test_dataset_crud(
         )
     )
 
-    response = await client.post("/datasets/", json=payload, auth=temp_user.auth)
+    response = await client.post(
+        f"/catalogs/{org.siret}/datasets/", json=payload, auth=user.auth
+    )
     assert response.status_code == 201
     data = response.json()
 
@@ -145,7 +180,10 @@ async def test_dataset_crud(
         "id": pk,
         "catalog_record": {
             **data["catalog_record"],
-            "organization": LEGACY_ORGANIZATION.dict(),
+            "organization": {
+                "siret": str(org.siret),
+                "name": org.name,
+            },
         },
         "title": "Example title",
         "description": "Example description",
@@ -166,24 +204,24 @@ async def test_dataset_crud(
 
     non_existing_id = id_factory()
 
-    response = await client.get(f"/datasets/{non_existing_id}/", auth=temp_user.auth)
+    response = await client.get(f"/datasets/{non_existing_id}/", auth=user.auth)
     assert response.status_code == 404
 
-    response = await client.get(f"/datasets/{pk}/", auth=temp_user.auth)
+    response = await client.get(f"/datasets/{pk}/", auth=user.auth)
     assert response.status_code == 200
     assert response.json() == data
 
-    response = await client.get("/datasets/", auth=temp_user.auth)
+    response = await client.get("/datasets/", auth=user.auth)
     assert response.status_code == 200
     assert response.json()["items"] == [data]
 
     response = await client.delete(f"/datasets/{pk}/", auth=admin_user.auth)
     assert response.status_code == 204
 
-    response = await client.get(f"/datasets/{pk}/", auth=temp_user.auth)
+    response = await client.get(f"/datasets/{pk}/", auth=user.auth)
     assert response.status_code == 404
 
-    response = await client.get("/datasets/", auth=temp_user.auth)
+    response = await client.get("/datasets/", auth=user.auth)
     assert response.status_code == 200
     assert response.json()["items"] == []
 
@@ -191,11 +229,40 @@ async def test_dataset_crud(
 @pytest.mark.asyncio
 class TestDatasetPermissions:
     async def test_create_not_authenticated(self, client: httpx.AsyncClient) -> None:
+        org, _ = await _setup()
+
         response = await client.post(
-            "/datasets/",
+            f"/catalogs/{org.siret}/datasets/",
             json=to_payload(CreateDatasetFactory.build()),
         )
         assert response.status_code == 401
+
+    async def test_create_foreign_org_denied(self, client: httpx.AsyncClient) -> None:
+        bus = resolve(MessageBus)
+
+        _, user1 = await _setup()
+
+        siret2 = await bus.execute(CreateOrganizationFactory.build())
+        await bus.execute(CreateCatalog(organization_siret=siret2))
+
+        payload = to_payload(CreateDatasetFactory.build())
+        response = await client.post(
+            f"/catalogs/{siret2}/datasets/", json=payload, auth=user1.auth
+        )
+
+        assert response.status_code == 403
+
+    async def test_create_foreign_org_admin_ok(
+        self, client: httpx.AsyncClient, admin_user: TestPasswordUser
+    ) -> None:
+        org, _ = await _setup()
+        assert org.siret != admin_user.account.organization_siret
+
+        payload = to_payload(CreateDatasetFactory.build())
+        response = await client.post(
+            f"/catalogs/{org.siret}/datasets/", json=payload, auth=admin_user.auth
+        )
+        assert response.status_code == 201
 
     async def test_get_not_authenticated(self, client: httpx.AsyncClient) -> None:
         pk = id_factory()
@@ -328,29 +395,32 @@ class TestDatasetOptionalFields:
     async def test_optional_fields_missing_uses_defaults(
         self,
         client: httpx.AsyncClient,
-        temp_user: TestPasswordUser,
         field: str,
         default: Any,
     ) -> None:
+        org, user = await _setup()
+
         payload = to_payload(CreateDatasetFactory.build())
         payload.pop(field)
-        response = await client.post("/datasets/", json=payload, auth=temp_user.auth)
+        response = await client.post(
+            f"/catalogs/{org.siret}/datasets/", json=payload, auth=user.auth
+        )
         assert response.status_code == 201
         dataset = response.json()
         assert dataset[field] == default
 
-    async def test_optional_fields_invalid(
-        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
-    ) -> None:
+    async def test_optional_fields_invalid(self, client: httpx.AsyncClient) -> None:
+        org, user = await _setup()
+
         response = await client.post(
-            "/datasets/",
+            f"/catalogs/{org.siret}/datasets/",
             json={
                 **to_payload(CreateDatasetFactory.build()),
                 "contact_emails": ["notanemail", "valid@mydomain.org"],
                 "update_frequency": "not_in_enum",
                 "last_updated_at": "not_a_datetime",
             },
-            auth=temp_user.auth,
+            auth=user.auth,
         )
         assert response.status_code == 422
         (
@@ -638,7 +708,7 @@ class TestTags:
 
 @pytest.mark.asyncio
 class TestExtraFieldValues:
-    async def _create_extra_field_in_catalog(self) -> ID:
+    async def _setup(self) -> Tuple[Siret, TestPasswordUser, ID]:
         bus = resolve(MessageBus)
         siret = await bus.execute(CreateOrganizationFactory.build())
 
@@ -657,12 +727,17 @@ class TestExtraFieldValues:
         )
 
         catalog = await bus.execute(GetCatalogBySiret(siret=siret))
-        return catalog.extra_fields[0].id
+
+        user = await create_test_password_user(
+            CreatePasswordUserFactory.build(organization_siret=siret)
+        )
+
+        return siret, user, catalog.extra_fields[0].id
 
     async def test_create_dataset_with_extra_field_values(
-        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
+        self, client: httpx.AsyncClient
     ) -> None:
-        extra_field_id = await self._create_extra_field_in_catalog()
+        siret, user, extra_field_id = await self._setup()
 
         payload = to_payload(
             CreateDatasetFactory.build(
@@ -671,7 +746,9 @@ class TestExtraFieldValues:
                 ]
             )
         )
-        response = await client.post("/datasets/", json=payload, auth=temp_user.auth)
+        response = await client.post(
+            f"/catalogs/{siret}/datasets/", json=payload, auth=user.auth
+        )
         assert response.status_code == 201
         data = response.json()
         assert data["extra_field_values"] == [
@@ -685,7 +762,7 @@ class TestExtraFieldValues:
         self, client: httpx.AsyncClient, temp_user: TestPasswordUser
     ) -> None:
         bus = resolve(MessageBus)
-        extra_field_id = await self._create_extra_field_in_catalog()
+        _, _, extra_field_id = await self._setup()
 
         command = CreateDatasetFactory.build()
         dataset_id = await bus.execute(command)
@@ -720,7 +797,7 @@ class TestExtraFieldValues:
         self, client: httpx.AsyncClient, temp_user: TestPasswordUser
     ) -> None:
         bus = resolve(MessageBus)
-        extra_field_id = await self._create_extra_field_in_catalog()
+        _, _, extra_field_id = await self._setup()
 
         command = CreateDatasetFactory.build(
             extra_field_values=[

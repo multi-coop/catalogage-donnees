@@ -84,16 +84,18 @@ export const getDatasets: GetDatasets = async ({
 type CreateDataset = (opts: {
   fetch: Fetch;
   apiToken: string;
+  siret: string;
   data: DatasetCreateData;
 }) => Promise<Maybe<Dataset>>;
 
 export const createDataset: CreateDataset = async ({
   fetch,
   apiToken,
+  siret,
   data,
 }) => {
   const body = JSON.stringify(toPayload(data));
-  const url = `${getApiUrl()}/datasets/`;
+  const url = `${getApiUrl()}/catalogs/${siret}/datasets/`;
   const request = new Request(url, {
     method: "POST",
     headers: new Headers([
