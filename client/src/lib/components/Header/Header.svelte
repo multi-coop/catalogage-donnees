@@ -41,9 +41,8 @@
           <div class="fr-header__brand-top">
             <div class="fr-header__logo">
               <p class="fr-logo">
-                Catalogage
-                <br />des
-                <br />données
+                République
+                <br />Française
               </p>
             </div>
             <div class="fr-header__navbar">
@@ -67,7 +66,12 @@
               <p class="fr-header__service-title">
                 Catalogue Interministériel des Données
               </p>
-            </a>
+              <p
+                class="fr-badge fr-badge--success fr-badge--sm fr-badge--no-icon"
+              >
+                Bêta
+              </p></a
+            >
           </div>
         </div>
         <div class="fr-header__tools tools-container">
@@ -148,17 +152,9 @@
     overflow-x: hidden; /* Prevent beta banner from overflowing */
   }
 
-  header::after {
-    /* Beta corner banner */
-    position: absolute;
-    float: right;
-    top: 1.5em;
-    right: -3em;
-    padding: 0.5em 3em;
-    transform: rotate(45deg);
-    background-color: var(--background-action-low-pink-tuile);
-    content: "Version bêta";
-    z-index: 1;
+  a {
+    display: flex;
+    gap: 15px;
   }
 
   @media (max-width: 1440px) and (min-width: 768px) {
