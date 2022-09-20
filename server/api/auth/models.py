@@ -2,15 +2,15 @@ from typing import Optional
 
 from starlette.authentication import BaseUser
 
-from server.application.auth.views import AccountView
+from server.domain.auth.entities import Account
 
 
 class ApiUser(BaseUser):
-    def __init__(self, account: Optional[AccountView]) -> None:
+    def __init__(self, account: Optional[Account]) -> None:
         self._account = account
 
     @property
-    def account(self) -> AccountView:
+    def account(self) -> Account:
         if self._account is None:
             raise RuntimeError(
                 "Cannot access .account, as the user is anonymous. "

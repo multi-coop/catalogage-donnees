@@ -56,7 +56,7 @@ async def login_password_user(data: PasswordUserLogin) -> AuthenticatedAccountVi
     dependencies=[Depends(IsAuthenticated())],
 )
 async def get_connected_user(request: APIRequest) -> AccountView:
-    return request.user.account
+    return AccountView(**request.user.account.dict())
 
 
 @router.delete(

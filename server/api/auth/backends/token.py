@@ -8,10 +8,8 @@ from starlette.authentication import (
 )
 from starlette.requests import HTTPConnection
 
-from server.application.auth.queries import GetAccountByAPIToken
 from server.config.di import resolve
-from server.domain.auth.exceptions import AccountDoesNotExist
-from server.seedwork.application.messages import MessageBus
+from server.domain.auth.repositories import AccountRepository
 
 from ..models import ApiUser
 
@@ -26,6 +24,8 @@ class TokenAuthBackend(AuthenticationBackend):
     async def authenticate(
         self, conn: HTTPConnection
     ) -> Optional[Tuple[AuthCredentials, ApiUser]]:
+        account_repository = resolve(AccountRepository)
+
         # NOTE: we don't reuse fastapi.security.HTTPBearer as it does not distinguish
         # "no Authorization" / "scheme is not Bearer" and "malformed Authorization".
 
@@ -42,13 +42,9 @@ class TokenAuthBackend(AuthenticationBackend):
         if scheme.lower() != "bearer":
             return AuthCredentials(), ApiUser(None)
 
-        bus = resolve(MessageBus)
+        account = await account_repository.get_by_api_token(api_token)
 
-        query = GetAccountByAPIToken(api_token=api_token)
-
-        try:
-            account = await bus.execute(query)
-        except AccountDoesNotExist:
+        if account is None:
             raise AuthenticationError()
 
         return AuthCredentials(scopes=["authenticated"]), ApiUser(account)
