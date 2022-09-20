@@ -20,6 +20,7 @@ from server.config.di import bootstrap, resolve
 from server.domain.auth.entities import UserRole
 from server.domain.auth.repositories import PasswordUserRepository
 from server.domain.catalogs.repositories import CatalogRepository
+from server.domain.common.types import Skip
 from server.domain.datasets.entities import Dataset
 from server.domain.datasets.repositories import DatasetRepository
 from server.domain.organizations.repositories import OrganizationRepository
@@ -175,7 +176,7 @@ async def handle_dataset(item: dict, reset: bool = False) -> None:
         print(f"{info('ok')}: {dataset_repr}")
         return
 
-    create_command = CreateDataset(**item["params"])
+    create_command = CreateDataset(account=Skip(), **item["params"])
 
     await bus.execute(create_command, id_=id_)
     print(f"{success('created')}: {create_command!r}")

@@ -7,18 +7,20 @@ from server.application.datasets.commands import (
     DeleteDataset,
     UpdateDataset,
 )
+from server.application.datasets.exceptions import CannotCreateDataset
 from server.application.datasets.queries import GetAllDatasets, GetDatasetByID
 from server.application.datasets.views import DatasetView
 from server.config.di import resolve
 from server.domain.auth.entities import UserRole
+from server.domain.catalogs.exceptions import CatalogDoesNotExist
 from server.domain.common.pagination import Page, Pagination
 from server.domain.common.types import ID
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.datasets.specifications import DatasetSpec
-from server.domain.organizations.exceptions import OrganizationDoesNotExist
 from server.seedwork.application.messages import MessageBus
 
 from ..auth.permissions import HasRole, IsAuthenticated
+from ..types import APIRequest
 from . import filters
 from .schemas import DatasetCreate, DatasetListParams, DatasetUpdate
 
@@ -78,15 +80,17 @@ async def get_dataset_by_id(id: ID) -> DatasetView:
     response_model=DatasetView,
     status_code=201,
 )
-async def create_dataset(data: DatasetCreate) -> DatasetView:
+async def create_dataset(data: DatasetCreate, request: "APIRequest") -> DatasetView:
     bus = resolve(MessageBus)
 
-    command = CreateDataset(**data.dict())
+    command = CreateDataset(account=request.user.account, **data.dict())
 
     try:
         id = await bus.execute(command)
-    except OrganizationDoesNotExist as exc:
+    except CatalogDoesNotExist as exc:
         raise HTTPException(400, detail=str(exc))
+    except CannotCreateDataset:
+        raise HTTPException(403, detail="Permission denied")
 
     query = GetDatasetByID(id=id)
     return await bus.execute(query)

@@ -1,0 +1,2 @@
+class CannotCreateDataset(Exception):
+    pass

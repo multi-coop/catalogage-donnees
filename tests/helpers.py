@@ -4,12 +4,11 @@ from typing import Callable
 import httpx
 from pydantic import BaseModel
 
+from server.application.auth.commands import CreatePasswordUser
 from server.config.di import resolve
 from server.domain.auth.entities import PasswordUser, UserRole
 from server.domain.auth.repositories import PasswordUserRepository
 from server.seedwork.application.messages import MessageBus
-
-from .factories import CreatePasswordUserFactory
 
 
 def create_client(app: Callable) -> httpx.AsyncClient:
@@ -46,11 +45,12 @@ class TestPasswordUser(PasswordUser):
         return request
 
 
-async def create_test_password_user(role: UserRole) -> TestPasswordUser:
+async def create_test_password_user(
+    command: CreatePasswordUser, *, role: UserRole = UserRole.USER
+) -> TestPasswordUser:
     bus = resolve(MessageBus)
     password_user_repository = resolve(PasswordUserRepository)
 
-    command = CreatePasswordUserFactory.build()
     await bus.execute(command, role=role)
 
     user = await password_user_repository.get_by_email(command.email)

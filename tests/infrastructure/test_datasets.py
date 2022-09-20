@@ -10,16 +10,19 @@ from server.infrastructure.database import Database
 from server.infrastructure.datasets.models import DatasetModel
 from server.infrastructure.tags.models import TagModel, dataset_tag
 from server.seedwork.application.messages import MessageBus
+from tests.helpers import TestPasswordUser
 
 from ..factories import CreateDatasetFactory, CreateTagFactory
 
 
 @pytest.mark.asyncio
-async def test_dataset_cascades() -> None:
+async def test_dataset_cascades(temp_user: TestPasswordUser) -> None:
     bus = resolve(MessageBus)
 
     tag_id = await bus.execute(CreateTagFactory.build(name="Architecture"))
-    dataset_id = await bus.execute(CreateDatasetFactory.build(tag_ids=[tag_id]))
+    dataset_id = await bus.execute(
+        CreateDatasetFactory.build(account=temp_user.account, tag_ids=[tag_id])
+    )
 
     dataset = await bus.execute(GetDatasetByID(id=dataset_id))
 

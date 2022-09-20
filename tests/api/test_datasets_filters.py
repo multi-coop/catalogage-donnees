@@ -15,9 +15,10 @@ from server.seedwork.application.messages import MessageBus
 from ..factories import (
     CreateDatasetFactory,
     CreateOrganizationFactory,
+    CreatePasswordUserFactory,
     CreateTagFactory,
 )
-from ..helpers import TestPasswordUser
+from ..helpers import TestPasswordUser, create_test_password_user
 
 
 @pytest.mark.asyncio
@@ -42,11 +43,16 @@ async def test_dataset_filters_info(
         CreateOrganizationFactory.build(name="C - Organization without a catalog")
     )
 
+    user = await create_test_password_user(
+        CreatePasswordUserFactory.build(organization_siret=siret_non_empty)
+    )
+
     tag_id = await bus.execute(CreateTagFactory.build(name="Architecture"))
 
     await bus.execute(
         CreateDatasetFactory.build(
             organization_siret=siret_non_empty,
+            account=user.account,
             geographical_coverage="France métropolitaine",
             service="Same example service",
             technical_source="Example database system",
@@ -58,6 +64,7 @@ async def test_dataset_filters_info(
     await bus.execute(
         CreateDatasetFactory.build(
             organization_siret=siret_non_empty,
+            account=user.account,
             geographical_coverage="Région Nouvelle-Aquitaine",
             service="Same example service",
             technical_source=None,
@@ -210,7 +217,13 @@ async def test_dataset_filters_apply(
     kwargs: dict = {"organization_siret": siret_any}
     kwargs.update(create_kwargs(env))
 
-    dataset_id = await bus.execute(CreateDatasetFactory.build(**kwargs))
+    user = await create_test_password_user(
+        CreatePasswordUserFactory.build(organization_siret=kwargs["organization_siret"])
+    )
+
+    dataset_id = await bus.execute(
+        CreateDatasetFactory.build(account=user.account, **kwargs)
+    )
 
     params = {filtername: negative_value(env)}
     response = await client.get("/datasets/", params=params, auth=temp_user.auth)
@@ -233,10 +246,12 @@ async def test_dataset_filters_license_any(
     bus = resolve(MessageBus)
 
     dataset1_id = await bus.execute(
-        CreateDatasetFactory.build(license="Licence Ouverte")
+        CreateDatasetFactory.build(account=temp_user.account, license="Licence Ouverte")
     )
     dataset2_id = await bus.execute(
-        CreateDatasetFactory.build(license="ODC Open Database Licence v1.0")
+        CreateDatasetFactory.build(
+            account=temp_user.account, license="ODC Open Database Licence v1.0"
+        )
     )
 
     params = {"license": "*"}

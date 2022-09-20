@@ -5,8 +5,9 @@ from typing import Any, TypeVar
 import faker
 from faker.providers import BaseProvider
 from pydantic import BaseModel
-from pydantic_factories import ModelFactory, Use
+from pydantic_factories import ModelFactory, Require, Use
 
+from server.api.datasets.schemas import DatasetCreate
 from server.application.auth.commands import CreateDataPassUser, CreatePasswordUser
 from server.application.datasets.commands import CreateDataset, UpdateDataset
 from server.application.organizations.commands import CreateOrganization
@@ -62,9 +63,7 @@ _FAKE_GEOGRAPHICAL_COVERAGES = [
 ]
 
 
-class CreateDatasetFactory(Factory[CreateDataset]):
-    __model__ = CreateDataset
-
+class _BaseCreateDatasetFactory:
     organization_siret = Use(lambda: LEGACY_ORGANIZATION.siret)
     title = Use(fake.sentence)
     description = Use(fake.text)
@@ -82,6 +81,16 @@ class CreateDatasetFactory(Factory[CreateDataset]):
     license = Use(random.choice, [None, *BUILTIN_LICENSE_SUGGESTIONS])
     tag_ids = Use(lambda: [])
     extra_field_values = Use(lambda: [])
+
+
+class CreateDatasetFactory(_BaseCreateDatasetFactory, Factory[CreateDataset]):
+    __model__ = CreateDataset
+
+    account = Require()
+
+
+class CreateDatasetPayloadFactory(_BaseCreateDatasetFactory, Factory[DatasetCreate]):
+    __model__ = DatasetCreate
 
 
 class UpdateDatasetFactory(Factory[UpdateDataset]):
