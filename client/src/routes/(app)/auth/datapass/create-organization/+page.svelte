@@ -1,5 +1,6 @@
 <script lang="ts">
   import padlock from "$lib/assets/padlock.svg";
+  import { USER_DOCUMENTATION_LINK } from "src/constants";
 </script>
 
 <section class="fr-container fr-py-8w">
@@ -15,7 +16,10 @@
         <p>
           Vous ne pouvez pas accéder au service pour le moment, mais vous pouvez
           effectuer une demande d’enregistrement afin d’intégrer votre
-          organisation à notre outil.
+          organisation à notre outil. Pour obtenir plus de détails, veuillez
+          consulter <a target="_blank" href={USER_DOCUMENTATION_LINK}
+            >la documentation détaillée</a
+          >.
         </p>
       </div>
     </div>
@@ -36,5 +40,9 @@
 
   .container {
     display: flex;
+  }
+
+  a {
+    color: var(--text-action-high-blue-france) !important;
   }
 </style>
