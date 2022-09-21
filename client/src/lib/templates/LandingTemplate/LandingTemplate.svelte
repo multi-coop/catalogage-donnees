@@ -46,6 +46,7 @@
         l’instant possible uniquement aux agents des organisations enregistrées.
         Pour en savoir plus sur les moyens de s’enregistrer et intégrer son
         catalogue, vous pouvez consulter <a
+          class="fr-link"
           target="_blank"
           href={USER_DOCUMENTATION_LINK}>la documentation détaillée</a
         >.
@@ -87,9 +88,5 @@
   .title-container {
     align-items: center;
     gap: 15px;
-  }
-
-  a {
-    color: var(--text-action-high-blue-france) !important;
   }
 </style>

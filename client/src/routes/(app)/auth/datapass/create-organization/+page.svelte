@@ -17,8 +17,11 @@
           Vous ne pouvez pas accéder au service pour le moment, mais vous pouvez
           effectuer une demande d’enregistrement afin d’intégrer votre
           organisation à notre outil. Pour obtenir plus de détails, veuillez
-          consulter <a target="_blank" href={USER_DOCUMENTATION_LINK}
-            >la documentation détaillée</a
+          consulter <a
+            class="fr-link"
+            target="_blank"
+            rel="noopener"
+            href={USER_DOCUMENTATION_LINK}>la documentation détaillée</a
           >.
         </p>
       </div>
@@ -40,9 +43,5 @@
 
   .container {
     display: flex;
-  }
-
-  a {
-    color: var(--text-action-high-blue-france) !important;
   }
 </style>
