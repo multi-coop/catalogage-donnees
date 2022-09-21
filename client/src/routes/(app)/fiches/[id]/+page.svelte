@@ -152,5 +152,6 @@
   .header__tags {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
   }
 </style>
