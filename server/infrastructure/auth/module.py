@@ -9,13 +9,11 @@ from server.application.auth.handlers import (
     create_datapass_user,
     create_password_user,
     delete_password_user,
-    get_account_by_api_token,
     get_account_by_email,
     login_datapass_user,
     login_password_user,
 )
 from server.application.auth.queries import (
-    GetAccountByAPIToken,
     GetAccountByEmail,
     LoginDataPassUser,
     LoginPasswordUser,
@@ -35,5 +33,4 @@ class AuthModule(Module):
         LoginPasswordUser: login_password_user,
         LoginDataPassUser: login_datapass_user,
         GetAccountByEmail: get_account_by_email,
-        GetAccountByAPIToken: get_account_by_api_token,
     }
