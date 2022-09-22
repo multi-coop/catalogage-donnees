@@ -1,7 +1,12 @@
 import { test as base, expect, type APIRequestContext } from "@playwright/test";
 import type { Dataset } from "../../definitions/datasets.js";
 import { toDataset } from "../../lib/transformers/dataset.js";
-import { ADMIN_EMAIL, TEST_EMAIL, TEST_PASSWORD } from "./constants.js";
+import {
+  ADMIN_EMAIL,
+  ADMIN_PASSWORD,
+  TEST_EMAIL,
+  TEST_PASSWORD,
+} from "./constants.js";
 
 /**
  * These fixtures allow simplifying setup/teardown logic in tests,
@@ -10,10 +15,6 @@ import { ADMIN_EMAIL, TEST_EMAIL, TEST_PASSWORD } from "./constants.js";
  * See: https://playwright.dev/docs/test-api-testing#sending-api-requests-from-ui-tests
  */
 
-type AppOptions = {
-  adminTestPassword: string;
-};
-
 type AppFixtures = {
   apiContext: APIRequestContext;
   adminApiToken: string;
@@ -21,10 +22,9 @@ type AppFixtures = {
   dataset: Dataset;
 };
 
-export type AppTestArgs = AppOptions & AppFixtures;
+export type AppTestArgs = AppFixtures;
 
 export const test = base.extend<AppTestArgs>({
-  adminTestPassword: ["admin", { option: true }],
   apiContext: async ({ playwright }, use) => {
     const baseURL = "http://localhost:3579";
     const apiContext = await playwright.request.newContext({ baseURL });
@@ -32,10 +32,10 @@ export const test = base.extend<AppTestArgs>({
     await apiContext.dispose();
   },
 
-  adminApiToken: async ({ apiContext, adminTestPassword }, use) => {
+  adminApiToken: async ({ apiContext }, use) => {
     const data = {
       email: ADMIN_EMAIL,
-      password: adminTestPassword,
+      password: ADMIN_PASSWORD,
     };
     const response = await apiContext.post("/auth/login/", { data });
     expect(response.ok()).toBeTruthy();

@@ -3,7 +3,9 @@
   import paths from "$lib/paths";
   import { UPDATE_FREQUENCY_LABELS } from "src/constants";
   import { formatFullDate, splitParagraphs } from "src/lib/util/format";
+  import { account } from "$lib/stores/auth";
   import { Maybe } from "$lib/util/maybe";
+  import permissions from "$lib/permissions";
   import AsideItem from "./_AsideItem.svelte";
   import ExtraFieldsList from "./_ExtraFieldsList.svelte";
 
@@ -45,15 +47,17 @@
       <ul
         class="fr-grid-row fr-grid-row--right fr-btns-group fr-btns-group--inline fr-btns-group--icon-right fr-my-5w"
       >
-        <li>
-          <a
-            href={editUrl}
-            class="fr-btn fr-btn--secondary fr-icon-edit-fill"
-            title="Modifier ce jeu de données"
-          >
-            Modifier
-          </a>
-        </li>
+        {#if permissions.dataset.edit(dataset, Maybe.expect($account, "$account"))}
+          <li>
+            <a
+              href={editUrl}
+              class="fr-btn fr-btn--secondary fr-icon-edit-fill"
+              title="Modifier ce jeu de données"
+            >
+              Modifier
+            </a>
+          </li>
+        {/if}
         <li>
           <a
             class="fr-btn fr-btn--secondary fr-icon-mail-line"
