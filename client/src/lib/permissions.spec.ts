@@ -5,7 +5,7 @@ import { getFakeOrganization } from "src/tests/factories/organizations";
 import { canEditDataset } from "./permissions";
 
 describe("permissions", () => {
-  describe("dataset", () => {
+  describe("canEditDataset", () => {
     test("Account with same SIRET as dataset can edit", () => {
       const organization = getFakeOrganization();
       const dataset = getFakeDataset({
