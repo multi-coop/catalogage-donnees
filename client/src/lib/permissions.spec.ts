@@ -2,7 +2,7 @@ import { getFakeAccount } from "src/tests/factories/accounts";
 import { getFakeCatalogRecord } from "src/tests/factories/catalog_records";
 import { getFakeDataset } from "src/tests/factories/dataset";
 import { getFakeOrganization } from "src/tests/factories/organizations";
-import permissions from "./permissions";
+import { canEditDataset } from "./permissions";
 
 describe("permissions", () => {
   describe("dataset", () => {
@@ -12,13 +12,13 @@ describe("permissions", () => {
         catalogRecord: getFakeCatalogRecord({ organization }),
       });
       const account = getFakeAccount({ organizationSiret: organization.siret });
-      expect(permissions.dataset.edit(dataset, account)).toBeTruthy();
+      expect(canEditDataset(dataset, account)).toBeTruthy();
     });
 
     test("Account with different SIRET than dataset cannot edit", () => {
       const dataset = getFakeDataset();
       const account = getFakeAccount();
-      expect(permissions.dataset.edit(dataset, account)).toBeFalsy();
+      expect(canEditDataset(dataset, account)).toBeFalsy();
     });
   });
 });

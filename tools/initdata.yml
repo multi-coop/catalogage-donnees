@@ -63,6 +63,14 @@ users:
     extras:
       role: ADMIN
 
+  - id: "17bda0c7-5bf0-46a3-b89b-9aeb2fa47974"
+    params:
+      organization_siret: "13001653800014"
+      email: admin.sante@catalogue.data.gouv.fr
+      password: __env__
+    extras:
+      role: ADMIN
+
 tags:
   - id: "9c1549a5-02ef-43a9-aa20-6babdce0b733"
     params:

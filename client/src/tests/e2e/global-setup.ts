@@ -7,9 +7,12 @@ import {
 
 import {
   ADMIN_EMAIL,
+  ADMIN_EMAIL_SANTE,
   ADMIN_PASSWORD,
+  ADMIN_PASSWORD_SANTE,
   STATE_AUTHENTICATED,
   STATE_AUTHENTICATED_ADMIN,
+  STATE_AUTHENTICATED_ADMIN_SANTE,
   STATE_AUTHENTICATED_SANTE,
   TEST_EMAIL,
   TEST_EMAIL_SANTE,
@@ -41,6 +44,12 @@ export default async function globalSetup(
     email: ADMIN_EMAIL,
     password: ADMIN_PASSWORD,
     path: STATE_AUTHENTICATED_ADMIN,
+  });
+
+  await saveAuthenticatedState(browser, config, {
+    email: ADMIN_EMAIL_SANTE,
+    password: ADMIN_PASSWORD_SANTE,
+    path: STATE_AUTHENTICATED_ADMIN_SANTE,
   });
 
   await browser.close();

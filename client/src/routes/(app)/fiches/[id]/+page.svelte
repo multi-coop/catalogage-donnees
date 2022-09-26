@@ -5,7 +5,7 @@
   import { formatFullDate, splitParagraphs } from "src/lib/util/format";
   import { account } from "$lib/stores/auth";
   import { Maybe } from "$lib/util/maybe";
-  import permissions from "$lib/permissions";
+  import { canEditDataset } from "$lib/permissions";
   import AsideItem from "./_AsideItem.svelte";
   import ExtraFieldsList from "./_ExtraFieldsList.svelte";
 
@@ -47,7 +47,7 @@
       <ul
         class="fr-grid-row fr-grid-row--right fr-btns-group fr-btns-group--inline fr-btns-group--icon-right fr-my-5w"
       >
-        {#if permissions.dataset.edit(dataset, Maybe.expect($account, "$account"))}
+        {#if canEditDataset(dataset, Maybe.expect($account, "$account"))}
           <li>
             <a
               href={editUrl}
