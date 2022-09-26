@@ -213,6 +213,27 @@ Vous pouvez alors lancer un initdata avec :
 make ops-initdata env=<ENV>
 ```
 
+### Démanteler un environnement
+
+Un environnement peut devenir obsolète, par exemple parce qu'il n'est plus utile, qu'il a été remplacé par un autre environnement, ou tout autre cas faisant que l'instance associée doit être arrêtée.
+
+Il s'agit alors de :
+
+* S'assurer que l'environnement n'est plus utilisé et qu'il peut être supprimé définitivement.
+* Retirer les ressources informatiques allouées à cet environnement.
+
+    Voici, à date (26/09/2022), une liste des ressources et leur localisation.
+
+    | Ressource | Environnements | Lieu | Contact |
+    |---|---|---|---|
+    | Instance cloud (VM) | sandbox, staging, demo | Console Scaleway de Multi| johan.richer[ @ ]multi.coop |
+    | Instance PostgreSQL | sandbox, staging, demo | Console Scaleway de Multi | johan.richer[ @ ]multi.coop |
+    | Enregistrement DNS | sandbox, staging, demo | Service DNS de Multi | johan.richer[ @ ]multi.coop |
+    | URLs OpenID Connect pour l'authentification "Compte DataPass" | sandbox, staging, demo | Infrastructure Etalab | Contacter l'équipe "Compte DataPass" sur BetaGouv, ou ouvrir un billet sur [betagouv/api-auth](https://github.com/betagouv/api-auth) |
+
+* Mettre à jour la présente documentation en retirant l'environnement.
+* Retirer le dossier de l'environnement de `ops/ansible`.
+
 ## Tests
 
 Il est possible de tester la configuration Ansible sur une VM locale.
