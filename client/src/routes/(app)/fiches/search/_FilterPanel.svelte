@@ -16,13 +16,15 @@
   export let info: DatasetFiltersInfo;
   export let value: DatasetFiltersValue;
 
-  const createOrganizationSiretToNameMap = (organizations: Organization[]) => {
+  const createOrganizationSiretToNameMap = (
+    organizations: Organization[]
+  ): Record<string, string> => {
     const map = {};
     organizations.forEach(({ siret, name }) => (map[siret] = name));
     return map;
   };
 
-  const createTagIdToNameMap = (tags: Tag[]) => {
+  const createTagIdToNameMap = (tags: Tag[]): Record<string, string> => {
     const map = {};
     tags.forEach(({ id, name }) => (map[id] = name));
     return map;
