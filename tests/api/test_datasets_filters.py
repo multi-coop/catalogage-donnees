@@ -4,12 +4,19 @@ from typing import Callable
 import httpx
 import pytest
 
+from server.application.catalogs.commands import CreateCatalog
 from server.config.di import resolve
 from server.domain.common.types import ID, id_factory
 from server.domain.datasets.entities import DataFormat
+from server.domain.organizations.entities import LEGACY_ORGANIZATION
+from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 
-from ..factories import CreateDatasetFactory, CreateTagFactory
+from ..factories import (
+    CreateDatasetFactory,
+    CreateOrganizationFactory,
+    CreateTagFactory,
+)
 from ..helpers import TestPasswordUser
 
 
@@ -19,10 +26,27 @@ async def test_dataset_filters_info(
 ) -> None:
     bus = resolve(MessageBus)
 
+    siret_non_empty = await bus.execute(
+        CreateOrganizationFactory.build(
+            name="A - Organization with a non-empty catalog"
+        )
+    )
+    await bus.execute(CreateCatalog(organization_siret=siret_non_empty))
+
+    siret_empty = await bus.execute(
+        CreateOrganizationFactory.build(name="B - Organization with an empty catalog")
+    )
+    await bus.execute(CreateCatalog(organization_siret=siret_empty))
+
+    await bus.execute(
+        CreateOrganizationFactory.build(name="C - Organization without a catalog")
+    )
+
     tag_id = await bus.execute(CreateTagFactory.build(name="Architecture"))
 
     await bus.execute(
         CreateDatasetFactory.build(
+            organization_siret=siret_non_empty,
             geographical_coverage="France métropolitaine",
             service="Same example service",
             technical_source="Example database system",
@@ -33,6 +57,7 @@ async def test_dataset_filters_info(
     # Add another with filterable optional fields left out
     await bus.execute(
         CreateDatasetFactory.build(
+            organization_siret=siret_non_empty,
             geographical_coverage="Région Nouvelle-Aquitaine",
             service="Same example service",
             technical_source=None,
@@ -45,6 +70,7 @@ async def test_dataset_filters_info(
     data = response.json()
 
     assert set(data) == {
+        "organization_siret",
         "geographical_coverage",
         "service",
         "format",
@@ -52,6 +78,18 @@ async def test_dataset_filters_info(
         "tag_id",
         "license",
     }
+
+    assert data["organization_siret"] == [
+        {
+            "siret": str(siret_non_empty),
+            "name": "A - Organization with a non-empty catalog",
+        },
+        {
+            "siret": str(siret_empty),
+            "name": "B - Organization with an empty catalog",
+        },
+        LEGACY_ORGANIZATION.dict(),
+    ]
 
     assert data["geographical_coverage"] == [
         "France métropolitaine",
@@ -89,6 +127,8 @@ async def test_dataset_filters_info(
 
 @dataclass
 class _Env:
+    siret_any: Siret
+    siret_match: Siret
     tag_id: ID
 
 
@@ -96,6 +136,13 @@ class _Env:
 @pytest.mark.parametrize(
     "filtername, create_kwargs, negative_value, positive_value",
     [
+        pytest.param(
+            "organization_siret",
+            lambda env: {"organization_siret": env.siret_match},
+            lambda env: [str(env.siret_any)],
+            lambda env: [str(env.siret_match)],
+            id="organization_siret",
+        ),
         pytest.param(
             "geographical_coverage",
             lambda _: {"geographical_coverage": "France métropolitaine"},
@@ -150,10 +197,20 @@ async def test_dataset_filters_apply(
 ) -> None:
     bus = resolve(MessageBus)
 
-    tag_id = await bus.execute(CreateTagFactory.build())
-    env = _Env(tag_id=tag_id)
+    siret_any = await bus.execute(CreateOrganizationFactory.build())
+    await bus.execute(CreateCatalog(organization_siret=siret_any))
 
-    dataset_id = await bus.execute(CreateDatasetFactory.build(**create_kwargs(env)))
+    siret_match = await bus.execute(CreateOrganizationFactory.build())
+    await bus.execute(CreateCatalog(organization_siret=siret_match))
+
+    tag_id = await bus.execute(CreateTagFactory.build())
+
+    env = _Env(tag_id=tag_id, siret_any=siret_any, siret_match=siret_match)
+
+    kwargs: dict = {"organization_siret": siret_any}
+    kwargs.update(create_kwargs(env))
+
+    dataset_id = await bus.execute(CreateDatasetFactory.build(**kwargs))
 
     params = {filtername: negative_value(env)}
     response = await client.get("/datasets/", params=params, auth=temp_user.auth)

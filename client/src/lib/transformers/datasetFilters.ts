@@ -8,8 +8,15 @@ import type { QueryParamRecord } from "src/definitions/url";
 import { Maybe } from "../util/maybe";
 
 export const toFiltersInfo = (data: any): DatasetFiltersInfo => {
-  const { geographical_coverage, technical_source, tag_id, ...rest } = data;
+  const {
+    organization_siret,
+    geographical_coverage,
+    technical_source,
+    tag_id,
+    ...rest
+  } = data;
   return {
+    organizationSiret: organization_siret,
     geographicalCoverage: geographical_coverage,
     technicalSource: technical_source,
     tagId: tag_id,
@@ -21,6 +28,7 @@ export const toFiltersValue = (
   searchParams: URLSearchParams
 ): DatasetFiltersValue => {
   return {
+    organizationSiret: searchParams.get("organization_siret"),
     geographicalCoverage: searchParams.get("geographical_coverage"),
     service: searchParams.get("service"),
     format: searchParams.get("format"),
@@ -34,6 +42,7 @@ export const toFiltersParams = (
   value: DatasetFiltersValue
 ): QueryParamRecord => {
   const {
+    organizationSiret,
     geographicalCoverage,
     service,
     format,
@@ -43,6 +52,7 @@ export const toFiltersParams = (
   } = value;
 
   return [
+    ["organization_siret", organizationSiret],
     ["geographical_coverage", geographicalCoverage],
     ["service", service],
     ["format", format],
@@ -56,6 +66,10 @@ export const toFiltersOptions = (
   info: DatasetFiltersInfo
 ): DatasetFiltersOptions => {
   return {
+    organizationSiret: info.organizationSiret.map(({ name, siret }) => ({
+      label: name,
+      value: siret,
+    })),
     geographicalCoverage: info.geographicalCoverage.map((value) => ({
       label: value,
       value,
@@ -79,9 +93,14 @@ export const toFiltersOptions = (
 
 export const toFiltersButtonTexts = (
   value: DatasetFiltersValue,
+  organizationSiretToName: Record<string, string>,
   tagIdToName: Record<string, string>
 ): { [K in keyof DatasetFiltersValue]: Maybe<string> } => {
   return {
+    organizationSiret: Maybe.map(
+      value.organizationSiret,
+      (v) => organizationSiretToName[v]
+    ),
     geographicalCoverage: value.geographicalCoverage,
     service: value.service,
     format: Maybe.map(value.format, (v) => DATA_FORMAT_LABELS[v]),

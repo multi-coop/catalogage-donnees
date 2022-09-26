@@ -1,13 +1,14 @@
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy import select
-from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import contains_eager, noload
 
 from server.domain.catalogs.entities import Catalog
 from server.domain.catalogs.repositories import CatalogRepository
 from server.domain.organizations.types import Siret
 
 from ..database import Database
+from ..organizations.models import OrganizationModel
 from .models import CatalogModel
 from .transformers import make_entity, make_instance
 
@@ -33,6 +34,23 @@ class SqlCatalogRepository(CatalogRepository):
             if instance is None:
                 return None
             return make_entity(instance)
+
+    async def get_all(self) -> List[Catalog]:
+        async with self._db.session() as session:
+            stmt = (
+                select(CatalogModel)
+                .join(CatalogModel.organization)
+                .order_by(OrganizationModel.name)
+                .options(
+                    contains_eager(CatalogModel.organization),
+                    # Don't need these so they aren't fetched, return [] when
+                    # accessing the attribute on the instance.
+                    noload(CatalogModel.extra_fields),
+                )
+            )
+            result = await session.execute(stmt)
+            items = result.unique().scalars()
+            return [make_entity(item) for item in items]
 
     async def insert(self, entity: Catalog) -> Siret:
         async with self._db.session() as session:
