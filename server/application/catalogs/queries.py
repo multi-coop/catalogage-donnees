@@ -10,5 +10,5 @@ class GetCatalogBySiret(Query[CatalogView]):
     siret: Siret
 
 
-class GetAllNonEmptyCatalogs(Query[List[CatalogView]]):
+class GetAllCatalogs(Query[List[CatalogView]]):
     pass

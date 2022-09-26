@@ -8,6 +8,7 @@ from server.domain.catalogs.repositories import CatalogRepository
 from server.domain.organizations.types import Siret
 
 from ..database import Database
+from ..organizations.models import OrganizationModel
 from .models import CatalogModel
 from .transformers import make_entity, make_instance
 
@@ -34,13 +35,12 @@ class SqlCatalogRepository(CatalogRepository):
                 return None
             return make_entity(instance)
 
-    async def get_all_non_empty(self) -> List[Catalog]:
+    async def get_all(self) -> List[Catalog]:
         async with self._db.session() as session:
             stmt = (
                 select(CatalogModel)
                 .join(CatalogModel.organization)
-                # This join ensures we don't include empty catalogs
-                .join(CatalogModel.catalog_records, isouter=False)
+                .order_by(OrganizationModel.name)
                 .options(
                     contains_eager(CatalogModel.organization),
                     # Don't need these so they aren't fetched, return [] when

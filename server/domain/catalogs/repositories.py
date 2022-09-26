@@ -10,7 +10,7 @@ class CatalogRepository(Repository):
     async def get_by_siret(self, siret: Siret) -> Optional[Catalog]:
         raise NotImplementedError  # pragma: no cover
 
-    async def get_all_non_empty(self) -> List[Catalog]:
+    async def get_all(self) -> List[Catalog]:
         raise NotImplementedError  # pragma: no cover
 
     async def insert(self, catalog: Catalog) -> Siret:

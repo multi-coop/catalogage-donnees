@@ -1,4 +1,4 @@
-from server.application.catalogs.queries import GetAllNonEmptyCatalogs
+from server.application.catalogs.queries import GetAllCatalogs
 from server.application.licenses.queries import GetLicenseSet
 from server.application.tags.queries import GetAllTags
 from server.config.di import resolve
@@ -84,7 +84,7 @@ async def get_dataset_filters(query: GetDatasetFilters) -> DatasetFiltersView:
     bus = resolve(MessageBus)
     repository = resolve(DatasetRepository)
 
-    catalogs = await bus.execute(GetAllNonEmptyCatalogs())
+    catalogs = await bus.execute(GetAllCatalogs())
     geographical_coverages = await repository.get_geographical_coverage_set()
     services = await repository.get_service_set()
     technical_sources = await repository.get_technical_source_set()

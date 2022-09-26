@@ -10,7 +10,7 @@ from server.domain.organizations.repositories import OrganizationRepository
 from server.domain.organizations.types import Siret
 
 from .commands import CreateCatalog
-from .queries import GetAllNonEmptyCatalogs, GetCatalogBySiret
+from .queries import GetAllCatalogs, GetCatalogBySiret
 from .views import CatalogView
 
 
@@ -26,11 +26,11 @@ async def get_catalog_by_siret(query: GetCatalogBySiret) -> CatalogView:
     return CatalogView(**catalog.dict())
 
 
-async def get_all_non_empty_catalogs(
-    query: GetAllNonEmptyCatalogs,
+async def get_all_catalogs(
+    query: GetAllCatalogs,
 ) -> List[CatalogView]:
     repository = resolve(CatalogRepository)
-    catalogs = await repository.get_all_non_empty()
+    catalogs = await repository.get_all()
     return [CatalogView(**catalog.dict()) for catalog in catalogs]
 
 

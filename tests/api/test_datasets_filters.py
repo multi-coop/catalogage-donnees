@@ -8,6 +8,7 @@ from server.application.catalogs.commands import CreateCatalog
 from server.config.di import resolve
 from server.domain.common.types import ID, id_factory
 from server.domain.datasets.entities import DataFormat
+from server.domain.organizations.entities import LEGACY_ORGANIZATION
 from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 
@@ -26,17 +27,19 @@ async def test_dataset_filters_info(
     bus = resolve(MessageBus)
 
     siret_non_empty = await bus.execute(
-        CreateOrganizationFactory.build(name="Organization with a non-empty catalog")
+        CreateOrganizationFactory.build(
+            name="A - Organization with a non-empty catalog"
+        )
     )
     await bus.execute(CreateCatalog(organization_siret=siret_non_empty))
 
     siret_empty = await bus.execute(
-        CreateOrganizationFactory.build(name="Organization with an empty catalog")
+        CreateOrganizationFactory.build(name="B - Organization with an empty catalog")
     )
     await bus.execute(CreateCatalog(organization_siret=siret_empty))
 
     await bus.execute(
-        CreateOrganizationFactory.build(name="Organization without a catalog")
+        CreateOrganizationFactory.build(name="C - Organization without a catalog")
     )
 
     tag_id = await bus.execute(CreateTagFactory.build(name="Architecture"))
@@ -79,8 +82,13 @@ async def test_dataset_filters_info(
     assert data["organization_siret"] == [
         {
             "siret": str(siret_non_empty),
-            "name": "Organization with a non-empty catalog",
+            "name": "A - Organization with a non-empty catalog",
         },
+        {
+            "siret": str(siret_empty),
+            "name": "B - Organization with an empty catalog",
+        },
+        LEGACY_ORGANIZATION.dict(),
     ]
 
     assert data["geographical_coverage"] == [
