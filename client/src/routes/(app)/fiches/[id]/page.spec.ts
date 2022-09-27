@@ -11,12 +11,15 @@ import type {
   ExtraField,
   ExtraFieldValue,
 } from "src/definitions/catalogs";
+import { login, logout } from "src/lib/stores/auth";
+import { getFakeOrganization } from "src/tests/factories/organizations";
+import { getFakeCatalogRecord } from "src/tests/factories/catalog_records";
+import { getFakeAccount } from "src/tests/factories/accounts";
+
+const organization = getFakeOrganization();
 
 const catalog: Catalog = {
-  organization: {
-    siret: "<siret>",
-    name: "Org 1",
-  },
+  organization,
   extraFields: [],
 };
 
@@ -27,9 +30,18 @@ const dataset = getFakeDataset({
   formats: ["other"],
   producerEmail: "service@mydomain.org",
   contactEmails: ["service@mydomain.org"],
+  catalogRecord: getFakeCatalogRecord({
+    organization,
+  }),
 });
 
 const data = { catalog, dataset };
+
+beforeAll(() =>
+  login(getFakeAccount({ organizationSiret: organization.siret }), "abcd1234")
+);
+
+afterAll(() => logout());
 
 describe("Dataset detail page header", () => {
   test("The dataset title is present", () => {
@@ -44,6 +56,12 @@ describe("Dataset detail page action buttons", () => {
     const modifyButton = getByText("Modifier");
     expect(modifyButton).toBeInTheDocument();
     expect(modifyButton.getAttribute("href")).toContain(dataset.id);
+  });
+  test("The button to modify the dataset is absent if user does not belong to organization", async () => {
+    login(getFakeAccount({ organizationSiret: "<other_siret>" }), "1234");
+    const { queryByText } = render(index, { data });
+    const modifyButton = queryByText("Modifier");
+    expect(modifyButton).not.toBeInTheDocument();
   });
   test("The button to contact the author is present", () => {
     const { getByText } = render(index, { data });

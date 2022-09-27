@@ -1,8 +1,15 @@
-import { TEST_EMAIL, TEST_ORGANIZATION } from "./constants.js";
 import { test } from "./fixtures.js";
 import { expect } from "@playwright/test";
+import type { Organization } from "src/definitions/organizations";
 
 test.describe("Datapass", () => {
+  const TEST_EMAIL = "user@mydomain.org";
+
+  const TEST_ORGANIZATION: Organization = {
+    siret: "44229377500031",
+    name: "Ministère de la culture",
+  };
+
   test("A user tried to log in but no organization has been found", async ({
     page,
   }) => {

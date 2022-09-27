@@ -1,4 +1,5 @@
 import json
+import re
 import uuid
 from pathlib import Path
 
@@ -116,11 +117,12 @@ async def test_repo_initdata(
 ) -> None:
     bus = resolve(MessageBus)
     path = Path("tools", "initdata.yml")
-    monkeypatch.setenv(
-        "TOOLS_PASSWORDS", json.dumps({"admin@catalogue.data.gouv.fr": "test"})
-    )
+    env_example = Path(".env.example").read_text()
+    m = re.search("TOOLS_PASSWORDS='(.*)'", env_example)
+    assert m is not None
+    monkeypatch.setenv("TOOLS_PASSWORDS", m.group(1))
 
-    num_users = 3
+    num_users = 4
     num_tags = 7
     num_datasets = 4
     num_organizations = 2

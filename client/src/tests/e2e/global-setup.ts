@@ -7,10 +7,17 @@ import {
 
 import {
   ADMIN_EMAIL,
+  ADMIN_EMAIL_SANTE,
+  ADMIN_PASSWORD,
+  ADMIN_PASSWORD_SANTE,
   STATE_AUTHENTICATED,
   STATE_AUTHENTICATED_ADMIN,
+  STATE_AUTHENTICATED_ADMIN_SANTE,
+  STATE_AUTHENTICATED_SANTE,
   TEST_EMAIL,
+  TEST_EMAIL_SANTE,
   TEST_PASSWORD,
+  TEST_PASSWORD_SANTE,
 } from "./constants.js";
 import type { AppTestArgs } from "./fixtures.js";
 
@@ -28,9 +35,21 @@ export default async function globalSetup(
   });
 
   await saveAuthenticatedState(browser, config, {
+    email: TEST_EMAIL_SANTE,
+    password: TEST_PASSWORD_SANTE,
+    path: STATE_AUTHENTICATED_SANTE,
+  });
+
+  await saveAuthenticatedState(browser, config, {
     email: ADMIN_EMAIL,
-    password: config.projects[0].use.adminTestPassword || "",
+    password: ADMIN_PASSWORD,
     path: STATE_AUTHENTICATED_ADMIN,
+  });
+
+  await saveAuthenticatedState(browser, config, {
+    email: ADMIN_EMAIL_SANTE,
+    password: ADMIN_PASSWORD_SANTE,
+    path: STATE_AUTHENTICATED_ADMIN_SANTE,
   });
 
   await browser.close();
