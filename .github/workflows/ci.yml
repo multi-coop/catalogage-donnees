@@ -22,9 +22,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     env:
-      APP_SECRET_KEY: "<testing>"
       APP_DATABASE_URL: "postgresql+asyncpg://username:password@localhost:5432/catalogage"
-      TOOLS_PASSWORDS: '{"admin@catalogue.data.gouv.fr": "ci-admin"}'
 
     steps:
       - uses: actions/checkout@v3
@@ -44,6 +42,9 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-node-${{ hashFiles('**/client/package-lock.json') }}
+
+      - name: "Setup .env"
+        run: cp .env.example .env
 
       - name: "Install dependencies"
         run: make install

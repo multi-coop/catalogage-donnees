@@ -2,28 +2,9 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
   import { logout, account } from "$lib/stores/auth";
+  import { navigationItems } from "$lib/stores/layout";
   import paths from "$lib/paths";
   import { Maybe } from "$lib/util/maybe";
-
-  type NavItem = {
-    label: string;
-    href: string;
-  };
-
-  const navigationItems: NavItem[] = [
-    {
-      label: "Accueil",
-      href: paths.home,
-    },
-    {
-      label: "Rechercher",
-      href: paths.datasetSearch,
-    },
-    {
-      label: "Contribuer",
-      href: paths.contribute,
-    },
-  ];
 
   $: path = $page.url.pathname;
 
@@ -129,7 +110,7 @@
           data-fr-js-navigation="true"
         >
           <ul class="fr-nav__list">
-            {#each navigationItems as { label, href }}
+            {#each $navigationItems as { label, href }}
               <li class="fr-nav__item" data-fr-js-navigaton-item="true">
                 <a
                   {href}

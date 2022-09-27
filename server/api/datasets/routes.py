@@ -43,6 +43,7 @@ async def list_datasets(
         page=page,
         spec=DatasetSpec(
             search_term=params.q,
+            organization_siret=params.organization_siret,
             geographical_coverage__in=params.geographical_coverage,
             service__in=params.service,
             format__in=params.format,

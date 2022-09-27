@@ -60,6 +60,9 @@ class GetAllQuery:
             # Sort rows by search rank, best match first.
             orderbyclauses.append(desc(text("rank")))
 
+        if (siret := spec.organization_siret) is not None:
+            whereclauses.append(CatalogRecordModel.organization_siret == siret)
+
         if (geographical_coverages := spec.geographical_coverage__in) is not None:
             whereclauses.append(
                 DatasetModel.geographical_coverage.in_(geographical_coverages),

@@ -1,4 +1,4 @@
-from typing import Generic, List, TypeVar
+from typing import Any, Generic, List, TypeVar, cast
 
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
@@ -21,8 +21,8 @@ class Pagination(GenericModel, Generic[T]):
     items: List[T]
     total_items: int
     page_size: int
-    total_pages: Computed[int] = Field(
-        Computed.Expr("math.ceil(total_items / page_size)")
+    total_pages: Computed[int] = cast(
+        Any, Field(Computed.Expr("math.ceil(total_items / page_size)"))
     )
 
     class Config:

@@ -8,6 +8,7 @@ from server.domain.datasets.entities import DataFormat, UpdateFrequency
 from server.domain.datasets.repositories import DatasetHeadlines
 
 from ..catalog_records.views import CatalogRecordView
+from ..organizations.views import OrganizationView
 from ..tags.views import TagView
 
 
@@ -39,6 +40,7 @@ class DatasetView(BaseModel):
 
 
 class DatasetFiltersView(BaseModel):
+    organization_siret: List[OrganizationView]
     geographical_coverage: List[str]
     service: List[str]
     format: List[DataFormat]

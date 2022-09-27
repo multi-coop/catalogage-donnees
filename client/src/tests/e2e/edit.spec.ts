@@ -1,5 +1,10 @@
 import { expect } from "@playwright/test";
-import { STATE_AUTHENTICATED, STATE_AUTHENTICATED_ADMIN } from "./constants.js";
+import {
+  STATE_AUTHENTICATED,
+  STATE_AUTHENTICATED_ADMIN,
+  STATE_AUTHENTICATED_ADMIN_SANTE,
+  STATE_AUTHENTICATED_SANTE,
+} from "./constants.js";
 import { test } from "./fixtures.js";
 
 const DELETE_DATASET_BUTTON_LOCATOR = "text=Supprimer ce jeu de données";
@@ -157,6 +162,37 @@ test.describe("confirm before exit", () => {
 
     // check if the user has been redirected to the home page
     await page.waitForURL("/");
+  });
+});
+
+test.describe("Edit as outside contributor", () => {
+  test.describe("As a user", () => {
+    test.use({ storageState: STATE_AUTHENTICATED_SANTE });
+
+    test("Visits edit page as user from other org and gets permission denied", async ({
+      page,
+      dataset,
+    }) => {
+      await page.goto(`/fiches/${dataset.id}/edit`);
+      await page.locator("form [name=title]").waitFor();
+    });
+  });
+
+  test.describe("As an admin", () => {
+    test.use({ storageState: STATE_AUTHENTICATED_ADMIN_SANTE });
+
+    test("Visits edit page as admin from other org", async ({
+      page,
+      dataset,
+    }) => {
+      /**
+       * [Regression test] Legitimate users outside the dataset's organization used
+       * to not be able to access the page because we fetched their organization's
+       * catalog, instead of the catalog of the dataset.
+       */
+      await page.goto(`/fiches/${dataset.id}/edit`);
+      await page.locator("form [name=title]").waitFor();
+    });
   });
 });
 
