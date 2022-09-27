@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
 from starlette.responses import Response
@@ -23,6 +25,8 @@ from ..auth.permissions import HasRole, IsAuthenticated
 from ..types import APIRequest
 from . import filters
 from .schemas import DatasetCreate, DatasetListParams, DatasetUpdate
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/datasets", tags=["datasets"])
 
@@ -89,7 +93,8 @@ async def create_dataset(data: DatasetCreate, request: "APIRequest") -> DatasetV
         id = await bus.execute(command)
     except CatalogDoesNotExist as exc:
         raise HTTPException(400, detail=str(exc))
-    except CannotCreateDataset:
+    except CannotCreateDataset as exc:
+        logger.exception(exc)
         raise HTTPException(403, detail="Permission denied")
 
     query = GetDatasetByID(id=id)
