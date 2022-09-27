@@ -12,7 +12,7 @@ from server.application.tags.commands import CreateTag
 from server.application.tags.queries import GetTagByID
 from server.config.di import resolve
 from server.domain.catalogs.entities import ExtraFieldValue, TextExtraField
-from server.domain.common.types import ID, id_factory
+from server.domain.common.types import ID, Skip, id_factory
 from server.domain.datasets.entities import DataFormat, UpdateFrequency
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.organizations.entities import LEGACY_ORGANIZATION
@@ -26,7 +26,7 @@ from ..factories import (
     CreateDatasetPayloadFactory,
     CreateOrganizationFactory,
     CreatePasswordUserFactory,
-    UpdateDatasetFactory,
+    UpdateDatasetPayloadFactory,
     fake,
 )
 from ..helpers import TestPasswordUser, create_test_password_user, to_payload
@@ -257,6 +257,28 @@ class TestDatasetPermissions:
         response = await client.put(f"/datasets/{pk}/", json={})
         assert response.status_code == 401
 
+    async def test_update_in_other_org_denied(
+        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
+    ) -> None:
+        bus = resolve(MessageBus)
+
+        other_org_siret = await bus.execute(CreateOrganizationFactory.build())
+        await bus.execute(CreateCatalog(organization_siret=other_org_siret))
+
+        command = CreateDatasetFactory.build(
+            organization_siret=other_org_siret, account=Skip()
+        )
+        dataset_id = await bus.execute(command)
+
+        payload = to_payload(
+            UpdateDatasetPayloadFactory.build_from_create_command(command)
+        )
+        response = await client.put(
+            f"/datasets/{dataset_id}/", json=payload, auth=temp_user.auth
+        )
+
+        assert response.status_code == 403
+
     async def test_delete_not_authenticated(self, client: httpx.AsyncClient) -> None:
         pk = id_factory()
         response = await client.delete(f"/datasets/{pk}/")
@@ -425,7 +447,7 @@ class TestDatasetUpdate:
         pk = id_factory()
         response = await client.put(
             f"/datasets/{pk}/",
-            json=to_payload(UpdateDatasetFactory.build(id=pk)),
+            json=to_payload(UpdateDatasetPayloadFactory.build(id=pk)),
             auth=temp_user.auth,
         )
         assert response.status_code == 404
@@ -480,13 +502,13 @@ class TestDatasetUpdate:
         response = await client.put(
             f"/datasets/{dataset_id}/",
             json=to_payload(
-                UpdateDatasetFactory.build(
+                UpdateDatasetPayloadFactory.build_from_create_command(
+                    command.copy(exclude={"title", "description", "service", "url"}),
                     factory_use_construct=True,  # Skip validation
                     title="",
                     description="",
                     service="",
                     url="",
-                    **command.dict(exclude={"title", "description", "service", "url"}),
                 )
             ),
             auth=temp_user.auth,
@@ -523,7 +545,7 @@ class TestDatasetUpdate:
         other_last_updated_at = fake.date_time_tz()
 
         payload = to_payload(
-            UpdateDatasetFactory.build(
+            UpdateDatasetPayloadFactory.build(
                 title="Other title",
                 description="Other description",
                 service="Other service",
@@ -603,9 +625,9 @@ class TestFormats:
         response = await client.put(
             f"/datasets/{dataset_id}/",
             json=to_payload(
-                UpdateDatasetFactory.build(
+                UpdateDatasetPayloadFactory.build_from_create_command(
+                    command.copy(exclude={"formats"}),
                     formats=[DataFormat.WEBSITE, DataFormat.API, DataFormat.FILE_GIS],
-                    **command.dict(exclude={"formats"}),
                 )
             ),
             auth=temp_user.auth,
@@ -627,9 +649,9 @@ class TestFormats:
         response = await client.put(
             f"/datasets/{dataset_id}/",
             json=to_payload(
-                UpdateDatasetFactory.build(
+                UpdateDatasetPayloadFactory.build_from_create_command(
+                    command.copy(exclude={"formats"}),
                     formats=[DataFormat.WEBSITE],
-                    **command.dict(exclude={"formats"}),
                 )
             ),
             auth=temp_user.auth,
@@ -654,9 +676,9 @@ class TestTags:
         response = await client.put(
             f"/datasets/{dataset_id}/",
             json=to_payload(
-                UpdateDatasetFactory.build(
+                UpdateDatasetPayloadFactory.build_from_create_command(
+                    command.copy(exclude={"tag_ids"}),
                     tag_ids=[str(tag_architecture_id)],
-                    **command.dict(exclude={"tag_ids"}),
                 )
             ),
             auth=temp_user.auth,
@@ -684,9 +706,9 @@ class TestTags:
         response = await client.put(
             f"/datasets/{dataset_id}/",
             json=to_payload(
-                UpdateDatasetFactory.build(
+                UpdateDatasetPayloadFactory.build_from_create_command(
+                    command.copy(exclude={"tag_ids"}),
                     tag_ids=[],
-                    **command.dict(exclude={"tag_ids"}),
                 )
             ),
             auth=temp_user.auth,
@@ -752,9 +774,7 @@ class TestExtraFieldValues:
             }
         ]
 
-    async def test_add_extra_field_value(
-        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
-    ) -> None:
+    async def test_add_extra_field_value(self, client: httpx.AsyncClient) -> None:
         bus = resolve(MessageBus)
         siret, user, extra_field_id = await self._setup()
 
@@ -766,19 +786,18 @@ class TestExtraFieldValues:
         assert not dataset.extra_field_values
 
         payload = to_payload(
-            UpdateDatasetFactory.build(
-                id=dataset_id,
+            UpdateDatasetPayloadFactory.build_from_create_command(
+                command.copy(exclude={"extra_field_values"}),
                 extra_field_values=[
                     ExtraFieldValue(
                         extra_field_id=extra_field_id,
                         value="Environ 10 To",
                     )
                 ],
-                **command.dict(exclude={"extra_field_values"}),
             )
         )
         response = await client.put(
-            f"/datasets/{dataset_id}/", json=payload, auth=temp_user.auth
+            f"/datasets/{dataset_id}/", json=payload, auth=user.auth
         )
         assert response.status_code == 200
         data = response.json()
@@ -789,9 +808,7 @@ class TestExtraFieldValues:
             }
         ]
 
-    async def test_remove_extra_field_value(
-        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
-    ) -> None:
+    async def test_remove_extra_field_value(self, client: httpx.AsyncClient) -> None:
         bus = resolve(MessageBus)
         siret, user, extra_field_id = await self._setup()
 
@@ -810,14 +827,13 @@ class TestExtraFieldValues:
         assert len(dataset.extra_field_values) == 1
 
         payload = to_payload(
-            UpdateDatasetFactory.build(
-                id=dataset_id,
+            UpdateDatasetPayloadFactory.build_from_create_command(
+                command.copy(exclude={"extra_field_values"}),
                 extra_field_values=[],
-                **command.dict(exclude={"extra_field_values"}),
             )
         )
         response = await client.put(
-            f"/datasets/{dataset_id}/", json=payload, auth=temp_user.auth
+            f"/datasets/{dataset_id}/", json=payload, auth=user.auth
         )
         assert response.status_code == 200
         data = response.json()

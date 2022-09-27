@@ -7,7 +7,7 @@ from faker.providers import BaseProvider
 from pydantic import BaseModel
 from pydantic_factories import ModelFactory, Require, Use
 
-from server.api.datasets.schemas import DatasetCreate
+from server.api.datasets.schemas import DatasetCreate, DatasetUpdate
 from server.application.auth.commands import CreateDataPassUser, CreatePasswordUser
 from server.application.datasets.commands import CreateDataset, UpdateDataset
 from server.application.organizations.commands import CreateOrganization
@@ -93,11 +93,27 @@ class CreateDatasetPayloadFactory(_BaseCreateDatasetFactory, Factory[DatasetCrea
     __model__ = DatasetCreate
 
 
-class UpdateDatasetFactory(Factory[UpdateDataset]):
-    __model__ = UpdateDataset
-
+class _BaseUpdateDatasetFactory:
     tag_ids = Use(lambda: [])
     extra_field_values = Use(lambda: [])
+
+
+class UpdateDatasetFactory(_BaseCreateDatasetFactory, Factory[UpdateDataset]):
+    __model__ = UpdateDataset
+
+    account = Require()
+
+
+class UpdateDatasetPayloadFactory(_BaseUpdateDatasetFactory, Factory[DatasetUpdate]):
+    __model__ = DatasetUpdate
+
+    @classmethod
+    def build_from_create_command(
+        cls, command: CreateDataset, **kwargs: Any
+    ) -> DatasetUpdate:
+        return cls.build(
+            **command.dict(exclude={"account", "organization_siret"}), **kwargs
+        )
 
 
 class CreateOrganizationFactory(Factory[CreateOrganization]):

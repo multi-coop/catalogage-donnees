@@ -183,7 +183,10 @@ async def test_search_results_change_when_data_changes(
 
     # Update dataset title
     update_command = UpdateDatasetFactory.build(
-        id=pk, title="Modifié", **command.dict(exclude={"title"})
+        account=temp_user.account,
+        id=pk,
+        title="Modifié",
+        **command.dict(exclude={"title", "account", "organization_siret"}),
     )
 
     await bus.execute(update_command)
@@ -200,7 +203,7 @@ async def test_search_results_change_when_data_changes(
     # Same on description
     update_command = UpdateDatasetFactory.build(
         description="Jeu de données spécial",
-        **update_command.dict(exclude={"description"})
+        **update_command.dict(exclude={"description"}),
     )
     await bus.execute(update_command)
     response = await client.get(

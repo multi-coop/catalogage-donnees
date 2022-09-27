@@ -15,9 +15,9 @@ from server.domain.tags.repositories import TagRepository
 from server.seedwork.application.messages import MessageBus
 
 from .commands import CreateDataset, DeleteDataset, UpdateDataset
-from .exceptions import CannotCreateDataset
+from .exceptions import CannotCreateDataset, CannotUpdateDataset
 from .queries import GetAllDatasets, GetDatasetByID, GetDatasetFilters
-from .specifications import can_create_dataset
+from .specifications import can_create_dataset, can_update_dataset
 from .views import DatasetFiltersView, DatasetView
 
 
@@ -72,9 +72,14 @@ async def update_dataset(command: UpdateDataset) -> None:
     if dataset is None:
         raise DatasetDoesNotExist(pk)
 
+    if not isinstance(command.account, Skip) and not can_update_dataset(
+        dataset, command.account
+    ):
+        raise CannotUpdateDataset(f"{command.account=}, {dataset=}")
+
     tags = await tag_repository.get_all(ids=command.tag_ids)
     dataset.update(
-        **command.dict(exclude={"id", "tag_ids", "extra_field_values"}),
+        **command.dict(exclude={"account", "id", "tag_ids", "extra_field_values"}),
         tags=tags,
         extra_field_values=command.extra_field_values,
     )
