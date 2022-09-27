@@ -279,6 +279,29 @@ class TestDatasetPermissions:
 
         assert response.status_code == 403
 
+    async def test_update_in_other_org_admin_denied(
+        self, client: httpx.AsyncClient, admin_user: TestPasswordUser
+    ) -> None:
+        bus = resolve(MessageBus)
+
+        other_org_siret = await bus.execute(CreateOrganizationFactory.build())
+        assert admin_user.account.organization_siret != other_org_siret
+        await bus.execute(CreateCatalog(organization_siret=other_org_siret))
+
+        command = CreateDatasetFactory.build(
+            organization_siret=other_org_siret, account=Skip()
+        )
+        dataset_id = await bus.execute(command)
+
+        payload = to_payload(
+            UpdateDatasetPayloadFactory.build_from_create_command(command)
+        )
+        response = await client.put(
+            f"/datasets/{dataset_id}/", json=payload, auth=admin_user.auth
+        )
+
+        assert response.status_code == 403
+
     async def test_delete_not_authenticated(self, client: httpx.AsyncClient) -> None:
         pk = id_factory()
         response = await client.delete(f"/datasets/{pk}/")
