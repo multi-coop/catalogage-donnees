@@ -52,10 +52,14 @@
 <section class="fr-container">
   {#if Maybe.Some(paginatedDatasets)}
     <div class="fr-grid-row summary">
-      <div class="fr-col-12 fr-pb-3w summary__header">
+      <div class="fr-col-12 fr-pb-1w summary__header">
         <h2>
           {paginatedDatasets.totalItems}
-          {pluralize(paginatedDatasets.totalItems, "résultat", "résultats")}
+          {pluralize(
+            paginatedDatasets.totalItems,
+            "fiche de données",
+            "fiches de données"
+          )}
         </h2>
 
         <button
