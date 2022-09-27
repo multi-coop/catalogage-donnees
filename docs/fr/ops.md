@@ -3,32 +3,27 @@
 **Table des matières**
 
 - [Généralités](#généralités)
-- [Architecture](#architecture)
-  - [Vue globale](#vue-globale)
+- [Environnements](#environnements)
+  - [Liste des environnements](#liste-des-environnements)
+  - [Versions](#versions)
+  - [Ajouter un nouvel environnement](#ajouter-un-nouvel-environnement)
+  - [Secrets](#secrets)
+  - [Démanteler un environnement](#démanteler-un-environnement)
+- [Intégrations](#intégrations)
   - [Comptes DataPass](#comptes-datapass)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Tests](#tests)
+- [Comment déployer](#comment-déployer)
+  - [Installation](#installation)
+  - [Déployer un environnement](#déployer-un-environnement)
+  - [Déployer sur staging](#déployer-sur-staging)
+  - [(Avancé) Déployer une version quelconque](#avancé-déployer-une-version-quelconque)
+- [Outils](#outils)
+  - [Données initiales](#données-initiales)
+  - [Tester sur une VM locale](#tester-sur-une-vm-locale)
 - [Débogage](#débogage)
-- [Versions](#versions)
 
 ## Généralités
 
 Le déploiement et la gestion des serveurs distants est réalisée à l'aide de [Ansible](https://docs.ansible.com/ansible/latest/user_guide/index.html).
-
-Les différents déploiements sont organisés en _environnements_ (copies de l'infrastructure) :
-
-| Nom     | Description | Déploie la branche |
-|---------|-------------|--------------------|
-| demo    | Environnement de démo | `master` |
-| sandbox | Environnement "bac à sable" destiné à des utilisateurs test | `master` |
-| staging | Environnement de staging | `staging` |
-
-Il y a un seul _groupe_ Ansible : `web`.
-
-## Architecture
-
-### Vue globale
 
 L'architecture du service déployé est la suivante :
 
@@ -52,6 +47,93 @@ Par ailleurs :
 * Le lien entre Uvicorn et la base de données PostgreSQL est paramétrable (_database URL_). Cette dernier ne vit donc pas nécessairement sur la même machine que le serveur applicatif.
 * Nginx fait la terminaison TLS avec des certificats gérés avec [Certbot](https://eff-certbot.readthedocs.io) (LetsEncrypt).
 
+## Environnements
+
+### Liste des environnements
+
+Les différents déploiements sont organisés en _environnements_ (copies de l'infrastructure) :
+
+| Nom     | Description | À déployer depuis |
+|---------|-------------|-------------------|
+| demo    | Environnement de démo | `master` |
+| sandbox | Environnement "bac à sable" destiné à des utilisateurs test | `master` |
+| staging | Environnement de staging | `staging` |
+
+Voici, à date, une liste des ressources pour chaque environnement et leur localisation.
+
+| Ressource | Environnements | Lieu | Contact |
+|-----------|----------------|------|---------|
+| Instance cloud (VM) | sandbox, staging, demo | Console Scaleway de Multi| johan.richer[ @ ]multi.coop |
+| Instance PostgreSQL | sandbox, staging, demo | Console Scaleway de Multi | johan.richer[ @ ]multi.coop |
+| Enregistrement DNS | sandbox, staging, demo | Service DNS de Multi | johan.richer[ @ ]multi.coop |
+| URLs de callback OpenID Connect pour "Comptes DataPass" | sandbox, staging, demo | Infrastructure BetaGouv | Contacter l'équipe "Compte DataPass" sur BetaGouv, ou ouvrir un billet sur [betagouv/api-auth](https://github.com/betagouv/api-auth) |
+
+### Versions
+
+Voici la version des logiciels nécessaires ou installés via Ansible dans les environnements.
+
+| Logiciel | Version | Notes |
+|----------|---------|-------|
+| OS | debian/bullseye64 | À sélectionner lors de la configuration de la VM chez l'hébergeur cloud |
+| PostgreSQL | 12 | |
+| Python | 3.8.x | Installé sur les serveurs distants avec [pyenv](https://github.com/pyenv/pyenv). Paramétré par la variable `pyenv_python_version`. Python peut être mis à jour en la modifiant. Penser à retirer toute ancienne version après une telle opération. |
+| Node | v16.x | Installé sur les serveurs distants avec [nvm](https://github.com/nvm-sh/nvm). Paramétré par la variable `nvm_node_version`. |
+
+### Ajouter un nouvel environnement
+
+Pour créer un nouvel environnement, munissez-vous tout d'abord des ressources informatiques décrites dans [Liste des environnements](#liste-des-environnements).
+
+Créez ensuite le dossier de l'environnement dans `ops/ansible/environments/`, sur le modèle de ceux qui existent déjà.
+
+Les fichiers suivants sont attendus :
+
+- `hosts` : _inventory_ Ansible.
+- `secrets` : fichier de variables secrètes - voir [Secrets](#secrets) pour comment le modifier.
+- `group_vars/web.yml` : variables spécifiques à l'environnement.
+
+Quand tout semble prêt, initialisez l'environnement `<ENV>` :
+
+```
+make ops-provision env=<ENV>
+```
+
+Vous pouvez ensuite [déployer](#déployer-un-environnement).
+
+### Secrets
+
+La gestion des secrets s'appuie sur [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html).
+
+Pour modifier le fichier de secrets d'un environnement, lancez :
+
+```
+make ops-secrets env=<ENV>
+```
+
+Astuce : vous pouvez aussi [chiffrer un fichier quelconque avec Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html#encrypting-files-with-ansible-vault) :
+
+```
+venv/bin/ansible-vault encrypt <FILE> --vault-password-file ops/ansible/vault-password
+```
+
+Pour modifier un fichier chiffré, utilisez :
+
+```
+venv/bin/ansible-vault edit <FILE> --vault-password-file ops/ansible/vault-password
+```
+
+### Démanteler un environnement
+
+Un environnement peut devenir obsolète, par exemple parce qu'il n'est plus utile, qu'il a été remplacé par un autre environnement, ou tout autre cas faisant que l'instance associée doit être arrêtée.
+
+Il s'agit alors de :
+
+* S'assurer que l'environnement n'est plus utilisé et qu'il peut être supprimé définitivement.
+* Retirer les ressources informatiques allouées à cet environnement (voir [Liste des environnements](#liste-des-environnements)).
+* Mettre à jour la présente documentation en retirant l'environnement.
+* Retirer le dossier de l'environnement de `ops/ansible`.
+
+## Intégrations
+
 ### Comptes DataPass
 
 L'outil délègue la gestion des organisations à [Comptes DataPass](https://github.com/betagouv/api-auth), un fédérateur d'entités de personnes morales.
@@ -68,7 +150,9 @@ Dans les [secrets](#secrets) de chaque environnement est configuré un couple d'
 
 En local, il est possible de copier les identifiants `staging` (depuis les secrets de l'environnement) dans son `.env` (voir [Configuration (Démarrage)](./demarrage.md#configuration)) pour développer avec l'authentification par DataPass.
 
-## Installation
+## Comment déployer
+
+### Installation
 
 **Prérequis** :
 
@@ -97,9 +181,7 @@ cd ops && make ping env=staging
 
 Vous devriez recevoir un "pong".
 
-## Usage
-
-### Déployer
+### Déployer un environnement
 
 Pour déployer l'environnement `<ENV>`, lancez :
 
@@ -153,45 +235,7 @@ make ops-deploy env=<ENV> extra_opts="-e git_version=<GIT_VERSION>"
 
 où `<GIT_VERSION>` peut être n'importe quelle [référence git](https://git-scm.com/book/fr/v2/Les-tripes-de-Git-R%C3%A9f%C3%A9rences-Git) : branche, tag, ou commit hash.
 
-### Ajouter un nouvel environnement
-
-Créez le dossier de l'environnement dans `ops/ansible/environments/`, sur le modèle de ceux qui existent déjà.
-
-Les fichiers suivants sont attendus :
-
-- `hosts` : _inventory_ Ansible.
-- `secrets` : fichier de variables secrètes - voir [Secrets](#secrets) pour comment le modifier.
-- `group_vars/web.yml` : variables spécifiques à l'environnement.
-
-Quand tout semble prêt, initialisez l'environnement `<ENV>` :
-
-```
-make ops-provision env=<ENV>
-```
-
-Vous pouvez ensuite [déployer](#déployer).
-
-### Secrets
-
-La gestion des secrets s'appuie sur [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html).
-
-Pour modifier le fichier de secrets d'un environnement, lancez :
-
-```
-make ops-secrets env=<ENV>
-```
-
-Rappel : vous pouvez aussi [chiffrer un fichier quelconque avec Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html#encrypting-files-with-ansible-vault) :
-
-```
-venv/bin/ansible-vault encrypt <FILE> --vault-password-file ops/ansible/vault-password
-```
-
-Pour modifier un fichier chiffré, utilisez :
-
-```
-venv/bin/ansible-vault edit <FILE> --vault-password-file ops/ansible/vault-password
-```
+## Outils
 
 ### Données initiales
 
@@ -213,28 +257,7 @@ Vous pouvez alors lancer un initdata avec :
 make ops-initdata env=<ENV>
 ```
 
-### Démanteler un environnement
-
-Un environnement peut devenir obsolète, par exemple parce qu'il n'est plus utile, qu'il a été remplacé par un autre environnement, ou tout autre cas faisant que l'instance associée doit être arrêtée.
-
-Il s'agit alors de :
-
-* S'assurer que l'environnement n'est plus utilisé et qu'il peut être supprimé définitivement.
-* Retirer les ressources informatiques allouées à cet environnement.
-
-    Voici, à date (26/09/2022), une liste des ressources et leur localisation.
-
-    | Ressource | Environnements | Lieu | Contact |
-    |---|---|---|---|
-    | Instance cloud (VM) | sandbox, staging, demo | Console Scaleway de Multi| johan.richer[ @ ]multi.coop |
-    | Instance PostgreSQL | sandbox, staging, demo | Console Scaleway de Multi | johan.richer[ @ ]multi.coop |
-    | Enregistrement DNS | sandbox, staging, demo | Service DNS de Multi | johan.richer[ @ ]multi.coop |
-    | URLs OpenID Connect pour l'authentification "Compte DataPass" | sandbox, staging, demo | Infrastructure Etalab | Contacter l'équipe "Compte DataPass" sur BetaGouv, ou ouvrir un billet sur [betagouv/api-auth](https://github.com/betagouv/api-auth) |
-
-* Mettre à jour la présente documentation en retirant l'environnement.
-* Retirer le dossier de l'environnement de `ops/ansible`.
-
-## Tests
+### Tester sur une VM locale
 
 Il est possible de tester la configuration Ansible sur une VM locale.
 
@@ -461,29 +484,3 @@ Pour régénérer manuellement les certificats pour un environnement :
 3. Redéployer : un nouveau certificat sera créé et configuré.
 
 > N.B. : LetsEncrypt applique du _rate limiting_ à la délivrance de certificats. Voir [Let's Encrypt: Rate Limits](https://letsencrypt.org/docs/rate-limits/).
-
-## Versions
-
-## OS
-
-**Version** : debian/bullseye64
-
-## PostgreSQL
-
-**Version** : PostgreSQL 12
-
-### Python
-
-**Version** : Python 3.8.x
-
-On utilise [pyenv](https://github.com/pyenv/pyenv) pour installer Python sur les serveurs distants.
-
-La configuration est aussi gérée par Ansible (rôle `pyenv`), notamment au moyen de la variable `pyenv_python_version`. En la modifiant, on peut ainsi mettre Python à jour. Il sera bien sûr préférable de s'assurer de retirer toute ancienne version de Python après une telle opération.
-
-### Node
-
-**Version** : Node v16.x
-
-De la même façon, on utilise [nvm](https://github.com/nvm-sh/nvm) pour installer Node.
-
-La version est paramétrée par la variable `nvm_node_version`.
