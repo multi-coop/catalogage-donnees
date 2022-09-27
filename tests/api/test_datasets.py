@@ -228,7 +228,7 @@ class TestDatasetPermissions:
 
         assert response.status_code == 403
 
-    async def test_create_in_other_org_admin_ok(
+    async def test_create_in_other_org_admin_denied(
         self, client: httpx.AsyncClient, admin_user: TestPasswordUser
     ) -> None:
         bus = resolve(MessageBus)
@@ -241,7 +241,7 @@ class TestDatasetPermissions:
             CreateDatasetPayloadFactory.build(organization_siret=other_org_siret)
         )
         response = await client.post("/datasets/", json=payload, auth=admin_user.auth)
-        assert response.status_code == 201
+        assert response.status_code == 403
 
     async def test_get_not_authenticated(self, client: httpx.AsyncClient) -> None:
         pk = id_factory()
@@ -268,20 +268,6 @@ class TestDatasetPermissions:
         pk = id_factory()
         response = await client.delete(f"/datasets/{pk}/", auth=temp_user.auth)
         assert response.status_code == 403
-
-
-async def add_dataset_pagination_corpus(
-    user: TestPasswordUser, n: int, tags: list
-) -> None:
-    bus = resolve(MessageBus)
-
-    for k in range(1, n + 1):
-        tag_ids = [tag.id for tag in random.choices(tags, k=random.randint(0, 2))]
-        await bus.execute(
-            CreateDatasetFactory.build(
-                account=user.account, title=f"Dataset {k}", tag_ids=tag_ids
-            )
-        )
 
 
 @pytest.mark.asyncio
@@ -334,14 +320,23 @@ async def test_dataset_pagination(
     expected_num_items: int,
     expected_dataset_titles: List[str],
 ) -> None:
-    await add_dataset_pagination_corpus(temp_user, n=13, tags=tags)
+    bus = resolve(MessageBus)
+
+    n_datasets = 13
+    for k in range(1, n_datasets + 1):
+        tag_ids = [tag.id for tag in random.choices(tags, k=random.randint(0, 2))]
+        await bus.execute(
+            CreateDatasetFactory.build(
+                account=temp_user.account, title=f"Dataset {k}", tag_ids=tag_ids
+            )
+        )
 
     response = await client.get("/datasets/", params=params, auth=temp_user.auth)
     assert response.status_code == 200
     data = response.json()
 
     assert len(data["items"]) == expected_num_items
-    assert data["total_items"] == 13
+    assert data["total_items"] == n_datasets
     assert data["page_size"] == params.get("page_size", 10)
     if "__skip__" not in expected_dataset_titles:
         assert [item["title"] for item in data["items"]] == expected_dataset_titles
