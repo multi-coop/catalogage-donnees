@@ -9,6 +9,7 @@
   import { Maybe } from "$lib/util/maybe";
   import DatasetFormLayout from "src/lib/components/DatasetFormLayout/DatasetFormLayout.svelte";
   import ModalExitFormConfirmation from "src/lib/components/ModalExitFormConfirmation/ModalExitFormConfirmation.svelte";
+  import { hasHistory } from "src/lib/util/history";
 
   let modalControlId = "confirm-stop-contributing-modal";
 
@@ -38,8 +39,12 @@
     }
   };
 
-  const handleExitForm = () => {
-    history.go(-1);
+  const handleExitForm = async () => {
+    if (hasHistory()) {
+      history.back();
+    } else {
+      await goto(paths.home);
+    }
   };
 </script>
 
