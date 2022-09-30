@@ -1,10 +1,11 @@
 import datetime as dt
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from pydantic import EmailStr, Field
 
+from server.domain.auth.entities import Account
 from server.domain.catalogs.entities import ExtraFieldValue
-from server.domain.common.types import ID
+from server.domain.common.types import ID, Skip
 from server.domain.datasets.entities import DataFormat, UpdateFrequency
 from server.domain.organizations.entities import LEGACY_ORGANIZATION
 from server.domain.organizations.types import Siret
@@ -14,6 +15,8 @@ from .validation import CreateDatasetValidationMixin, UpdateDatasetValidationMix
 
 
 class CreateDataset(CreateDatasetValidationMixin, Command[ID]):
+    account: Union[Account, Skip]
+
     organization_siret: Siret = LEGACY_ORGANIZATION.siret
     title: str
     description: str
@@ -32,6 +35,8 @@ class CreateDataset(CreateDatasetValidationMixin, Command[ID]):
 
 
 class UpdateDataset(UpdateDatasetValidationMixin, Command[None]):
+    account: Union[Account, Skip]
+
     id: ID
     title: str
     description: str

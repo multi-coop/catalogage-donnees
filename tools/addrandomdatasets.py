@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 from server.application.tags.queries import GetAllTags
 from server.config.di import bootstrap, resolve
+from server.domain.common.types import Skip
 from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 from tests.factories import CreateDatasetFactory
@@ -26,7 +27,9 @@ async def main(n: int, siret: Siret) -> None:
             tag_id_set, k=random.randint(1, min(3, len(tag_id_set)))
         )
         await bus.execute(
-            CreateDatasetFactory.build(organization_siret=siret, tag_ids=tag_ids)
+            CreateDatasetFactory.build(
+                account=Skip(), organization_siret=siret, tag_ids=tag_ids
+            )
         )
 
     print(f"{success('created')}: {n} datasets")

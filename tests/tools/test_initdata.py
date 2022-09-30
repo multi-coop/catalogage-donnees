@@ -11,7 +11,7 @@ from server.application.auth.queries import LoginPasswordUser
 from server.application.datasets.commands import UpdateDataset
 from server.application.datasets.queries import GetAllDatasets, GetDatasetByID
 from server.config.di import resolve
-from server.domain.common.types import ID
+from server.domain.common.types import ID, Skip
 from server.seedwork.application.messages import MessageBus
 from tools import initdata
 
@@ -146,6 +146,7 @@ async def test_repo_initdata(
 
     # Make a change.
     command = UpdateDataset(
+        account=Skip(),
         **dataset.dict(exclude={"title"}),
         tag_ids=[tag.id for tag in dataset.tags],
         title="Changed",

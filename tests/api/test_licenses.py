@@ -18,7 +18,9 @@ async def test_license_list(
     assert response.status_code == 200
     assert response.json() == ["Licence Ouverte", "ODC Open Database License"]
 
-    await bus.execute(CreateDatasetFactory.build(license="Autre licence"))
+    await bus.execute(
+        CreateDatasetFactory.build(account=temp_user.account, license="Autre licence")
+    )
 
     response = await client.get("/licenses/", auth=temp_user.auth)
     assert response.status_code == 200
