@@ -9,7 +9,10 @@ from server.application.datasets.commands import (
     DeleteDataset,
     UpdateDataset,
 )
-from server.application.datasets.exceptions import CannotCreateDataset
+from server.application.datasets.exceptions import (
+    CannotCreateDataset,
+    CannotUpdateDataset,
+)
 from server.application.datasets.queries import GetAllDatasets, GetDatasetByID
 from server.application.datasets.views import DatasetView
 from server.config.di import resolve
@@ -107,15 +110,20 @@ async def create_dataset(data: DatasetCreate, request: "APIRequest") -> DatasetV
     response_model=DatasetView,
     responses={404: {}},
 )
-async def update_dataset(id: ID, data: DatasetUpdate) -> DatasetView:
+async def update_dataset(
+    id: ID, data: DatasetUpdate, request: "APIRequest"
+) -> DatasetView:
     bus = resolve(MessageBus)
 
-    command = UpdateDataset(id=id, **data.dict())
+    command = UpdateDataset(account=request.user.account, id=id, **data.dict())
 
     try:
         await bus.execute(command)
     except DatasetDoesNotExist:
         raise HTTPException(404)
+    except CannotUpdateDataset as exc:
+        logger.exception(exc)
+        raise HTTPException(403, detail="Permission denied")
 
     query = GetDatasetByID(id=id)
     return await bus.execute(query)

@@ -35,6 +35,8 @@ class CreateDataset(CreateDatasetValidationMixin, Command[ID]):
 
 
 class UpdateDataset(UpdateDatasetValidationMixin, Command[None]):
+    account: Union[Account, Skip]
+
     id: ID
     title: str
     description: str

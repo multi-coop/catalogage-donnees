@@ -159,7 +159,7 @@ async def handle_dataset(item: dict, reset: bool = False) -> None:
     existing_dataset = await repository.get_by_id(id_)
 
     if existing_dataset is not None:
-        update_command = UpdateDataset(id=id_, **item["params"])
+        update_command = UpdateDataset(account=Skip(), id=id_, **item["params"])
 
         changed = any(
             getattr(update_command, k) != _get_dataset_attr(existing_dataset, k)
