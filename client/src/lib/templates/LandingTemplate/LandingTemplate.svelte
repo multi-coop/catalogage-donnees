@@ -21,10 +21,12 @@
         <div class="fr-pl-3w">
           <h1>Bienvenue sur le service de catalogage de données de l’État</h1>
           <p>
-            Ce service permet de favoriser la circulation des données entre les
-            différentes administrations centrales et opérateurs de l’État.
-            L’intégration des différentes organisations se fait progressivement
-            et en fonction des demandes.
+            Ce service permet aux administrations centrales et aux opérateurs
+            sous leur tutelle de créer, gérer et ouvrir leurs catalogues de
+            données dans le cadre notamment de <a
+              href="https://www.etalab.gouv.fr/politique-de-la-donnee-des-algorithmes-et-des-codes-sources-15-strategies-ministerielles-et-500-actions-pour-accelerer/"
+              >leur stratégie en matière de politique de la donnée</a
+            >.
           </p>
 
           <div class="button-container">
