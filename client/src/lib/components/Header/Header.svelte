@@ -40,13 +40,8 @@
             </div>
           </div>
           <div class="fr-header__service">
-            <a
-              href={paths.home}
-              title="Accueil - Catalogue Interministériel des Données"
-            >
-              <p class="fr-header__service-title">
-                Catalogue Interministériel des Données
-              </p>
+            <a href={paths.home} title="Accueil - catalogue.data.gouv.fr">
+              <p class="fr-header__service-title">catalogue.data.gouv.fr</p>
               <p
                 class="fr-badge fr-badge--success fr-badge--sm fr-badge--no-icon"
               >
