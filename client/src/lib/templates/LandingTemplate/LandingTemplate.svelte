@@ -3,6 +3,7 @@
 
   import books from "$lib/assets/books-circle.svg";
   import flowChart from "$lib/assets/registration_flow_chart.svg";
+  import { USER_DOCUMENTATION_LINK } from "src/constants";
   import MonCompteProButton from "src/lib/components/MonCompteProButton/MonCompteProButton.svelte";
   import { getApiUrl } from "src/lib/fetch";
 
@@ -43,6 +44,12 @@
       <p>
         L’accès aux catalogues s’effectue via le compte datapass. Il est pour
         l’instant possible uniquement aux agents des organisations enregistrées.
+        Pour en savoir plus sur les moyens de s’enregistrer et intégrer son
+        catalogue, vous pouvez consulter <a
+          class="fr-link"
+          target="_blank"
+          href={USER_DOCUMENTATION_LINK}>la documentation détaillée</a
+        >.
       </p>
 
       <div class="flow-chart-container fr-pt-5w">

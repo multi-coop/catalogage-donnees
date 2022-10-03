@@ -21,6 +21,7 @@ class DatasetListParams:
         q: Optional[str] = None,
         page_number: int = 1,
         page_size: int = 10,
+        organization_siret: Optional[Siret] = Query(None),
         geographical_coverage: Optional[List[str]] = Query(None),
         service: Optional[List[str]] = Query(None),
         format_: Optional[List[DataFormat]] = Query(None, alias="format"),
@@ -29,6 +30,7 @@ class DatasetListParams:
         license: Optional[str] = Query(None),
     ) -> None:
         self.q = q
+        self.organization_siret = organization_siret
         self.page_number = page_number
         self.page_size = page_size
         self.geographical_coverage = geographical_coverage

@@ -1,5 +1,10 @@
 import { expect } from "@playwright/test";
-import { TEST_EMAIL, TEST_PASSWORD } from "./constants.js";
+import {
+  TEST_EMAIL,
+  TEST_EMAIL_SANTE,
+  TEST_PASSWORD,
+  TEST_PASSWORD_SANTE,
+} from "./constants.js";
 import { test } from "./fixtures.js";
 
 test.describe("Login", () => {
@@ -69,5 +74,25 @@ test.describe("Login", () => {
     const exampleProtectedPage = "/contribuer";
     await page.goto(exampleProtectedPage);
     await page.waitForURL("/");
+  });
+});
+
+test.describe("Login -- Multi-organization support", () => {
+  test("Contribute button is switched on or off when changing accounts in organizations that have/don't have a catalog", async ({
+    page,
+  }) => {
+    await page.goto("/login");
+    await page.fill("[name=email]", TEST_EMAIL);
+    await page.fill("[name=password]", TEST_PASSWORD);
+    await page.click("button[type='submit']");
+    await expect(page.locator("text=Contribuer")).toBeVisible();
+
+    await page.click("text=Déconnexion");
+
+    await page.click("text=Se connecter");
+    await page.fill("[name=email]", TEST_EMAIL_SANTE);
+    await page.fill("[name=password]", TEST_PASSWORD_SANTE);
+    await page.click("button[type='submit']");
+    await expect(page.locator("text=Contribuer")).toBeHidden();
   });
 });

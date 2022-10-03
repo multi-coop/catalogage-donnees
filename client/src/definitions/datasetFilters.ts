@@ -1,7 +1,9 @@
 import type { SelectOption } from "./form";
+import type { Organization } from "./organizations";
 import type { Tag } from "./tag";
 
 export type DatasetFiltersInfo = {
+  organizationSiret: Organization[];
   geographicalCoverage: string[];
   service: string[];
   format: string[];
@@ -11,6 +13,7 @@ export type DatasetFiltersInfo = {
 };
 
 export type DatasetFiltersValue = {
+  organizationSiret: string | null;
   geographicalCoverage: string | null;
   service: string | null;
   format: string | null;

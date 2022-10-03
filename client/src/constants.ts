@@ -37,3 +37,6 @@ export const UPDATE_FREQUENCY_LABELS: { [K in UpdateFrequency]: string } = {
 };
 
 export const DATASETS_PER_PAGE = 50;
+
+export const USER_DOCUMENTATION_LINK =
+  "https://github.com/etalab/catalogage-donnees/wiki/Documentation-%C3%A0-destination-des-utilisateurs";

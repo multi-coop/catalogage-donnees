@@ -1,43 +1,51 @@
+from server.application.catalogs.queries import GetAllCatalogs
 from server.application.licenses.queries import GetLicenseSet
 from server.application.tags.queries import GetAllTags
 from server.config.di import resolve
 from server.domain.catalog_records.entities import CatalogRecord
 from server.domain.catalog_records.repositories import CatalogRecordRepository
+from server.domain.catalogs.exceptions import CatalogDoesNotExist
+from server.domain.catalogs.repositories import CatalogRepository
 from server.domain.common.pagination import Pagination
-from server.domain.common.types import ID
+from server.domain.common.types import ID, Skip
 from server.domain.datasets.entities import DataFormat, Dataset
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.datasets.repositories import DatasetRepository
-from server.domain.organizations.exceptions import OrganizationDoesNotExist
-from server.domain.organizations.repositories import OrganizationRepository
 from server.domain.tags.repositories import TagRepository
 from server.seedwork.application.messages import MessageBus
 
 from .commands import CreateDataset, DeleteDataset, UpdateDataset
+from .exceptions import CannotCreateDataset, CannotUpdateDataset
 from .queries import GetAllDatasets, GetDatasetByID, GetDatasetFilters
+from .specifications import can_create_dataset, can_update_dataset
 from .views import DatasetFiltersView, DatasetView
 
 
 async def create_dataset(command: CreateDataset, *, id_: ID = None) -> ID:
     repository = resolve(DatasetRepository)
-    organization_repository = resolve(OrganizationRepository)
+    catalog_repository = resolve(CatalogRepository)
     catalog_record_repository = resolve(CatalogRecordRepository)
     tag_repository = resolve(TagRepository)
 
     if id_ is None:
         id_ = repository.make_id()
 
-    organization = await organization_repository.get_by_siret(
-        siret=command.organization_siret
-    )
+    catalog = await catalog_repository.get_by_siret(siret=command.organization_siret)
 
-    if organization is None:
-        raise OrganizationDoesNotExist(command.organization_siret)
+    if catalog is None:
+        raise CatalogDoesNotExist(command.organization_siret)
+
+    if not isinstance(command.account, Skip) and not can_create_dataset(
+        catalog, command.account
+    ):
+        raise CannotCreateDataset(
+            f"{command.account.organization_siret=}, {catalog.organization.siret=}"
+        )
 
     catalog_record_id = await catalog_record_repository.insert(
         CatalogRecord(
             id=catalog_record_repository.make_id(),
-            organization=organization,
+            organization=catalog.organization,
         )
     )
     catalog_record = await catalog_record_repository.get_by_id(catalog_record_id)
@@ -64,9 +72,14 @@ async def update_dataset(command: UpdateDataset) -> None:
     if dataset is None:
         raise DatasetDoesNotExist(pk)
 
+    if not isinstance(command.account, Skip) and not can_update_dataset(
+        dataset, command.account
+    ):
+        raise CannotUpdateDataset(f"{command.account=}, {dataset=}")
+
     tags = await tag_repository.get_all(ids=command.tag_ids)
     dataset.update(
-        **command.dict(exclude={"id", "tag_ids", "extra_field_values"}),
+        **command.dict(exclude={"account", "id", "tag_ids", "extra_field_values"}),
         tags=tags,
         extra_field_values=command.extra_field_values,
     )
@@ -83,6 +96,7 @@ async def get_dataset_filters(query: GetDatasetFilters) -> DatasetFiltersView:
     bus = resolve(MessageBus)
     repository = resolve(DatasetRepository)
 
+    catalogs = await bus.execute(GetAllCatalogs())
     geographical_coverages = await repository.get_geographical_coverage_set()
     services = await repository.get_service_set()
     technical_sources = await repository.get_technical_source_set()
@@ -90,6 +104,7 @@ async def get_dataset_filters(query: GetDatasetFilters) -> DatasetFiltersView:
     licenses = await bus.execute(GetLicenseSet())
 
     return DatasetFiltersView(
+        organization_siret=[catalog.organization for catalog in catalogs],
         geographical_coverage=sorted(geographical_coverages),
         service=list(services),
         format=list(DataFormat),

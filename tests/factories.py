@@ -5,8 +5,9 @@ from typing import Any, TypeVar
 import faker
 from faker.providers import BaseProvider
 from pydantic import BaseModel
-from pydantic_factories import ModelFactory, Use
+from pydantic_factories import ModelFactory, Require, Use
 
+from server.api.datasets.schemas import DatasetCreate, DatasetUpdate
 from server.application.auth.commands import CreateDataPassUser, CreatePasswordUser
 from server.application.datasets.commands import CreateDataset, UpdateDataset
 from server.application.organizations.commands import CreateOrganization
@@ -62,9 +63,7 @@ _FAKE_GEOGRAPHICAL_COVERAGES = [
 ]
 
 
-class CreateDatasetFactory(Factory[CreateDataset]):
-    __model__ = CreateDataset
-
+class _BaseCreateDatasetFactory:
     organization_siret = Use(lambda: LEGACY_ORGANIZATION.siret)
     title = Use(fake.sentence)
     description = Use(fake.text)
@@ -84,11 +83,37 @@ class CreateDatasetFactory(Factory[CreateDataset]):
     extra_field_values = Use(lambda: [])
 
 
-class UpdateDatasetFactory(Factory[UpdateDataset]):
-    __model__ = UpdateDataset
+class CreateDatasetFactory(_BaseCreateDatasetFactory, Factory[CreateDataset]):
+    __model__ = CreateDataset
 
+    account = Require()
+
+
+class CreateDatasetPayloadFactory(_BaseCreateDatasetFactory, Factory[DatasetCreate]):
+    __model__ = DatasetCreate
+
+
+class _BaseUpdateDatasetFactory:
     tag_ids = Use(lambda: [])
     extra_field_values = Use(lambda: [])
+
+
+class UpdateDatasetFactory(_BaseCreateDatasetFactory, Factory[UpdateDataset]):
+    __model__ = UpdateDataset
+
+    account = Require()
+
+
+class UpdateDatasetPayloadFactory(_BaseUpdateDatasetFactory, Factory[DatasetUpdate]):
+    __model__ = DatasetUpdate
+
+    @classmethod
+    def build_from_create_command(
+        cls, command: CreateDataset, **kwargs: Any
+    ) -> DatasetUpdate:
+        return cls.build(
+            **command.dict(exclude={"account", "organization_siret"}), **kwargs
+        )
 
 
 class CreateOrganizationFactory(Factory[CreateOrganization]):

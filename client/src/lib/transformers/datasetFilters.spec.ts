@@ -12,6 +12,7 @@ import {
 
 describe("transformers -- Dataset filters", () => {
   const info: DatasetFiltersInfo = {
+    organizationSiret: [{ siret: "ign_siret", name: "IGN" }],
     geographicalCoverage: [
       "Métropole Européenne de Lille",
       "France métropolitaine",
@@ -33,6 +34,7 @@ describe("transformers -- Dataset filters", () => {
   };
 
   const value: DatasetFiltersValue = {
+    organizationSiret: "ign_siret",
     geographicalCoverage: "France métropolitaine",
     format: "file_gis",
     service: null,
@@ -43,6 +45,7 @@ describe("transformers -- Dataset filters", () => {
 
   test("toFiltersParams", () => {
     const params = [
+      ["organization_siret", "ign_siret"],
       ["geographical_coverage", "France métropolitaine"],
       ["service", null],
       ["format", "file_gis"],
@@ -57,13 +60,14 @@ describe("transformers -- Dataset filters", () => {
   test("getFiltersValueFromParams", () => {
     const queryString = toQueryString(toFiltersParams(value));
     expect(queryString).toBe(
-      "?geographical_coverage=France+m%C3%A9tropolitaine&format=file_gis&technical_source=Serveur+GIS&license=Licence+Ouverte"
+      "?organization_siret=ign_siret&geographical_coverage=France+m%C3%A9tropolitaine&format=file_gis&technical_source=Serveur+GIS&license=Licence+Ouverte"
     );
     expect(toFiltersValue(new URLSearchParams(queryString))).toEqual(value);
   });
 
   test("toFiltersOptions", () => {
     const options: DatasetFiltersOptions = {
+      organizationSiret: [{ label: "IGN", value: "ign_siret" }],
       geographicalCoverage: [
         {
           label: "Métropole Européenne de Lille",

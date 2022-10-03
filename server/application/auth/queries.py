@@ -15,7 +15,3 @@ class LoginDataPassUser(Query[AuthenticatedAccountView]):
 
 class GetAccountByEmail(Query[AccountView]):
     email: EmailStr
-
-
-class GetAccountByAPIToken(Query[AccountView]):
-    api_token: str

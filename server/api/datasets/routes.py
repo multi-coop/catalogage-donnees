@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
 from starlette.responses import Response
@@ -7,20 +9,27 @@ from server.application.datasets.commands import (
     DeleteDataset,
     UpdateDataset,
 )
+from server.application.datasets.exceptions import (
+    CannotCreateDataset,
+    CannotUpdateDataset,
+)
 from server.application.datasets.queries import GetAllDatasets, GetDatasetByID
 from server.application.datasets.views import DatasetView
 from server.config.di import resolve
 from server.domain.auth.entities import UserRole
+from server.domain.catalogs.exceptions import CatalogDoesNotExist
 from server.domain.common.pagination import Page, Pagination
 from server.domain.common.types import ID
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.datasets.specifications import DatasetSpec
-from server.domain.organizations.exceptions import OrganizationDoesNotExist
 from server.seedwork.application.messages import MessageBus
 
 from ..auth.permissions import HasRole, IsAuthenticated
+from ..types import APIRequest
 from . import filters
 from .schemas import DatasetCreate, DatasetListParams, DatasetUpdate
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/datasets", tags=["datasets"])
 
@@ -43,6 +52,7 @@ async def list_datasets(
         page=page,
         spec=DatasetSpec(
             search_term=params.q,
+            organization_siret=params.organization_siret,
             geographical_coverage__in=params.geographical_coverage,
             service__in=params.service,
             format__in=params.format,
@@ -77,15 +87,18 @@ async def get_dataset_by_id(id: ID) -> DatasetView:
     response_model=DatasetView,
     status_code=201,
 )
-async def create_dataset(data: DatasetCreate) -> DatasetView:
+async def create_dataset(data: DatasetCreate, request: "APIRequest") -> DatasetView:
     bus = resolve(MessageBus)
 
-    command = CreateDataset(**data.dict())
+    command = CreateDataset(account=request.user.account, **data.dict())
 
     try:
         id = await bus.execute(command)
-    except OrganizationDoesNotExist as exc:
+    except CatalogDoesNotExist as exc:
         raise HTTPException(400, detail=str(exc))
+    except CannotCreateDataset as exc:
+        logger.exception(exc)
+        raise HTTPException(403, detail="Permission denied")
 
     query = GetDatasetByID(id=id)
     return await bus.execute(query)
@@ -97,15 +110,20 @@ async def create_dataset(data: DatasetCreate) -> DatasetView:
     response_model=DatasetView,
     responses={404: {}},
 )
-async def update_dataset(id: ID, data: DatasetUpdate) -> DatasetView:
+async def update_dataset(
+    id: ID, data: DatasetUpdate, request: "APIRequest"
+) -> DatasetView:
     bus = resolve(MessageBus)
 
-    command = UpdateDataset(id=id, **data.dict())
+    command = UpdateDataset(account=request.user.account, id=id, **data.dict())
 
     try:
         await bus.execute(command)
     except DatasetDoesNotExist:
         raise HTTPException(404)
+    except CannotUpdateDataset as exc:
+        logger.exception(exc)
+        raise HTTPException(403, detail="Permission denied")
 
     query = GetDatasetByID(id=id)
     return await bus.execute(query)

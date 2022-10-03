@@ -21,12 +21,7 @@ from .commands import (
     DeletePasswordUser,
 )
 from .passwords import PasswordEncoder, generate_api_token
-from .queries import (
-    GetAccountByAPIToken,
-    GetAccountByEmail,
-    LoginDataPassUser,
-    LoginPasswordUser,
-)
+from .queries import GetAccountByEmail, LoginDataPassUser, LoginPasswordUser
 
 
 async def create_password_user(
@@ -153,17 +148,6 @@ async def get_account_by_email(query: GetAccountByEmail) -> AccountView:
 
     if account is None:
         raise AccountDoesNotExist(email)
-
-    return AccountView(**account.dict())
-
-
-async def get_account_by_api_token(query: GetAccountByAPIToken) -> AccountView:
-    repository = resolve(AccountRepository)
-
-    account = await repository.get_by_api_token(query.api_token)
-
-    if account is None:
-        raise AccountDoesNotExist("__token__")
 
     return AccountView(**account.dict())
 

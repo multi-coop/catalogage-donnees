@@ -1,4 +1,5 @@
 import json
+import re
 import uuid
 from pathlib import Path
 
@@ -10,7 +11,7 @@ from server.application.auth.queries import LoginPasswordUser
 from server.application.datasets.commands import UpdateDataset
 from server.application.datasets.queries import GetAllDatasets, GetDatasetByID
 from server.config.di import resolve
-from server.domain.common.types import ID
+from server.domain.common.types import ID, Skip
 from server.seedwork.application.messages import MessageBus
 from tools import initdata
 
@@ -116,11 +117,12 @@ async def test_repo_initdata(
 ) -> None:
     bus = resolve(MessageBus)
     path = Path("tools", "initdata.yml")
-    monkeypatch.setenv(
-        "TOOLS_PASSWORDS", json.dumps({"admin@catalogue.data.gouv.fr": "test"})
-    )
+    env_example = Path(".env.example").read_text()
+    m = re.search("TOOLS_PASSWORDS='(.*)'", env_example)
+    assert m is not None
+    monkeypatch.setenv("TOOLS_PASSWORDS", m.group(1))
 
-    num_users = 3
+    num_users = 4
     num_tags = 7
     num_datasets = 4
     num_organizations = 2
@@ -144,6 +146,7 @@ async def test_repo_initdata(
 
     # Make a change.
     command = UpdateDataset(
+        account=Skip(),
         **dataset.dict(exclude={"title"}),
         tag_ids=[tag.id for tag in dataset.tags],
         title="Changed",

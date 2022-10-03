@@ -3,7 +3,9 @@
   import paths from "$lib/paths";
   import { UPDATE_FREQUENCY_LABELS } from "src/constants";
   import { formatFullDate, splitParagraphs } from "src/lib/util/format";
+  import { account } from "$lib/stores/auth";
   import { Maybe } from "$lib/util/maybe";
+  import { canEditDataset } from "$lib/permissions";
   import AsideItem from "./_AsideItem.svelte";
   import ExtraFieldsList from "./_ExtraFieldsList.svelte";
 
@@ -26,13 +28,15 @@
           </p>
         </div>
         <div class="fr-col-sm-8 fr-col-md-9 fr-col-lg-10">
-          <p class="fr-m-0 fr-text-mention--grey">Ministère de la culture</p>
+          <p class="fr-m-0 fr-text-mention--grey">{dataset.service}</p>
           <h1 class="fr-mb-0">
             {dataset.title}
           </h1>
           <div class="header__tags fr-mt-2w">
             {#each dataset.tags as tag}
-              <span class="fr-badge fr-badge--info fr-badge--no-icon">
+              <span
+                class="fr-badge fr-badge--sm fr-badge--info fr-badge--no-icon"
+              >
                 {tag.name}</span
               >
             {/each}
@@ -43,15 +47,17 @@
       <ul
         class="fr-grid-row fr-grid-row--right fr-btns-group fr-btns-group--inline fr-btns-group--icon-right fr-my-5w"
       >
-        <li>
-          <a
-            href={editUrl}
-            class="fr-btn fr-btn--secondary fr-icon-edit-fill"
-            title="Modifier ce jeu de données"
-          >
-            Modifier
-          </a>
-        </li>
+        {#if canEditDataset(dataset, Maybe.expect($account, "$account"))}
+          <li>
+            <a
+              href={editUrl}
+              class="fr-btn fr-btn--secondary fr-icon-edit-fill"
+              title="Modifier ce jeu de données"
+            >
+              Modifier
+            </a>
+          </li>
+        {/if}
         <li>
           <a
             class="fr-btn fr-btn--secondary fr-icon-mail-line"
@@ -66,6 +72,27 @@
 
     <div class="fr-grid-row fr-grid-row--gutters">
       <aside class="fr-col-md-4">
+        <h6 class="fr-mb-2w">Accès aux données</h6>
+
+        <AsideItem
+          icon="fr-icon-global-line"
+          label="Lien vers les données"
+          value={dataset.url}
+        >
+          <a
+            class="fr-btn fr-btn--icon-right fr-icon-external-link-line"
+            href={dataset.url}
+            target="_blank"
+          >
+            Voir les données
+          </a>
+        </AsideItem>
+
+        <AsideItem
+          icon="fr-icon-x-open-data"
+          label="Licence de réutilisation"
+          value={dataset.license}
+        />
         <h6 class="fr-mt-4w fr-mb-2w">Informations générales</h6>
 
         <AsideItem
@@ -96,28 +123,6 @@
             (v) => UPDATE_FREQUENCY_LABELS[v]
           )}
         />
-
-        <h6 class="fr-mb-2w">Accès aux données</h6>
-
-        <AsideItem
-          icon="fr-icon-global-line"
-          label="Lien vers les données"
-          value={dataset.url}
-        >
-          <a
-            class="fr-btn fr-btn--icon-right fr-icon-external-link-line"
-            href={dataset.url}
-            target="_blank"
-          >
-            Voir les données
-          </a>
-        </AsideItem>
-
-        <AsideItem
-          icon="fr-icon-x-open-data"
-          label="Licence de réutilisation"
-          value={dataset.license}
-        />
       </aside>
 
       <div class="fr-col-md-8">
@@ -144,11 +149,13 @@
 
 <style>
   .fr-logo {
-    white-space: nowrap;
+    width: 100%;
+    word-break: break-all;
   }
 
   .header__tags {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
   }
 </style>

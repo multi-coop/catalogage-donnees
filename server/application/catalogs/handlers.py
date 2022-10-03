@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 from server.config.di import resolve
 from server.domain.catalogs.entities import Catalog
@@ -10,7 +10,7 @@ from server.domain.organizations.repositories import OrganizationRepository
 from server.domain.organizations.types import Siret
 
 from .commands import CreateCatalog
-from .queries import GetCatalogBySiret
+from .queries import GetAllCatalogs, GetCatalogBySiret
 from .views import CatalogView
 
 
@@ -24,6 +24,14 @@ async def get_catalog_by_siret(query: GetCatalogBySiret) -> CatalogView:
         raise CatalogDoesNotExist(siret)
 
     return CatalogView(**catalog.dict())
+
+
+async def get_all_catalogs(
+    query: GetAllCatalogs,
+) -> List[CatalogView]:
+    repository = resolve(CatalogRepository)
+    catalogs = await repository.get_all()
+    return [CatalogView(**catalog.dict()) for catalog in catalogs]
 
 
 async def create_catalog(

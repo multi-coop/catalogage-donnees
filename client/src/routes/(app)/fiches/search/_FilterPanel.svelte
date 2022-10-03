@@ -4,6 +4,7 @@
     DatasetFiltersValue,
   } from "src/definitions/datasetFilters";
   import type { SelectOption } from "src/definitions/form";
+  import type { Organization } from "src/definitions/organizations";
   import type { Tag } from "src/definitions/tag";
   import SearchableSelect from "src/lib/components/SearchableSelect/SearchableSelect.svelte";
   import {
@@ -15,15 +16,30 @@
   export let info: DatasetFiltersInfo;
   export let value: DatasetFiltersValue;
 
-  const createTagIdToNameMap = (tags: Tag[]) => {
+  const createOrganizationSiretToNameMap = (
+    organizations: Organization[]
+  ): Record<string, string> => {
+    const map = {};
+    organizations.forEach(({ siret, name }) => (map[siret] = name));
+    return map;
+  };
+
+  const createTagIdToNameMap = (tags: Tag[]): Record<string, string> => {
     const map = {};
     tags.forEach(({ id, name }) => (map[id] = name));
     return map;
   };
 
+  $: organizationSiretToName = createOrganizationSiretToNameMap(
+    info.organizationSiret
+  );
   $: tagIdToName = createTagIdToNameMap(info.tagId);
   $: filtersOptions = toFiltersOptions(info);
-  $: buttonTexts = toFiltersButtonTexts(value, tagIdToName);
+  $: buttonTexts = toFiltersButtonTexts(
+    value,
+    organizationSiretToName,
+    tagIdToName
+  );
 
   const dispatch = createEventDispatcher<{ change: DatasetFiltersValue }>();
 
@@ -69,6 +85,19 @@
       buttonText={buttonTexts.license || "Rechercher..."}
       on:clickItem={(e) => handleSelectFilter("license", e)}
       options={filtersOptions.license}
+    />
+  </div>
+
+  <h6 class="fr-mt-3w">Catalogues</h6>
+
+  <div class="fr-mb-2w">
+    <SearchableSelect
+      label="Catalogue"
+      buttonPlaceholder="Rechercher..."
+      inputPlaceholder="Rechercher..."
+      buttonText={buttonTexts.organizationSiret || "Rechercher..."}
+      on:clickItem={(e) => handleSelectFilter("organizationSiret", e)}
+      options={filtersOptions.organizationSiret}
     />
   </div>
 </section>

@@ -1,4 +1,11 @@
-export const range = (start: number, end: number): number[] => {
+/**
+ * @returns An array of integers from `start` (included) to `end` (excluded).
+ */
+export const range = (start: number, end?: number): number[] => {
+  if (end === undefined) {
+    end = start;
+    start = 0;
+  }
   const length = end - start;
   return Array.from({ length }, (_, idx) => start + idx);
 };
