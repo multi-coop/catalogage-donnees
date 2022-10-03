@@ -1,0 +1,15 @@
+organizations:
+  - params:
+      # This organization already exists thanks to migrations.
+      # It is listed here because we explicitly expect it to be in this environment.
+      name: "Organisation par défaut"
+      siret: "00000000000000"
+
+users:
+  - id: "4a7416da-a392-4229-bb0d-fd6ac6fcba94"
+    params:
+      organization_siret: "00000000000000"
+      email: admin@catalogue.data.gouv.fr
+      password: __env__
+    extras:
+      role: ADMIN
