@@ -28,10 +28,6 @@
               >leur stratégie en matière de politique de la donnée</a
             >.
           </p>
-
-          <div class="button-container">
-            <MonCompteProButton on:click={triggerDataPassLoginFlow} />
-          </div>
         </div>
       </div>
     </div>
@@ -41,22 +37,17 @@
 <section class="fr-container fr-py-8w">
   <div class="fr-grid-row">
     <div class="fr-col-12">
-      <h3>Comment accéder aux catalogues ?</h3>
-
+      <h3>Connexion à catalogue.data.gouv.fr</h3>
+      <div class="button-container">
+        <MonCompteProButton on:click={triggerDataPassLoginFlow} />
+      </div>
       <p>
-        L’accès aux catalogues s’effectue via le compte datapass. Il est pour
-        l’instant possible uniquement aux agents des organisations enregistrées.
-        Pour en savoir plus sur les moyens de s’enregistrer et intégrer son
-        catalogue, vous pouvez consulter <a
+        Pour en savoir plus, vous pouvez consulter <a
           class="fr-link"
           target="_blank"
           href={USER_DOCUMENTATION_LINK}>la documentation détaillée</a
         >.
       </p>
-
-      <div class="flow-chart-container fr-pt-5w">
-        <img class="flow-chart" alt="" src={flowChart} />
-      </div>
     </div>
   </div>
 </section>
