@@ -1,0 +1,2 @@
+[web]
+catalogue.data.gouv.fr ansible_user=root

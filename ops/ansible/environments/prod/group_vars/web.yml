@@ -1,0 +1,4 @@
+tls_enabled: true
+
+client_url: "https://catalogue.data.gouv.fr"
+datapass_url: "https://auth.api.gouv.fr"

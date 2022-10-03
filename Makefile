@@ -66,6 +66,12 @@ randomdatasets: #- Add 500 random datasets
 id: #- Generate an ID suitable for use in database entities
 	${bin}python -m tools.makeid
 
+apikey: #- Generate an API key token
+	${bin}python -m tools.makeapikey
+
+secretkey: #- Generate a cookie signing secret key using Django 
+	${bin}python -m tools.makesecretkey
+
 changepassword: #- Change password of a user account
 	${bin}python -m tools.changepassword
 

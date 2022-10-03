@@ -109,6 +109,30 @@ Pour modifier le fichier de secrets d'un environnement, lancez :
 make ops-secrets env=<ENV>
 ```
 
+Voici quelques indications pour remplir ce fichier :
+
+* `host` - IP de la VM.
+* `secret_key` - Clé secrète de chiffrement des cookies.
+
+    À générer avec : `$ make secretkey`
+
+* `database_url` - URL de la base de données.
+
+    **Important** : la portion mot de passe de l'URL doit être URL-encodée :
+
+    ```python
+    >>> from urllib.parse import quote_plus
+    >>> quote_plus('mdp!des?caractèressp&ciaux')
+    'mdp%21des%3Fcaract%C3%A8ressp%26ciaux'
+    ```
+
+* `config_repo_api_key` - Clé d'API du dépôt de configuration
+
+    À générer avec : `$ make apikey`
+
+* `datapass_client_id` - _Client ID_ de l'instance auprès du serveur OpenID Connect de Compte DataPass.
+* `datapass_client_secret` - _Client secret_ de l'instance auprès du serveur OpenID Connect de Compte DataPass.
+
 Astuce : vous pouvez aussi [chiffrer un fichier quelconque avec Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html#encrypting-files-with-ansible-vault) :
 
 ```
@@ -144,8 +168,9 @@ Dans les [secrets](#secrets) de chaque environnement est configuré un couple d'
 
 | Environnement | Instance Comptes DataPass |
 |---------------|---------------------------|
+| prod          | production                |
 | staging       | staging                   |
-| demo          | production                |
+| demo          | staging                   |
 | sandbox       | production                |
 
 En local, il est possible de copier les identifiants `staging` (depuis les secrets de l'environnement) dans son `.env` (voir [Configuration (Démarrage)](./demarrage.md#configuration)) pour développer avec l'authentification par DataPass.
