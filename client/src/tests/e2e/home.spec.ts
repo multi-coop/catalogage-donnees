@@ -11,7 +11,7 @@ test.describe("Landing Page", () => {
         "text=Bienvenue sur le service de catalogage de données de l’État"
       )
       .waitFor();
-    await page.locator("text=Comment accéder aux catalogues ?").waitFor();
+    await page.locator("text=S'identifier avec Mon Compte Pro").waitFor();
   });
 });
 

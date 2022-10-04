@@ -2,7 +2,6 @@
   import { goto } from "$app/navigation";
 
   import books from "$lib/assets/books-circle.svg";
-  import flowChart from "$lib/assets/registration_flow_chart.svg";
   import { USER_DOCUMENTATION_LINK } from "src/constants";
   import MonCompteProButton from "src/lib/components/MonCompteProButton/MonCompteProButton.svelte";
   import { getApiUrl } from "src/lib/fetch";
