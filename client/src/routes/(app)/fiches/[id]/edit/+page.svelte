@@ -20,8 +20,6 @@
 
   let formHasBeenTouched = false;
 
-  const history = window.history;
-
   const onSave = async (event: CustomEvent<DatasetFormData>) => {
     if (!Maybe.Some(dataset)) {
       return;
@@ -64,8 +62,11 @@
     await goto(paths.home);
   };
 
-  const handleExitForm = () => {
-    history.go(-1);
+  const handleExitForm = async () => {
+    if (!Maybe.Some(dataset)) {
+      return;
+    }
+    await goto(paths.datasetDetail({ id: dataset.id }));
   };
 </script>
 
