@@ -1,5 +1,8 @@
 organizations:
   - params:
+      name: "Organisation par défaut"
+      siret: "00000000000000"
+  - params:
       name: "Ministère de la Culture"
       siret: "11004601800013"
 
@@ -21,7 +24,7 @@ users:
 
   - id: "4c2cefce-ea47-4e6e-8c79-8befd4495f45"
     params:
-      organization_siret: "11004601800013"
+      organization_siret: "00000000000000"
       email: admin@catalogue.data.gouv.fr
       password: __env__
     extras:
