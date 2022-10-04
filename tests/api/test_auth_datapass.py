@@ -208,10 +208,12 @@ class TestCallback:
             assert location.scheme == "http"
             assert location.netloc == b"client.testserver"
             assert location.path == "/auth/datapass/login"
-            assert location.params["organization_siret"] == siret_1
-            assert location.params["email"] == "johndoe@mydomain.org"
-            assert location.params["role"] == "USER"
-            assert location.params["api_token"] == user.account.api_token
+            assert json.loads(location.params["user_info"]) == {
+                "organization_siret": siret_1,
+                "email": "johndoe@mydomain.org",
+                "role": "USER",
+                "api_token": user.account.api_token,
+            }
 
     async def test_existing_password_user_reuses_account(
         self, client: httpx.AsyncClient, monkeypatch: pytest.MonkeyPatch

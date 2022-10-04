@@ -41,18 +41,21 @@ type LoginWithDataPass = (opts: {
 }) => Promise<Maybe<AuthenticatedUser>>;
 
 export const loginWithDataPass: LoginWithDataPass = async ({ params }) => {
-  const email = params.get("email");
-  const role = params.get("role");
-  const api_token = params.get("api_token");
+  const userInfo = params.get("user_info");
 
-  if (!email || !role || !api_token) {
+  if (!userInfo) {
     return null;
   }
 
-  return {
-    account: toAccount({ email, role }),
-    apiToken: api_token,
-  };
+  try {
+    const data = JSON.parse(userInfo);
+    return {
+      account: toAccount(data),
+      apiToken: data.api_token,
+    };
+  } catch (e) {
+    return null;
+  }
 };
 
 type GetMe = (opts: {

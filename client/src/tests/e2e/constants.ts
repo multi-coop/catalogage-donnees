@@ -13,9 +13,10 @@ export const ADMIN_PASSWORD_SANTE = getToolsPassword(
 );
 
 export const TEST_ORGANIZATION: Organization = {
-  siret: "44229377500031",
+  siret: "11004601800013",
   name: "Ministère de la culture",
 };
+
 export const STATE_AUTHENTICATED = "./src/tests/e2e/storage/authenticated.json";
 export const STATE_AUTHENTICATED_SANTE =
   "./src/tests/e2e/storage/authenticated-sante.json";
