@@ -7,10 +7,9 @@
     <div class="fr-footer__body">
       <div class="fr-footer__brand fr-enlarge-link">
         <a href={paths.home} title="Retour à l'accueil">
-          <p class="fr-logo" title="Catalogage des données">
-            Catalogage
-            <br />des
-            <br />données
+          <p class="fr-logo">
+            République
+            <br />Française
           </p>
         </a>
       </div>
