@@ -5,6 +5,8 @@ organizations:
       name: "Organisation par défaut"
       siret: "00000000000000"
 
+catalogs: []
+
 users:
   - id: "4a7416da-a392-4229-bb0d-fd6ac6fcba94"
     params:
@@ -13,3 +15,7 @@ users:
       password: __env__
     extras:
       role: ADMIN
+
+tags: []
+
+datasets: []
