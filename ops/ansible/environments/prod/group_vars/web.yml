@@ -1,4 +1,6 @@
 tls_enabled: true
 
+initdata_src: "{{ inventory_dir }}/assets/initdata.yml"
+
 client_url: "https://catalogue.data.gouv.fr"
 datapass_url: "https://auth.api.gouv.fr"
