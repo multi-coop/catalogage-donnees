@@ -145,8 +145,8 @@ test.describe("confirm before exit", () => {
 
     button.click();
 
-    // check if the user has been redirected to the home page
-    await page.waitForURL("/");
+    // check if the user has been redirected to the dataset detail page
+    await page.waitForURL(`/fiches/${dataset.id}`);
   });
 
   test("Should NOT display a modal after clicking the exit button if NO changes has been made and should go to previous page ", async ({
@@ -160,8 +160,8 @@ test.describe("confirm before exit", () => {
     // Try to quit the form
     await page.locator("[data-testid=exit-edit-form]").click();
 
-    // check if the user has been redirected to the home page
-    await page.waitForURL("/");
+    // check if the user has been redirected to the dataset detail page
+    await page.waitForURL(`/fiches/${dataset.id}`);
   });
 });
 
