@@ -71,14 +71,6 @@
                   </button>
                 </li>
               </ul>
-            {:else}
-              <ul class="fr-btns-group">
-                <li>
-                  <a href={paths.login} class="fr-btn" title="Se connecter">
-                    Se connecter
-                  </a>
-                </li>
-              </ul>
             {/if}
           </div>
         </div>

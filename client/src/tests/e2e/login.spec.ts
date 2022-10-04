@@ -89,7 +89,7 @@ test.describe("Login -- Multi-organization support", () => {
 
     await page.click("text=Déconnexion");
 
-    await page.click("text=Se connecter");
+    await page.goto("/login");
     await page.fill("[name=email]", TEST_EMAIL_SANTE);
     await page.fill("[name=password]", TEST_PASSWORD_SANTE);
     await page.click("button[type='submit']");
