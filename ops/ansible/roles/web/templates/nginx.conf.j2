@@ -23,6 +23,13 @@ http {
 
     gzip on;
 
+    # Increase the buffer size from 4k to 16k, otherwise third-party OAuth2/OIDC
+    # servers may send large cookie or header values, exceeding the buffer size
+    # and resulting in 502 Bad Gateway errors.
+    # See: https://github.com/etalab/catalogage-donnees/issues/403
+    # See: https://stackoverflow.com/a/7558945/10705285
+    proxy_buffer_size 16k;
+
     include /etc/nginx/conf.d/*.conf;
     include /etc/nginx/sites-enabled/*;
 }
