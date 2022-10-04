@@ -11,14 +11,22 @@ from server.domain.catalogs.entities import ExtraFieldType, TextExtraField
 from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 
-from ..factories import CreateDatasetFactory, CreateOrganizationFactory, fake
-from ..helpers import TestPasswordUser, api_key_auth
+from ..factories import (
+    CreateDatasetFactory,
+    CreateOrganizationFactory,
+    CreatePasswordUserFactory,
+    fake,
+)
+from ..helpers import TestPasswordUser, api_key_auth, create_test_password_user
 
 
 @pytest.mark.asyncio
 async def test_catalog_create(client: httpx.AsyncClient) -> None:
     bus = resolve(MessageBus)
     siret = await bus.execute(CreateOrganizationFactory.build(name="Org 1"))
+    user = await create_test_password_user(
+        CreatePasswordUserFactory.build(organization_siret=siret)
+    )
 
     response = await client.post(
         "/catalogs/", json={"organization_siret": str(siret)}, auth=api_key_auth
@@ -34,7 +42,9 @@ async def test_catalog_create(client: httpx.AsyncClient) -> None:
     catalog = await bus.execute(GetCatalogBySiret(siret=siret))
     assert catalog.organization.siret == siret
 
-    dataset_id = await bus.execute(CreateDatasetFactory.build(organization_siret=siret))
+    dataset_id = await bus.execute(
+        CreateDatasetFactory.build(account=user.account, organization_siret=siret)
+    )
     dataset = await bus.execute(GetDatasetByID(id=dataset_id))
     assert dataset.catalog_record.organization.siret == siret
 
