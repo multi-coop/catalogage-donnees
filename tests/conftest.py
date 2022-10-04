@@ -1,5 +1,6 @@
 import asyncio
 import os
+from pathlib import Path
 from typing import TYPE_CHECKING, AsyncIterator, Iterator, List
 
 import httpx
@@ -120,3 +121,8 @@ async def fixture_temp_user() -> TestPasswordUser:
 async def admin_user() -> TestPasswordUser:
     command = CreatePasswordUserFactory.build()
     return await create_test_password_user(command, role=UserRole.ADMIN)
+
+
+@pytest.fixture
+def ops_environments_dir() -> Path:
+    return Path("ops/ansible/environments")
