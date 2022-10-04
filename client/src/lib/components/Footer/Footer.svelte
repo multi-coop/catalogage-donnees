@@ -15,7 +15,8 @@
       </div>
       <div class="fr-footer__content">
         <p class="fr-footer__content-desc">
-          Un outil pour cataloguer les jeux de données des différents ministères
+          Un service pour aider les administrations à créer, gérer et ouvrir
+          leurs catalogues.
         </p>
         <ul class="fr-footer__content-list">
           <li class="fr-footer__content-item">
