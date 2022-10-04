@@ -41,14 +41,14 @@ type LoginWithDataPass = (opts: {
 }) => Promise<Maybe<AuthenticatedUser>>;
 
 export const loginWithDataPass: LoginWithDataPass = async ({ params }) => {
-  const encoded = params.get("user_info");
+  const userInfo = params.get("user_info");
 
-  if (!encoded) {
+  if (!userInfo) {
     return null;
   }
 
   try {
-    const data = JSON.parse(encoded);
+    const data = JSON.parse(userInfo);
     return {
       account: toAccount(data),
       apiToken: data.api_token,

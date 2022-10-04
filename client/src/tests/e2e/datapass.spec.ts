@@ -1,15 +1,8 @@
 import { test } from "./fixtures.js";
 import { expect } from "@playwright/test";
-import type { Organization } from "src/definitions/organizations";
+import { TEST_EMAIL, TEST_ORGANIZATION } from "./constants.js";
 
 test.describe("Datapass", () => {
-  const TEST_EMAIL = "user@mydomain.org";
-
-  const TEST_ORGANIZATION: Organization = {
-    siret: "44229377500031",
-    name: "Ministère de la culture",
-  };
-
   test("A user tried to log in but no organization has been found", async ({
     page,
   }) => {
@@ -23,11 +16,23 @@ test.describe("Datapass", () => {
   });
 
   test("A user can log in with datapass", async ({ page, apiToken }) => {
+    const info = {
+      email: TEST_EMAIL,
+      organization_siret: TEST_ORGANIZATION.siret,
+      api_token: apiToken,
+      role: "USER",
+    };
     await page.goto(
-      `/auth/datapass/login?role=USER&api_token=${apiToken}&email=${TEST_EMAIL}`
+      `/auth/datapass/login?user_info=${encodeURIComponent(
+        JSON.stringify(info)
+      )}`
     );
 
     await page.locator("text='Recherchez un jeu de données'").waitFor();
+
+    // The user's organization was saved as the current organization.
+    await page.click("text='Contribuer'");
+    await page.locator("text=Ministère de la Culture").waitFor();
   });
 
   test("A user picks the organization they want to be linked with", async ({
@@ -49,7 +54,7 @@ test.describe("Datapass", () => {
       .waitFor();
     await page.locator("text=Ministère de la culture").check();
 
-    const button = await page.locator("text=Associer mon compte");
+    const button = page.locator("text=Associer mon compte");
 
     const [request, response] = await Promise.all([
       page.waitForRequest("**/auth/datapass/users/"),
