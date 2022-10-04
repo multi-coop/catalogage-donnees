@@ -81,10 +81,16 @@ async def login(request: Request) -> Response:
 
                 #### Redirected URL query parameters
 
-                * `organization_siret`: `string($siret)`
-                * `email`: `string($email)`
-                * `role`: `UserRole`
-                * `api_token`: `string`
+                * `user_info`: an URL-encoded JSON object with the following format:
+
+                  ```json
+                  {
+                    "organization_siret": "string($siret)",
+                    "email": "string($email)",
+                    "role`: "UserRole",
+                    "api_token": "string"
+                  }
+                  ```
 
                 ### 0 matching organization
 
@@ -193,16 +199,15 @@ async def callback(request: Request) -> Response:
 
         account = await bus.execute(LoginDataPassUser(email=email))
 
+    view = AuthenticatedAccountView(**account.dict())
+
     url = get_client_root_url()
     url = url.replace(path="/auth/datapass/login")
     url = url.include_query_params(
         # These will be grabbed by the frontend and stored in its localStorage as the
         # currently authenticated user.
         # Protected against MITM attacks as long as we serve over HTTPS.
-        organization_siret=account.organization_siret,
-        email=account.email,
-        role=account.role.value,
-        api_token=account.api_token,
+        user_info=view.json(exclude={"id"}),
     )
 
     return RedirectResponse(url, status_code=307)
