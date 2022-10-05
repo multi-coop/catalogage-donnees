@@ -1,4 +1,4 @@
-from typing import List
+from typing import Callable, List
 
 import httpx
 import pytest
@@ -8,46 +8,77 @@ from server.application.auth.queries import GetAccountByEmail
 from server.config.di import resolve
 from server.domain.auth.exceptions import AccountDoesNotExist
 from server.domain.common.types import id_factory
-from server.domain.organizations.entities import LEGACY_ORGANIZATION
+from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 
+from ..factories import CreateOrganizationFactory, fake
 from ..helpers import TestPasswordUser
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "payload, expected_errors_attrs",
+    "payload_factory, expected_errors_attrs",
     [
         pytest.param(
-            {},
+            lambda _: {},
             [
+                {"loc": ["body", "organization_siret"], "type": "value_error.missing"},
                 {"loc": ["body", "email"], "type": "value_error.missing"},
                 {"loc": ["body", "password"], "type": "value_error.missing"},
             ],
             id="empty",
         ),
         pytest.param(
-            {"email": "john", "password": "s3kr3t"},
+            lambda _: {
+                "organization_siret": fake.siret(),
+                "email": "john",
+                "password": "s3kr3t",
+            },
+            [{"type": "value_error.email"}],
+            id="invalid-organization-does-not-exist",
+        ),
+        pytest.param(
+            lambda siret: {
+                "organization_siret": siret,
+                "email": "john",
+                "password": "s3kr3t",
+            },
             [{"type": "value_error.email"}],
             id="invalid-email-no-domain",
         ),
         pytest.param(
-            {"email": "john@doe", "password": "s3kr3t"},
+            lambda siret: {
+                "organization_siret": siret,
+                "email": "john@doe",
+                "password": "s3kr3t",
+            },
             [{"type": "value_error.email"}],
             id="invalid-email-no-domain-extension",
         ),
         pytest.param(
-            {"email": "johndoe.com", "password": "s3kr3t"},
+            lambda siret: {
+                "organization_siret": siret,
+                "email": "johndoe.com",
+                "password": "s3kr3t",
+            },
             [{"type": "value_error.email"}],
             id="invalid-email-no-@",
         ),
         pytest.param(
-            {"email": "john@", "password": "s3kr3t"},
+            lambda siret: {
+                "organization_siret": siret,
+                "email": "john@",
+                "password": "s3kr3t",
+            },
             [{"type": "value_error.email"}],
             id="invalid-email-no-suffix",
         ),
         pytest.param(
-            {"email": "@doe.com", "password": "s3kr3t"},
+            lambda siret: {
+                "organization_siret": siret,
+                "email": "@doe.com",
+                "password": "s3kr3t",
+            },
             [{"type": "value_error.email"}],
             id="invalid-email-no-prefix",
         ),
@@ -56,9 +87,13 @@ from ..helpers import TestPasswordUser
 async def test_create_user_invalid(
     client: httpx.AsyncClient,
     admin_user: TestPasswordUser,
-    payload: dict,
+    payload_factory: Callable[[Siret], dict],
     expected_errors_attrs: List[dict],
 ) -> None:
+    bus = resolve(MessageBus)
+    siret = await bus.execute(CreateOrganizationFactory.build())
+
+    payload = payload_factory(siret)
     response = await client.post("/auth/users/", json=payload, auth=admin_user.auth)
     assert response.status_code == 422
 
@@ -74,7 +109,14 @@ async def test_create_user_invalid(
 async def test_create_user(
     client: httpx.AsyncClient, temp_user: TestPasswordUser, admin_user: TestPasswordUser
 ) -> None:
-    payload = {"email": "john@doe.com", "password": "s3kr3t"}
+    bus = resolve(MessageBus)
+    siret = await bus.execute(CreateOrganizationFactory.build())
+
+    payload = {
+        "organization_siret": siret,
+        "email": "john@doe.com",
+        "password": "s3kr3t",
+    }
 
     # Permissions
     response = await client.post("/auth/users/", json=payload)
@@ -89,7 +131,7 @@ async def test_create_user(
     assert isinstance(id_, str)
     assert user == {
         "id": id_,
-        "organization_siret": str(LEGACY_ORGANIZATION.siret),
+        "organization_siret": str(siret),
         "email": "john@doe.com",
         "role": "USER",
     }
@@ -99,7 +141,15 @@ async def test_create_user(
 async def test_create_user_already_exists(
     client: httpx.AsyncClient, temp_user: TestPasswordUser, admin_user: TestPasswordUser
 ) -> None:
-    payload = {"email": temp_user.account.email, "password": "somethingelse"}
+    bus = resolve(MessageBus)
+    # Doesn't have to be in the same organization. Only email matters.
+    siret = await bus.execute(CreateOrganizationFactory.build())
+
+    payload = {
+        "organization_siret": str(siret),
+        "email": temp_user.account.email,
+        "password": "somethingelse",
+    }
     response = await client.post("/auth/users/", json=payload, auth=admin_user.auth)
     assert response.status_code == 400
 
@@ -112,7 +162,7 @@ async def test_login(client: httpx.AsyncClient, temp_user: TestPasswordUser) -> 
     user = response.json()
     assert user == {
         "id": str(temp_user.account_id),
-        "organization_siret": str(LEGACY_ORGANIZATION.siret),
+        "organization_siret": str(temp_user.account.organization_siret),
         "email": temp_user.account.email,
         "role": temp_user.account.role.value,
         "api_token": temp_user.account.api_token,
@@ -148,7 +198,7 @@ async def test_get_connected_user(
     assert response.status_code == 200
     assert response.json() == {
         "id": str(temp_user.account_id),
-        "organization_siret": str(LEGACY_ORGANIZATION.siret),
+        "organization_siret": str(temp_user.account.organization_siret),
         "email": temp_user.account.email,
         "role": temp_user.account.role.value,
     }

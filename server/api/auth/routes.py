@@ -28,7 +28,11 @@ router.include_router(datapass.router)
 async def create_password_user(data: PasswordUserCreate) -> AccountView:
     bus = resolve(MessageBus)
 
-    command = CreatePasswordUser(email=data.email, password=data.password)
+    command = CreatePasswordUser(
+        organization_siret=data.organization_siret,
+        email=data.email,
+        password=data.password,
+    )
 
     try:
         await bus.execute(command)

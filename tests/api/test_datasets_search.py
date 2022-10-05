@@ -6,6 +6,7 @@ import pytest
 
 from server.application.datasets.commands import DeleteDataset
 from server.application.datasets.queries import GetDatasetByID
+from server.application.organizations.views import OrganizationView
 from server.config.di import resolve
 from server.seedwork.application.messages import MessageBus
 from tests.factories import CreateDatasetFactory, UpdateDatasetFactory
@@ -19,8 +20,11 @@ DEFAULT_CORPUS_ITEMS = [
 ]
 
 
-async def add_corpus(
-    user: TestPasswordUser, *, items: List[Tuple[str, str]] = None
+async def add_test_datasets(
+    organization: OrganizationView,
+    user: TestPasswordUser,
+    *,
+    items: List[Tuple[str, str]] = None
 ) -> None:
     if items is None:
         items = DEFAULT_CORPUS_ITEMS
@@ -29,7 +33,10 @@ async def add_corpus(
 
     for title, description in items:
         command = CreateDatasetFactory.build(
-            account=user.account, title=title, description=description
+            account=user.account,
+            organization_siret=organization.siret,
+            title=title,
+            description=description,
         )
         pk = await bus.execute(command)
         query = GetDatasetByID(id=pk)
@@ -89,11 +96,12 @@ async def add_corpus(
 )
 async def test_search(
     client: httpx.AsyncClient,
+    temp_org: OrganizationView,
     temp_user: TestPasswordUser,
     q: str,
     expected_titles: List[str],
 ) -> None:
-    await add_corpus(temp_user)
+    await add_test_datasets(temp_org, temp_user)
 
     response = await client.get(
         "/datasets/",
@@ -123,9 +131,13 @@ async def test_search(
     ],
 )
 async def test_search_robustness(
-    client: httpx.AsyncClient, temp_user: TestPasswordUser, q_ref: str, q_other: str
+    client: httpx.AsyncClient,
+    temp_org: OrganizationView,
+    temp_user: TestPasswordUser,
+    q_ref: str,
+    q_other: str,
 ) -> None:
-    await add_corpus(temp_user)
+    await add_test_datasets(temp_org, temp_user)
 
     response = await client.get(
         "/datasets/",
@@ -152,9 +164,10 @@ async def test_search_robustness(
 @pytest.mark.asyncio
 async def test_search_results_change_when_data_changes(
     client: httpx.AsyncClient,
+    temp_org: OrganizationView,
     temp_user: TestPasswordUser,
 ) -> None:
-    await add_corpus(temp_user)
+    await add_test_datasets(temp_org, temp_user)
 
     bus = resolve(MessageBus)
 
@@ -169,7 +182,9 @@ async def test_search_results_change_when_data_changes(
     assert not data["items"]
 
     # Add new dataset
-    command = CreateDatasetFactory.build(account=temp_user.account, title="Titre")
+    command = CreateDatasetFactory.build(
+        account=temp_user.account, organization_siret=temp_org.siret, title="Titre"
+    )
     pk = await bus.execute(command)
     # New dataset is returned in search results
     response = await client.get(
@@ -230,7 +245,7 @@ async def test_search_results_change_when_data_changes(
 
 @pytest.mark.asyncio
 async def test_search_ranking(
-    client: httpx.AsyncClient, temp_user: TestPasswordUser
+    client: httpx.AsyncClient, temp_org: OrganizationView, temp_user: TestPasswordUser
 ) -> None:
     items = [
         ("A", "..."),
@@ -241,7 +256,7 @@ async def test_search_ranking(
 
     random.shuffle(items)  # Ensure DB insert order is irrelevant.
 
-    await add_corpus(temp_user, items=items)
+    await add_test_datasets(temp_org, temp_user, items=items)
 
     q = "Forêt ancienne"  # Lexemes: forêt, ancien
 
@@ -283,12 +298,13 @@ async def test_search_ranking(
 )
 async def test_search_highlight(
     client: httpx.AsyncClient,
+    temp_org: OrganizationView,
     temp_user: TestPasswordUser,
     corpus: list,
     q: str,
     expected_headlines: Optional[dict],
 ) -> None:
-    await add_corpus(temp_user, items=corpus)
+    await add_test_datasets(temp_org, temp_user, items=corpus)
 
     q = "restaurant"
 

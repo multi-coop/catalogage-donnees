@@ -11,7 +11,6 @@ from server.application.datasets.validation import (
 )
 from server.domain.common.types import ID
 from server.domain.datasets.entities import DataFormat, UpdateFrequency
-from server.domain.organizations.entities import LEGACY_ORGANIZATION
 from server.domain.organizations.types import Siret
 
 
@@ -42,7 +41,7 @@ class DatasetListParams:
 
 
 class DatasetCreate(CreateDatasetValidationMixin, BaseModel):
-    organization_siret: Siret = LEGACY_ORGANIZATION.siret
+    organization_siret: Siret
     title: str
     description: str
     service: str
