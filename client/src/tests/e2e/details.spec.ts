@@ -33,4 +33,18 @@ test.describe("Dataset details", () => {
       await expect(page.locator("text='Modifier'")).toBeHidden();
     });
   });
+
+  test.describe("Regressions -- Logout", () => {
+    test.use({ storageState: STATE_AUTHENTICATED });
+
+    test("Logout from detail page", async ({ page, dataset }) => {
+      // Regression test: logout used to fail.
+      // See: https://github.com/etalab/catalogage-donnees/issues/467
+      await page.goto(`/fiches/${dataset.id}`);
+      await page.click("text=Déconnexion");
+      await page
+        .locator("text=Bienvenue sur le service de catalogage")
+        .waitFor();
+    });
+  });
 });
