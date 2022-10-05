@@ -31,7 +31,8 @@ async def test_initdata_empty(tmp_path: Path) -> None:
 
         """
     )
-    await initdata.main(path)
+    code = await initdata.main(path)
+    assert code == 0
 
     pagination = await bus.execute(GetAllDatasets())
     assert pagination.items == []
@@ -58,6 +59,7 @@ async def test_initdata_env_password_invalid(
             params:
               email: test@admin.org
               password: __env__
+        tags: []
         datasets: []
         """
     )
@@ -77,6 +79,8 @@ async def test_initdata_env_password(
     path = tmp_path / "initdata.yml"
     path.write_text(
         """
+        organizations: []
+        catalogs: []
         users:
           - id: 9c2cefce-ea47-4e6e-8c79-8befd4495f45
             params:
@@ -84,15 +88,14 @@ async def test_initdata_env_password(
               password: __env__
         tags: []
         datasets: []
-        organizations: []
-        catalogs: []
 
         """
     )
 
     # Env variable is used to create the user.
     monkeypatch.setenv("TOOLS_PASSWORDS", json.dumps({"test@admin.org": "testpwd"}))
-    await initdata.main(path, no_input=True)
+    code = await initdata.main(path, no_input=True)
+    assert code == 0
 
     account = await bus.execute(
         LoginPasswordUser(
@@ -131,7 +134,8 @@ async def test_repo_initdata(
         num_users + num_tags + num_datasets + num_catalogs + num_organizations
     )
 
-    await initdata.main(path, no_input=True)
+    code = await initdata.main(path, no_input=True)
+    assert code == 0
     captured = capsys.readouterr()
     assert captured.out.count("created") == num_entities
 
@@ -140,7 +144,8 @@ async def test_repo_initdata(
     assert dataset.title == "Données brutes de l'inventaire forestier"
 
     # Run a second time, without changes.
-    await initdata.main(path)
+    code = await initdata.main(path)
+    assert code == 0
     captured = capsys.readouterr()
     assert captured.out.count("ok") == num_entities
 
@@ -156,14 +161,16 @@ async def test_repo_initdata(
     assert dataset.title == "Changed"
 
     # No reset: dataset left unchanged
-    await initdata.main(path)
+    code = await initdata.main(path)
+    assert code == 0
     captured = capsys.readouterr()
     assert captured.out.count("ok") == num_entities
     dataset = await bus.execute(GetDatasetByID(id=pk))
     assert dataset.title == "Changed"
 
     # Reset: dataset goes back to initial state defined in yml file
-    await initdata.main(path, reset=True)
+    code = await initdata.main(path, reset=True)
+    assert code == 0
     captured = capsys.readouterr()
     assert captured.out.count("ok") == num_entities - 1
     assert captured.out.count("reset") == 1
@@ -171,8 +178,26 @@ async def test_repo_initdata(
     assert dataset.title == "Données brutes de l'inventaire forestier"
 
     # Reset: dataset left in initial state
-    await initdata.main(path, reset=True)
+    code = await initdata.main(path, reset=True)
+    assert code == 0
     captured = capsys.readouterr()
     assert captured.out.count("ok") == num_entities
     dataset = await bus.execute(GetDatasetByID(id=pk))
     assert dataset.title == "Données brutes de l'inventaire forestier"
+
+
+@pytest.mark.asyncio
+async def test_environment_initdata_files_are_valid(ops_environments_dir: Path) -> None:
+    initdata_paths = [
+        initdata_path
+        for env_dir in ops_environments_dir.iterdir()
+        if (initdata_path := env_dir / "assets" / "initdata.yml").exists()
+    ]
+
+    assert (
+        initdata_paths
+    ), "No environment initdata.yml found: has their location changed?"
+
+    for initdata_path in initdata_paths:
+        code = await initdata.main(initdata_path, check=True)
+        assert code == 0, initdata_path

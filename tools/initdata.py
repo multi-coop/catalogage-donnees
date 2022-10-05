@@ -4,6 +4,8 @@ import functools
 import json
 import os
 import pathlib
+import sys
+import traceback
 from typing import Any, Dict
 
 import click
@@ -37,6 +39,15 @@ error = functools.partial(click.style, fg="red")
 
 def ruler(text: str) -> str:
     return click.style(f"──── {text}", fg="magenta")
+
+
+class InitData(BaseModel):
+    # Validate the general shape of the InitData file contents.
+    organizations: list
+    catalogs: list
+    users: list
+    tags: list
+    datasets: list
 
 
 class UserExtras(BaseModel):
@@ -182,36 +193,50 @@ async def handle_dataset(item: dict, reset: bool = False) -> None:
     print(f"{success('created')}: {create_command!r}")
 
 
-async def main(path: pathlib.Path, reset: bool = False, no_input: bool = False) -> None:
+async def main(
+    path: pathlib.Path, reset: bool = False, no_input: bool = False, check: bool = False
+) -> int:
     with path.open() as f:
-        spec = yaml.safe_load(f)
+        content = yaml.safe_load(f)
+
+    try:
+        spec = InitData(**content)
+    except ValidationError:
+        print(error("ERROR: YAML file content is invalid (see details below)"))
+        traceback.print_exc()
+        return 1
+
+    if check:
+        return 0
 
     print("\n", ruler("Organizations"))
 
-    for item in spec["organizations"]:
+    for item in spec.organizations:
         await handle_organizations(item)
 
     print("\n", ruler("Catalogs"))
 
-    for item in spec["catalogs"]:
+    for item in spec.catalogs:
         await handle_catalogs(item)
 
     print("\n", ruler("Users"))
 
     env_passwords = _parse_env_passwords(os.getenv("TOOLS_PASSWORDS", ""))
 
-    for item in spec["users"]:
+    for item in spec.users:
         await handle_user(item, no_input=no_input, env_passwords=env_passwords)
 
     print("\n", ruler("Tags"))
 
-    for item in spec["tags"]:
+    for item in spec.tags:
         await handle_tag(item)
 
     print("\n", ruler("Datasets"))
 
-    for item in spec["datasets"]:
+    for item in spec.datasets:
         await handle_dataset(item, reset=reset)
+
+    return 0
 
 
 if __name__ == "__main__":
@@ -219,8 +244,12 @@ if __name__ == "__main__":
     parser.add_argument("path", type=pathlib.Path)
     parser.add_argument("--reset", action="store_true")
     parser.add_argument("--no-input", action="store_true")
+    parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
 
     bootstrap()
 
-    asyncio.run(main(path=args.path, reset=args.reset, no_input=args.no_input))
+    code = asyncio.run(
+        main(path=args.path, reset=args.reset, no_input=args.no_input, check=args.check)
+    )
+    sys.exit(code)
