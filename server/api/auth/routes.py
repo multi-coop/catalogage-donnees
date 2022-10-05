@@ -8,6 +8,7 @@ from server.config.di import resolve
 from server.domain.auth.entities import UserRole
 from server.domain.auth.exceptions import EmailAlreadyExists, LoginFailed
 from server.domain.common.types import ID
+from server.domain.organizations.exceptions import OrganizationDoesNotExist
 from server.seedwork.application.messages import MessageBus
 
 from . import datapass
@@ -37,6 +38,8 @@ async def create_password_user(data: PasswordUserCreate) -> AccountView:
     try:
         await bus.execute(command)
     except EmailAlreadyExists as exc:
+        raise HTTPException(400, detail=str(exc))
+    except OrganizationDoesNotExist as exc:
         raise HTTPException(400, detail=str(exc))
 
     query = GetAccountByEmail(email=data.email)

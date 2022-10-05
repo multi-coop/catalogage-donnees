@@ -5,6 +5,7 @@ import pytest
 from pydantic import EmailStr
 
 from server.application.auth.queries import GetAccountByEmail
+from server.application.organizations.views import OrganizationView
 from server.config.di import resolve
 from server.domain.auth.exceptions import AccountDoesNotExist
 from server.domain.common.types import id_factory
@@ -27,15 +28,6 @@ from ..helpers import TestPasswordUser
                 {"loc": ["body", "password"], "type": "value_error.missing"},
             ],
             id="empty",
-        ),
-        pytest.param(
-            lambda _: {
-                "organization_siret": fake.siret(),
-                "email": "john",
-                "password": "s3kr3t",
-            },
-            [{"type": "value_error.email"}],
-            id="invalid-organization-does-not-exist",
         ),
         pytest.param(
             lambda siret: {
@@ -86,14 +78,12 @@ from ..helpers import TestPasswordUser
 )
 async def test_create_user_invalid(
     client: httpx.AsyncClient,
+    temp_org: OrganizationView,
     admin_user: TestPasswordUser,
     payload_factory: Callable[[Siret], dict],
     expected_errors_attrs: List[dict],
 ) -> None:
-    bus = resolve(MessageBus)
-    siret = await bus.execute(CreateOrganizationFactory.build())
-
-    payload = payload_factory(siret)
+    payload = payload_factory(temp_org.siret)
     response = await client.post("/auth/users/", json=payload, auth=admin_user.auth)
     assert response.status_code == 422
 
@@ -107,13 +97,13 @@ async def test_create_user_invalid(
 
 @pytest.mark.asyncio
 async def test_create_user(
-    client: httpx.AsyncClient, temp_user: TestPasswordUser, admin_user: TestPasswordUser
+    client: httpx.AsyncClient,
+    temp_org: OrganizationView,
+    temp_user: TestPasswordUser,
+    admin_user: TestPasswordUser,
 ) -> None:
-    bus = resolve(MessageBus)
-    siret = await bus.execute(CreateOrganizationFactory.build())
-
     payload = {
-        "organization_siret": siret,
+        "organization_siret": str(temp_org.siret),
         "email": "john@doe.com",
         "password": "s3kr3t",
     }
@@ -131,7 +121,7 @@ async def test_create_user(
     assert isinstance(id_, str)
     assert user == {
         "id": id_,
-        "organization_siret": str(siret),
+        "organization_siret": str(temp_org.siret),
         "email": "john@doe.com",
         "role": "USER",
     }
@@ -148,6 +138,19 @@ async def test_create_user_already_exists(
     payload = {
         "organization_siret": str(siret),
         "email": temp_user.account.email,
+        "password": "somethingelse",
+    }
+    response = await client.post("/auth/users/", json=payload, auth=admin_user.auth)
+    assert response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_create_user_org_does_not_exist(
+    client: httpx.AsyncClient, admin_user: TestPasswordUser
+) -> None:
+    payload = {
+        "organization_siret": fake.siret(),
+        "email": "john@doe.com",
         "password": "somethingelse",
     }
     response = await client.post("/auth/users/", json=payload, auth=admin_user.auth)

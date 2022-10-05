@@ -1,4 +1,5 @@
 from server.application.auth.views import AccountView, AuthenticatedAccountView
+from server.application.organizations.queries import GetOrganizationBySiret
 from server.config.di import resolve
 from server.domain.auth.entities import Account, DataPassUser, PasswordUser, UserRole
 from server.domain.auth.exceptions import (
@@ -13,6 +14,8 @@ from server.domain.auth.repositories import (
     PasswordUserRepository,
 )
 from server.domain.common.types import ID
+from server.domain.organizations.exceptions import OrganizationDoesNotExist
+from server.seedwork.application.messages import MessageBus
 
 from .commands import (
     ChangePassword,
@@ -27,6 +30,8 @@ from .queries import GetAccountByEmail, LoginDataPassUser, LoginPasswordUser
 async def create_password_user(
     command: CreatePasswordUser, *, id_: ID = None, role: UserRole = UserRole.USER
 ) -> ID:
+    bus = resolve(MessageBus)
+
     password_user_repository = resolve(PasswordUserRepository)
     account_repository = resolve(AccountRepository)
     password_encoder = resolve(PasswordEncoder)
@@ -37,12 +42,18 @@ async def create_password_user(
     if account is not None:
         raise EmailAlreadyExists(email)
 
+    siret = command.organization_siret
+    organization = await bus.execute(GetOrganizationBySiret(siret=siret))
+
+    if organization is None:
+        raise OrganizationDoesNotExist(siret)
+
     password_hash = password_encoder.hash(command.password)
     api_token = generate_api_token()
 
     account = Account(
         id=id_ if id_ is not None else account_repository.make_id(),
-        organization_siret=command.organization_siret,
+        organization_siret=siret,
         email=email,
         role=role,
         api_token=api_token,
