@@ -47,7 +47,7 @@
       <ul
         class="fr-grid-row fr-grid-row--right fr-btns-group fr-btns-group--inline fr-btns-group--icon-right fr-my-5w"
       >
-        {#if canEditDataset(dataset, Maybe.expect($account, "$account"))}
+        {#if canEditDataset(dataset, $account)}
           <li>
             <a
               href={editUrl}
