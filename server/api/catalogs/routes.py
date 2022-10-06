@@ -63,11 +63,12 @@ async def export_catalog(siret: Siret) -> Response:
     bus = resolve(MessageBus)
 
     try:
-        catalog = await bus.execute(GetCatalogBySiret(siret=siret))
+        export  = await bus.execute(GetCatalogBySiret(siret=siret))
+     
     except CatalogDoesNotExist as exc:
         raise HTTPException(404, detail=str(exc))
 
-    export = CatalogExportView(catalog=catalog)
+
 
     f = io.StringIO()
     export.to_csv(f)

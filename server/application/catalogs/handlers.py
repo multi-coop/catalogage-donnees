@@ -10,7 +10,7 @@ from server.domain.organizations.repositories import OrganizationRepository
 from server.domain.organizations.types import Siret
 
 from .commands import CreateCatalog
-from .queries import GetAllCatalogs, GetCatalogBySiret
+from .queries import GetAllCatalogs, GetCatalogBySiret, GetCatalogExport
 from .views import CatalogView
 
 
@@ -64,3 +64,8 @@ async def create_catalog(
     )
 
     return await repository.insert(catalog)
+
+async def get_catalog_export_by_siret(query: GetCatalogExport):
+        repository = resolve(CatalogRepository)
+        catalog =  await repository.get_by_siret(query.siret)
+        

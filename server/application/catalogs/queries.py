@@ -3,7 +3,7 @@ from typing import List
 from server.domain.organizations.types import Siret
 from server.seedwork.application.queries import Query
 
-from .views import CatalogView
+from .views import CatalogExportView, CatalogView
 
 
 class GetCatalogBySiret(Query[CatalogView]):
@@ -12,3 +12,6 @@ class GetCatalogBySiret(Query[CatalogView]):
 
 class GetAllCatalogs(Query[List[CatalogView]]):
     pass
+
+class GetCatalogExport(Query[CatalogExportView]):
+    siret: Siret
