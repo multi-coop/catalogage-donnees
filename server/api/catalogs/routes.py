@@ -71,4 +71,4 @@ async def export_catalog(siret: Siret) -> Response:
     export.to_csv(f)
     content = f.getvalue()
 
-    return Response(content, headers={"content-type": "application/csv"})
+    return Response(content, headers={"content-type": "text/csv"})

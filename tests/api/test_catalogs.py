@@ -1,3 +1,4 @@
+import csv
 from typing import List
 
 import httpx
@@ -374,3 +375,49 @@ class TestCatalogPermissions:
         await bus.execute(CreateCatalog(organization_siret=siret))
         response = await client.get(f"/catalogs/{siret}/")
         assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_export_catalog(
+    client: httpx.AsyncClient, temp_user: TestPasswordUser
+) -> None:
+    bus = resolve(MessageBus)
+
+    siret = await bus.execute(CreateOrganizationFactory.build(name="Org 1"))
+
+    await bus.execute(
+        CreateCatalog(
+            organization_siret=siret,
+            extra_fields=[
+                TextExtraField(
+                    organization_siret=siret,
+                    name="domaine",
+                    title="Domaine",
+                    hint_text="Domaine associé au jeu de données",
+                )
+            ],
+        )
+    )
+
+    response = await client.get(f"/catalogs/{siret}/export.csv")
+    assert response.status_code == 200
+
+    assert response.headers["content-type"] == "text/csv"
+
+    reader = csv.DictReader(response.text.splitlines())
+    assert reader.fieldnames == [
+        "titre",
+        "description",
+        "service",
+        "couv_geo",
+        "format",
+        "si",
+        "contact_service",
+        "contact_personne",
+        "freq_maj",
+        "date_maj",
+        "url",
+        "licence",
+        "mots_cles",
+        "domaine"
+    ]
