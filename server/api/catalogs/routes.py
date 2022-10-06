@@ -1,3 +1,7 @@
+import datetime as dt
+import io
+from typing import Any, Dict, Tuple
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, Response
@@ -7,6 +11,7 @@ from server.application.catalogs.queries import GetCatalogBySiret, GetCatalogExp
 from server.application.catalogs.views import CatalogView
 from server.config.di import resolve
 from server.domain.catalogs.exceptions import CatalogAlreadyExists, CatalogDoesNotExist
+from server.domain.common.datetime import now
 from server.domain.organizations.exceptions import OrganizationDoesNotExist
 from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
@@ -57,9 +62,29 @@ async def get_catalog(siret: Siret) -> CatalogView:
         raise HTTPException(404, detail=str(exc))
 
 
+export_cache: Dict[str, Tuple[dt.datetime, Any]] = {}
+
+
 @router.get("/{siret}/export.csv")
 async def export_catalog(siret: Siret) -> Response:
-    import io
+
+    max_age = dt.timedelta(days=1)
+    cache_control_header = f"max-age={int(max_age.total_seconds())}"
+
+    if siret in export_cache:
+        expiry_date, content = export_cache[siret]
+
+        if expiry_date > now():
+            return Response(
+                content,
+                headers={
+                    "content-type": "text/csv",
+                    "X-Cache": "hit",
+                    "Cache-Control": cache_control_header,
+                },
+            )
+        else:
+            del export_cache[siret]
 
     bus = resolve(MessageBus)
 
@@ -72,4 +97,9 @@ async def export_catalog(siret: Siret) -> Response:
     to_csv(export, f)
     content = f.getvalue()
 
-    return Response(content, headers={"content-type": "text/csv"})
+    export_cache[siret] = (now() + max_age, content)
+
+    return Response(
+        content,
+        headers={"content-type": "text/csv", "Cache-Control": cache_control_header},
+    )

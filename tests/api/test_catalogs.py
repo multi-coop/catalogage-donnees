@@ -478,3 +478,20 @@ async def test_export_catalog(client: httpx.AsyncClient) -> None:
         "mots_cles": "Musées, Salles de concert",
         "domaine": "Patrimoine",
     }
+
+
+@pytest.mark.asyncio
+async def test_export_catalog_with_cache(client: httpx.AsyncClient) -> None:
+    bus = resolve(MessageBus)
+
+    siret = await bus.execute(CreateOrganizationFactory.build(name="Org 1"))
+
+    await bus.execute(CreateCatalog(organization_siret=siret))
+
+    response = await client.get(f"/catalogs/{siret}/export.csv")
+
+    assert response.status_code == 200
+    assert "X-Cache" not in response.headers
+
+    response = await client.get(f"/catalogs/{siret}/export.csv")
+    assert "X-Cache" in response.headers
