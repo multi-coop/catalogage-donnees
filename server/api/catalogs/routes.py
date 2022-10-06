@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 
 from server.application.catalogs.commands import CreateCatalog
 from server.application.catalogs.queries import GetCatalogBySiret
-from server.application.catalogs.views import CatalogView
+from server.application.catalogs.views import CatalogExportView, CatalogView
 from server.config.di import resolve
 from server.domain.catalogs.exceptions import CatalogAlreadyExists, CatalogDoesNotExist
 from server.domain.organizations.exceptions import OrganizationDoesNotExist
@@ -54,3 +54,23 @@ async def get_catalog(siret: Siret) -> CatalogView:
         return await bus.execute(GetCatalogBySiret(siret=siret))
     except CatalogDoesNotExist as exc:
         raise HTTPException(404, detail=str(exc))
+
+
+@router.get("/{siret}/export.csv")
+async def export_catalog(siret: Siret) -> Response:
+    import io
+
+    bus = resolve(MessageBus)
+
+    try:
+        catalog = await bus.execute(GetCatalogBySiret(siret=siret))
+    except CatalogDoesNotExist as exc:
+        raise HTTPException(404, detail=str(exc))
+
+    export = CatalogExportView(catalog=catalog)
+
+    f = io.StringIO()
+    export.to_csv(f)
+    content = f.getvalue()
+
+    return Response(content, headers={"content-type": "application/csv"})
