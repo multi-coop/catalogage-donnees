@@ -12,6 +12,7 @@ from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 
 from ..auth.permissions import HasAPIKey, IsAuthenticated
+from .rendering import to_csv
 from .schemas import CatalogCreate
 
 router = APIRouter(prefix="/catalogs", tags=["catalogs"])
@@ -68,7 +69,7 @@ async def export_catalog(siret: Siret) -> Response:
         raise HTTPException(404, detail=str(exc))
 
     f = io.StringIO()
-    export.to_csv(f)
+    to_csv(export, f)
     content = f.getvalue()
 
     return Response(content, headers={"content-type": "text/csv"})
