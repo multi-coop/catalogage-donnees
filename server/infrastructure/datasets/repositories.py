@@ -29,16 +29,22 @@ class SqlDatasetRepository(DatasetRepository):
     async def get_all(
         self,
         *,
-        page: Page = Page(),
+        page: Optional[Page] = Page(),
         spec: DatasetSpec = DatasetSpec(),
     ) -> Tuple[List[Tuple[Dataset, DatasetGetAllExtras]], int]:
-        limit, offset = to_limit_offset(page)
 
         async with self._db.session() as session:
             query = GetAllQuery(spec)
             stmt = query.statement
+
             count = await get_count_from(stmt, session)
-            result = await session.stream(stmt.limit(limit).offset(offset))
+
+            if page is not None:
+                limit, offset = to_limit_offset(page)
+                stmt = stmt.limit(limit).offset(offset)
+
+            result = await session.stream(stmt)
+
             items = [
                 (make_entity(query.instance(row)), query.extras(row))
                 async for row in result

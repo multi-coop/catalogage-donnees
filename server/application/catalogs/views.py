@@ -1,11 +1,12 @@
-from typing import List, TextIO, Optional
 import csv
 import datetime as dt
+import json
+from typing import List, Optional, TextIO
 
 from pydantic import BaseModel
+
 from server.application.datasets.views import ExtraFieldValueView
 from server.application.tags.views import TagView
-
 from server.domain.catalogs.entities import ExtraFieldType
 from server.domain.common.types import ID
 from server.domain.datasets.entities import DataFormat, UpdateFrequency
@@ -63,7 +64,8 @@ class CatalogExportView(BaseModel):
         writer.writeheader()
 
         for dataset in self.datasets:
-            row = dataset.dict(exclude={"extra_field_values"})
+            # TODO: convert
+            row = json.loads(dataset.json(exclude={"extra_field_values"}))
 
             extra_field_value_by_id = {
                 extra_field_value.extra_field_id: extra_field_value.value
@@ -73,4 +75,4 @@ class CatalogExportView(BaseModel):
             for extra_field in self.catalog.extra_fields:
                 row[extra_field.name] = extra_field_value_by_id.get(extra_field.id, "")
 
-            writer.writerow(dataset.dict())
+            writer.writerow(row)

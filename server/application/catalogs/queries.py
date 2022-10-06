@@ -13,5 +13,6 @@ class GetCatalogBySiret(Query[CatalogView]):
 class GetAllCatalogs(Query[List[CatalogView]]):
     pass
 
+
 class GetCatalogExport(Query[CatalogExportView]):
     siret: Siret

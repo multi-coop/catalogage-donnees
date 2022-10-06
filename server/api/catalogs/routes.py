@@ -3,8 +3,8 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, Response
 
 from server.application.catalogs.commands import CreateCatalog
-from server.application.catalogs.queries import GetCatalogBySiret
-from server.application.catalogs.views import CatalogExportView, CatalogView
+from server.application.catalogs.queries import GetCatalogBySiret, GetCatalogExport
+from server.application.catalogs.views import CatalogView
 from server.config.di import resolve
 from server.domain.catalogs.exceptions import CatalogAlreadyExists, CatalogDoesNotExist
 from server.domain.organizations.exceptions import OrganizationDoesNotExist
@@ -63,12 +63,9 @@ async def export_catalog(siret: Siret) -> Response:
     bus = resolve(MessageBus)
 
     try:
-        export  = await bus.execute(GetCatalogBySiret(siret=siret))
-     
+        export = await bus.execute(GetCatalogExport(siret=siret))
     except CatalogDoesNotExist as exc:
         raise HTTPException(404, detail=str(exc))
-
-
 
     f = io.StringIO()
     export.to_csv(f)
