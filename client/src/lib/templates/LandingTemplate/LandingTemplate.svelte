@@ -3,7 +3,7 @@
 
   import books from "$lib/assets/books-circle.svg";
   import logoMC from "$lib/assets/organizations/logoMC.svg";
-  import logoAdeme from "$lib/assets/organizations/logo_ADEME.svg";
+  import logoAdeme from "$lib/assets/organizations/logoAdeme.svg";
   import flowChart from "$lib/assets/registration_flow_chart.svg";
   import { USER_DOCUMENTATION_LINK } from "src/constants";
   import MonCompteProButton from "src/lib/components/MonCompteProButton/MonCompteProButton.svelte";
