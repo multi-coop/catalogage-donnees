@@ -1,7 +1,7 @@
 <script lang="ts">
   export let name: string;
   export let src: string;
-  export let status: string;
+  export let status: "catalog" | "registered" | "pending";
 </script>
 
 <div class="fr-card">
