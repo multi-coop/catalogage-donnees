@@ -11,7 +11,10 @@ from alembic.config import Config
 from asgi_lifespan import LifespanManager
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
+from server.application.catalogs.commands import CreateCatalog
 from server.application.datasets.queries import GetAllDatasets
+from server.application.organizations.queries import GetOrganizationBySiret
+from server.application.organizations.views import OrganizationView
 from server.application.tags.queries import GetAllTags
 from server.application.tags.views import TagView
 from server.config import Settings
@@ -21,7 +24,7 @@ from server.infrastructure.database import Database
 from server.seedwork.application.messages import MessageBus
 from tests.factories import CreateTagFactory
 
-from .factories import CreatePasswordUserFactory
+from .factories import CreateOrganizationFactory, CreatePasswordUserFactory
 from .helpers import TestPasswordUser, create_client, create_test_password_user
 
 if TYPE_CHECKING:
@@ -111,15 +114,25 @@ async def client(app: "App") -> AsyncIterator[httpx.AsyncClient]:
         yield client
 
 
-@pytest_asyncio.fixture(name="temp_user")
-async def fixture_temp_user() -> TestPasswordUser:
-    command = CreatePasswordUserFactory.build()
+@pytest_asyncio.fixture(scope="session")
+async def temp_org() -> OrganizationView:
+    bus = resolve(MessageBus)
+    siret = await bus.execute(
+        CreateOrganizationFactory.build(name="0 - Temporary test organization")
+    )
+    await bus.execute(CreateCatalog(organization_siret=siret))
+    return await bus.execute(GetOrganizationBySiret(siret=siret))
+
+
+@pytest_asyncio.fixture(name="temp_user", scope="session")
+async def fixture_temp_user(temp_org: OrganizationView) -> TestPasswordUser:
+    command = CreatePasswordUserFactory.build(organization_siret=temp_org.siret)
     return await create_test_password_user(command, role=UserRole.USER)
 
 
-@pytest_asyncio.fixture
-async def admin_user() -> TestPasswordUser:
-    command = CreatePasswordUserFactory.build()
+@pytest_asyncio.fixture(scope="session")
+async def admin_user(temp_org: OrganizationView) -> TestPasswordUser:
+    command = CreatePasswordUserFactory.build(organization_siret=temp_org.siret)
     return await create_test_password_user(command, role=UserRole.ADMIN)
 
 

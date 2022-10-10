@@ -53,19 +53,20 @@ Par ailleurs :
 
 Les différents déploiements sont organisés en _environnements_ (copies de l'infrastructure) :
 
-| Nom     | Description | À déployer depuis |
-|---------|-------------|-------------------|
-| demo    | Environnement de démo | `master` |
-| staging | Environnement de staging | `staging` |
+| Nom     | Description | URL | À déployer depuis |
+|---------|-------------|-----|-------------------|
+| prod    | Environnement de production | https://catalogue.data.gouv.fr | `master` |
+| demo    | Environnement de démo | https://demo.catalogue.multi.coop | `master` |
+| staging | Environnement de staging | https://staging.catalogue.multi.coop | `staging` |
 
 Voici, à date, une liste des ressources pour chaque environnement et leur localisation.
 
 | Ressource | Environnements | Lieu | Contact |
 |-----------|----------------|------|---------|
-| Instance cloud (VM) | staging, demo | Console Scaleway de Multi| johan.richer[ @ ]multi.coop |
-| Instance PostgreSQL | staging, demo | Console Scaleway de Multi | johan.richer[ @ ]multi.coop |
-| Enregistrement DNS | staging, demo | Service DNS de Multi | johan.richer[ @ ]multi.coop |
-| URLs de callback OpenID Connect pour "Comptes DataPass" | staging, demo | Infrastructure BetaGouv | Contacter l'équipe "Compte DataPass" sur BetaGouv, ou ouvrir un billet sur [betagouv/api-auth](https://github.com/betagouv/api-auth) |
+| Instance cloud (VM) | Tous | Console Scaleway de Multi| johan.richer[ @ ]multi.coop |
+| Instance PostgreSQL | Tous | Console Scaleway de Multi | johan.richer[ @ ]multi.coop |
+| Enregistrement DNS | Tous | Service DNS de Multi | johan.richer[ @ ]multi.coop |
+| URLs de callback OpenID Connect pour "Comptes DataPass" | Tous | Infrastructure BetaGouv | Contacter l'équipe "Compte DataPass" sur BetaGouv, ou ouvrir un billet sur [betagouv/api-auth](https://github.com/betagouv/api-auth) |
 
 ### Versions
 

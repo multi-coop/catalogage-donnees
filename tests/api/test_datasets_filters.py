@@ -5,10 +5,10 @@ import httpx
 import pytest
 
 from server.application.catalogs.commands import CreateCatalog
+from server.application.organizations.views import OrganizationView
 from server.config.di import resolve
 from server.domain.common.types import ID, id_factory
 from server.domain.datasets.entities import DataFormat
-from server.domain.organizations.entities import LEGACY_ORGANIZATION
 from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 
@@ -18,12 +18,12 @@ from ..factories import (
     CreatePasswordUserFactory,
     CreateTagFactory,
 )
-from ..helpers import TestPasswordUser, create_test_password_user
+from ..helpers import LEGACY_ORGANIZATION, TestPasswordUser, create_test_password_user
 
 
 @pytest.mark.asyncio
 async def test_dataset_filters_info(
-    client: httpx.AsyncClient, temp_user: TestPasswordUser
+    client: httpx.AsyncClient, temp_org: OrganizationView, temp_user: TestPasswordUser
 ) -> None:
     bus = resolve(MessageBus)
 
@@ -87,6 +87,7 @@ async def test_dataset_filters_info(
     }
 
     assert data["organization_siret"] == [
+        temp_org.dict(),
         {
             "siret": str(siret_non_empty),
             "name": "A - Organization with a non-empty catalog",
@@ -241,16 +242,22 @@ async def test_dataset_filters_apply(
 
 @pytest.mark.asyncio
 async def test_dataset_filters_license_any(
-    client: httpx.AsyncClient, temp_user: TestPasswordUser
+    client: httpx.AsyncClient, temp_org: OrganizationView, temp_user: TestPasswordUser
 ) -> None:
     bus = resolve(MessageBus)
 
     dataset1_id = await bus.execute(
-        CreateDatasetFactory.build(account=temp_user.account, license="Licence Ouverte")
+        CreateDatasetFactory.build(
+            account=temp_user.account,
+            organization_siret=temp_org.siret,
+            license="Licence Ouverte",
+        )
     )
     dataset2_id = await bus.execute(
         CreateDatasetFactory.build(
-            account=temp_user.account, license="ODC Open Database Licence v1.0"
+            account=temp_user.account,
+            organization_siret=temp_org.siret,
+            license="ODC Open Database Licence v1.0",
         )
     )
 

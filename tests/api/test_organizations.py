@@ -1,6 +1,8 @@
 import httpx
 import pytest
 
+from server.application.organizations.views import OrganizationView
+
 from ..factories import CreateOrganizationFactory
 from ..helpers import TestPasswordUser, api_key_auth, to_payload
 
@@ -34,7 +36,6 @@ from ..helpers import TestPasswordUser, api_key_auth, to_payload
 )
 async def test_create_organization_invalid(
     client: httpx.AsyncClient,
-    temp_user: TestPasswordUser,
     payload: dict,
     expected_errors_attrs: list,
 ) -> None:
@@ -76,17 +77,13 @@ async def test_create_organization_many(client: httpx.AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
-async def test_create_organization_already_exists(client: httpx.AsyncClient) -> None:
-    command = CreateOrganizationFactory.build()
-    payload = to_payload(command)
-    response = await client.post("/organizations/", json=payload, auth=api_key_auth)
-    assert response.status_code == 201
-    org = response.json()
-
-    payload = to_payload(CreateOrganizationFactory.build(siret=command.siret))
+async def test_create_organization_already_exists(
+    client: httpx.AsyncClient, temp_org: OrganizationView
+) -> None:
+    payload = to_payload(CreateOrganizationFactory.build(siret=temp_org.siret))
     response = await client.post("/organizations/", json=payload, auth=api_key_auth)
     assert response.status_code == 200
-    assert response.json() == org
+    assert response.json() == temp_org.dict()
 
 
 @pytest.mark.asyncio
