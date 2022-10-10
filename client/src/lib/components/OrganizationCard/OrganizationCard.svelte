@@ -28,5 +28,3 @@
   </div>
 </div>
 
-<style>
-</style>
