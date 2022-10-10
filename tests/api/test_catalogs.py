@@ -6,6 +6,7 @@ import pytest
 from server.application.catalogs.commands import CreateCatalog
 from server.application.catalogs.queries import GetCatalogBySiret
 from server.application.datasets.queries import GetDatasetByID
+from server.application.organizations.views import OrganizationView
 from server.config.di import resolve
 from server.domain.catalogs.entities import ExtraFieldType, TextExtraField
 from server.domain.organizations.types import Siret
@@ -50,20 +51,17 @@ async def test_catalog_create(client: httpx.AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
-async def test_catalog_create_already_exists(client: httpx.AsyncClient) -> None:
-    bus = resolve(MessageBus)
-    siret = await bus.execute(CreateOrganizationFactory.build(name="Org 1"))
-    await bus.execute(CreateCatalog(organization_siret=siret))
-
+async def test_catalog_create_already_exists(
+    client: httpx.AsyncClient, temp_org: OrganizationView
+) -> None:
     response = await client.post(
-        "/catalogs/", json={"organization_siret": str(siret)}, auth=api_key_auth
+        "/catalogs/",
+        json={"organization_siret": str(temp_org.siret)},
+        auth=api_key_auth,
     )
     assert response.status_code == 200
     assert response.json() == {
-        "organization": {
-            "siret": str(siret),
-            "name": "Org 1",
-        },
+        "organization": temp_org.dict(),
         "extra_fields": [],
     }
 
@@ -368,9 +366,8 @@ class TestCatalogPermissions:
         )
         assert response.status_code == 403
 
-    async def test_get_not_authenticated(self, client: httpx.AsyncClient) -> None:
-        bus = resolve(MessageBus)
-        siret = await bus.execute(CreateOrganizationFactory.build())
-        await bus.execute(CreateCatalog(organization_siret=siret))
-        response = await client.get(f"/catalogs/{siret}/")
+    async def test_get_not_authenticated(
+        self, temp_org: OrganizationView, client: httpx.AsyncClient
+    ) -> None:
+        response = await client.get(f"/catalogs/{temp_org.siret}/")
         assert response.status_code == 401

@@ -4,6 +4,7 @@ from sqlalchemy.orm import contains_eager
 
 from server.application.datasets.commands import DeleteDataset
 from server.application.datasets.queries import GetDatasetByID
+from server.application.organizations.views import OrganizationView
 from server.config.di import resolve
 from server.domain.catalog_records.repositories import CatalogRecordRepository
 from server.infrastructure.database import Database
@@ -16,12 +17,18 @@ from ..factories import CreateDatasetFactory, CreateTagFactory
 
 
 @pytest.mark.asyncio
-async def test_dataset_cascades(temp_user: TestPasswordUser) -> None:
+async def test_dataset_cascades(
+    temp_org: OrganizationView, temp_user: TestPasswordUser
+) -> None:
     bus = resolve(MessageBus)
 
     tag_id = await bus.execute(CreateTagFactory.build(name="Architecture"))
     dataset_id = await bus.execute(
-        CreateDatasetFactory.build(account=temp_user.account, tag_ids=[tag_id])
+        CreateDatasetFactory.build(
+            account=temp_user.account,
+            organization_siret=temp_org.siret,
+            tag_ids=[tag_id],
+        )
     )
 
     dataset = await bus.execute(GetDatasetByID(id=dataset_id))

@@ -1,13 +1,12 @@
 from pydantic import EmailStr, SecretStr
 
 from server.domain.common.types import ID
-from server.domain.organizations.entities import LEGACY_ORGANIZATION
 from server.domain.organizations.types import Siret
 from server.seedwork.application.commands import Command
 
 
 class CreatePasswordUser(Command[ID]):
-    organization_siret: Siret = LEGACY_ORGANIZATION.siret
+    organization_siret: Siret
     email: EmailStr
     password: SecretStr
 

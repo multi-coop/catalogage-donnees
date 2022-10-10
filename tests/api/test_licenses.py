@@ -1,6 +1,7 @@
 import httpx
 import pytest
 
+from server.application.organizations.views import OrganizationView
 from server.config.di import resolve
 from server.seedwork.application.messages import MessageBus
 
@@ -10,7 +11,7 @@ from ..helpers import TestPasswordUser
 
 @pytest.mark.asyncio
 async def test_license_list(
-    client: httpx.AsyncClient, temp_user: TestPasswordUser
+    client: httpx.AsyncClient, temp_org: OrganizationView, temp_user: TestPasswordUser
 ) -> None:
     bus = resolve(MessageBus)
 
@@ -19,7 +20,11 @@ async def test_license_list(
     assert response.json() == ["Licence Ouverte", "ODC Open Database License"]
 
     await bus.execute(
-        CreateDatasetFactory.build(account=temp_user.account, license="Autre licence")
+        CreateDatasetFactory.build(
+            account=temp_user.account,
+            organization_siret=temp_org.siret,
+            license="Autre licence",
+        )
     )
 
     response = await client.get("/licenses/", auth=temp_user.auth)
