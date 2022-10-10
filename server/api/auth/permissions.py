@@ -212,12 +212,9 @@ class HasAPIKey(BasePermission):
             logger.info("[HasAPIKey]: no X-Api-Key header")
             return False
 
-        # A more advanced implementation would reach to the database here.
-        # But all we need for now is to check for the sandbox config API key.
+        # We only manage a single API key for now, hence this simplified implementation.
 
         if not settings.config_repo_api_key:
-            # Not set in the current environment. Would be problematic in the
-            # "sandbox" environment.
             logger.warning(
                 "[HasAPIKey]: received request with an API key, "
                 "but APP_CONFIG_REPO_API_KEY is empty"

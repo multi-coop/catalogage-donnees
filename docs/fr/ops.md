@@ -56,17 +56,16 @@ Les différents déploiements sont organisés en _environnements_ (copies de l'i
 | Nom     | Description | À déployer depuis |
 |---------|-------------|-------------------|
 | demo    | Environnement de démo | `master` |
-| sandbox | Environnement "bac à sable" destiné à des utilisateurs test | `master` |
 | staging | Environnement de staging | `staging` |
 
 Voici, à date, une liste des ressources pour chaque environnement et leur localisation.
 
 | Ressource | Environnements | Lieu | Contact |
 |-----------|----------------|------|---------|
-| Instance cloud (VM) | sandbox, staging, demo | Console Scaleway de Multi| johan.richer[ @ ]multi.coop |
-| Instance PostgreSQL | sandbox, staging, demo | Console Scaleway de Multi | johan.richer[ @ ]multi.coop |
-| Enregistrement DNS | sandbox, staging, demo | Service DNS de Multi | johan.richer[ @ ]multi.coop |
-| URLs de callback OpenID Connect pour "Comptes DataPass" | sandbox, staging, demo | Infrastructure BetaGouv | Contacter l'équipe "Compte DataPass" sur BetaGouv, ou ouvrir un billet sur [betagouv/api-auth](https://github.com/betagouv/api-auth) |
+| Instance cloud (VM) | staging, demo | Console Scaleway de Multi| johan.richer[ @ ]multi.coop |
+| Instance PostgreSQL | staging, demo | Console Scaleway de Multi | johan.richer[ @ ]multi.coop |
+| Enregistrement DNS | staging, demo | Service DNS de Multi | johan.richer[ @ ]multi.coop |
+| URLs de callback OpenID Connect pour "Comptes DataPass" | staging, demo | Infrastructure BetaGouv | Contacter l'équipe "Compte DataPass" sur BetaGouv, ou ouvrir un billet sur [betagouv/api-auth](https://github.com/betagouv/api-auth) |
 
 ### Versions
 
@@ -152,9 +151,10 @@ Un environnement peut devenir obsolète, par exemple parce qu'il n'est plus util
 Il s'agit alors de :
 
 * S'assurer que l'environnement n'est plus utilisé et qu'il peut être supprimé définitivement.
+* Ouvrir, passer en revue et merger une PR incluant les modifications suivantes :
+  * Retirer le dossier de l'environnement de `ops/ansible`.
+  * Retirer l'environnement de la présente documentation.
 * Retirer les ressources informatiques allouées à cet environnement (voir [Liste des environnements](#liste-des-environnements)).
-* Mettre à jour la présente documentation en retirant l'environnement.
-* Retirer le dossier de l'environnement de `ops/ansible`.
 
 ## Intégrations
 
@@ -171,7 +171,6 @@ Dans les [secrets](#secrets) de chaque environnement est configuré un couple d'
 | prod          | production                |
 | staging       | staging                   |
 | demo          | staging                   |
-| sandbox       | production                |
 
 En local, il est possible de copier les identifiants `staging` (depuis les secrets de l'environnement) dans son `.env` (voir [Configuration (Démarrage)](./demarrage.md#configuration)) pour développer avec l'authentification par DataPass.
 
