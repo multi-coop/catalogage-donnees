@@ -11,6 +11,7 @@ from server.domain.common.types import ID, Skip
 from server.domain.datasets.entities import DataFormat, Dataset
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.datasets.repositories import DatasetRepository
+from server.domain.organizations.types import Siret
 from server.domain.tags.repositories import TagRepository
 from server.seedwork.application.messages import MessageBus
 
@@ -19,6 +20,10 @@ from .exceptions import CannotCreateDataset, CannotUpdateDataset
 from .queries import GetAllDatasets, GetDatasetByID, GetDatasetFilters
 from .specifications import can_create_dataset, can_update_dataset
 from .views import DatasetFiltersView, DatasetView
+
+# This organization typically holds password users used by the development team.
+# It is created by migration `f2ef4eef61e3` (create-legacy-organization).
+_LEGACY_ORGANIZATION_SIRET = Siret("000 000 000 00000")
 
 
 async def create_dataset(command: CreateDataset, *, id_: ID = None) -> ID:
@@ -104,7 +109,11 @@ async def get_dataset_filters(query: GetDatasetFilters) -> DatasetFiltersView:
     licenses = await bus.execute(GetLicenseSet())
 
     return DatasetFiltersView(
-        organization_siret=[catalog.organization for catalog in catalogs],
+        organization_siret=[
+            catalog.organization
+            for catalog in catalogs
+            if catalog.organization.siret != _LEGACY_ORGANIZATION_SIRET
+        ],
         geographical_coverage=sorted(geographical_coverages),
         service=list(services),
         format=list(DataFormat),
