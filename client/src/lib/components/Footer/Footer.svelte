@@ -7,16 +7,16 @@
     <div class="fr-footer__body">
       <div class="fr-footer__brand fr-enlarge-link">
         <a href={paths.home} title="Retour à l'accueil">
-          <p class="fr-logo" title="Catalogage des données">
-            Catalogage
-            <br />des
-            <br />données
+          <p class="fr-logo">
+            République
+            <br />Française
           </p>
         </a>
       </div>
       <div class="fr-footer__content">
         <p class="fr-footer__content-desc">
-          Un outil pour cataloguer les jeux de données des différents ministères
+          Un service pour aider les administrations à créer, gérer et ouvrir
+          leurs catalogues.
         </p>
         <ul class="fr-footer__content-list">
           <li class="fr-footer__content-item">
