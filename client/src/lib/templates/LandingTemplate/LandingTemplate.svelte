@@ -2,10 +2,13 @@
   import { goto } from "$app/navigation";
 
   import books from "$lib/assets/books-circle.svg";
+  import logoMC from "$lib/assets/organizations/logoMC.svg";
+  import logoAdeme from "$lib/assets/organizations/logoAdeme.svg";
   import flowChart from "$lib/assets/registration_flow_chart.svg";
   import { USER_DOCUMENTATION_LINK } from "src/constants";
   import MonCompteProButton from "src/lib/components/MonCompteProButton/MonCompteProButton.svelte";
   import { getApiUrl } from "src/lib/fetch";
+  import OrganizationCard from "src/lib/components/OrganizationCard/OrganizationCard.svelte";
 
   const triggerDataPassLoginFlow = async () => {
     await goto(`${getApiUrl()}/auth/datapass/login/`);
@@ -55,6 +58,21 @@
       <div class="flow-chart-container fr-pt-5w">
         <img class="flow-chart" alt="" src={flowChart} />
       </div>
+    </div>
+  </div>
+</section>
+<section class="fr-container fr-py-8w">
+  <h3>Ils utilisent notre service</h3>
+  <div class="fr-grid-row fr-grid-row--gutters">
+    <div class="fr-col-3">
+      <OrganizationCard
+        name="Ministère de la Culture"
+        src={logoMC}
+        status="catalog"
+      />
+    </div>
+    <div class="fr-col-3">
+      <OrganizationCard name="ADEME" src={logoAdeme} status="pending" />
     </div>
   </div>
 </section>
