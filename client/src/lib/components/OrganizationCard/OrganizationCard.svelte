@@ -12,7 +12,7 @@
       </h3>
       <div class="fr-card__start">
         {#if status == "catalog"}
-          <p class="fr-badge fr-badge--success">catalogue Activé</p>
+          <p class="fr-badge fr-badge--success">Catalogue activé</p>
         {:else if status == "registered"}
           <p class="fr-badge fr-badge--info">Enregistré</p>
         {:else if status == "pending"}
