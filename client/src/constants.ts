@@ -1,6 +1,7 @@
 import type { DataFormat, UpdateFrequency } from "./definitions/datasets";
 
 const STATIC_PAGES = [
+  "/mentions-legales",
   "/login",
   "/auth/datapass/create-organization",
   "/auth/datapass/login",
