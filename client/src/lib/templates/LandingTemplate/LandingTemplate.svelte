@@ -39,6 +39,7 @@
             <div>
               <a
                 target="_blank"
+                rel="noopener"
                 class="fr-btn fr-btn--secondary fr-btn--icon-right fr-icon-edit-fill"
                 href={REGISTER_ORGANIZATION_LINK}
                 >Enregistrer mon organisation</a
