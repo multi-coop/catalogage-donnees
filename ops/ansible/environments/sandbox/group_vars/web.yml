@@ -1,4 +1,0 @@
-tls_enabled: true
-
-client_url: "https://catalogue.multi.coop"
-datapass_url: "https://auth.api.gouv.fr"
