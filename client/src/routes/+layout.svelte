@@ -30,7 +30,7 @@
   <!-- 32×32 -->
   <link rel="manifest" href={manifest} crossorigin="use-credentials" />
 
-  <title>{$pageTitle}</title>
+  <title>{title}</title>
 
   <!-- Meta tags for Open Graph -->
   <meta property="og:type" content="website" />
