@@ -18,7 +18,7 @@ from ..factories import (
     CreatePasswordUserFactory,
     CreateTagFactory,
 )
-from ..helpers import LEGACY_ORGANIZATION, TestPasswordUser, create_test_password_user
+from ..helpers import TestPasswordUser, create_test_password_user
 
 
 @pytest.mark.asyncio
@@ -96,7 +96,6 @@ async def test_dataset_filters_info(
             "siret": str(siret_empty),
             "name": "B - Organization with an empty catalog",
         },
-        LEGACY_ORGANIZATION.dict(),
     ]
 
     assert data["geographical_coverage"] == [

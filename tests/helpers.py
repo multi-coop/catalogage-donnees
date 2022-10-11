@@ -8,15 +8,7 @@ from server.application.auth.commands import CreatePasswordUser
 from server.config.di import resolve
 from server.domain.auth.entities import PasswordUser, UserRole
 from server.domain.auth.repositories import PasswordUserRepository
-from server.domain.organizations.entities import Organization
-from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
-
-# This organization holds accounts that existed before introducing DataPass users.
-# It is created by migration `f2ef4eef61e3` (create-legacy-organization).
-LEGACY_ORGANIZATION = Organization(
-    name="Organisation par défaut", siret=Siret("000 000 000 00000")
-)
 
 
 def create_client(app: Callable) -> httpx.AsyncClient:
