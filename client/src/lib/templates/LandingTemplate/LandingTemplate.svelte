@@ -5,7 +5,10 @@
   import logoMC from "$lib/assets/organizations/logoMC.svg";
   import logoAdeme from "$lib/assets/organizations/logoAdeme.svg";
   import flowChart from "$lib/assets/registration_flow_chart.svg";
-  import { USER_DOCUMENTATION_LINK } from "src/constants";
+  import {
+    REGISTER_ORGANIZATION_LINK,
+    USER_DOCUMENTATION_LINK,
+  } from "src/constants";
   import MonCompteProButton from "src/lib/components/MonCompteProButton/MonCompteProButton.svelte";
   import { getApiUrl } from "src/lib/fetch";
   import OrganizationCard from "src/lib/components/OrganizationCard/OrganizationCard.svelte";
@@ -24,14 +27,30 @@
         <div class="fr-pl-3w">
           <h1>Bienvenue sur le service de catalogage de données de l’État</h1>
           <p>
-            Ce service permet de favoriser la circulation des données entre les
-            différentes administrations centrales et opérateurs de l’État.
-            L’intégration des différentes organisations se fait progressivement
-            et en fonction des demandes.
+            Ce service permet aux administrations centrales et aux opérateurs
+            sous leur tutelle de créer, gérer et ouvrir leurs catalogues de
+            données dans le cadre notamment de leur stratégie en matière de
+            politique de la donnée.
+          </p>
+
+          <p>
+            <strong
+              >Votre organisation doit être enregistrée pour vous identifier.<strong
+              />
+            </strong>
           </p>
 
           <div class="button-container">
             <MonCompteProButton on:click={triggerDataPassLoginFlow} />
+            <div>
+              <a
+                target="_blank"
+                rel="noopener"
+                class="fr-btn fr-btn--secondary fr-btn--icon-right fr-icon-edit-fill"
+                href={REGISTER_ORGANIZATION_LINK}
+                >Enregistrer mon organisation</a
+              >
+            </div>
           </div>
         </div>
       </div>
@@ -45,10 +64,10 @@
       <h3>Comment accéder aux catalogues ?</h3>
 
       <p>
-        L’accès aux catalogues s’effectue via le compte datapass. Il est pour
-        l’instant possible uniquement aux agents des organisations enregistrées.
-        Pour en savoir plus sur les moyens de s’enregistrer et intégrer son
-        catalogue, vous pouvez consulter <a
+        L’accès aux catalogues s’effectue via le compte MonComptePro. Il est
+        pour l’instant possible uniquement aux agents des organisations
+        enregistrées. Pour en savoir plus sur les moyens de s’enregistrer et
+        intégrer son catalogue, vous pouvez consulter <a
           class="fr-link"
           target="_blank"
           href={USER_DOCUMENTATION_LINK}>la documentation détaillée</a
@@ -98,6 +117,9 @@
     justify-content: center;
   }
 
+  .button-container {
+    gap: 8px;
+  }
   .title-container,
   .button-container {
     display: flex;
