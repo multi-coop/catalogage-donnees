@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { PageData } from "./$types";
   import paths from "$lib/paths";
-  import { UPDATE_FREQUENCY_LABELS } from "src/constants";
+  import { DATA_FORMAT_LABELS, UPDATE_FREQUENCY_LABELS } from "src/constants";
   import { formatFullDate, splitParagraphs } from "src/lib/util/format";
   import { account } from "$lib/stores/auth";
   import { Maybe } from "$lib/util/maybe";
@@ -75,10 +75,12 @@
         <h6 class="fr-mb-2w">Accès aux données</h6>
 
         <AsideItem
-          icon="fr-icon-global-line"
-          label="Lien vers les données"
-          value={dataset.url}
-        >
+          icon="fr-icon-x-open-data"
+          label="Licence de réutilisation"
+          value={dataset.license}
+        />
+
+        {#if dataset.url}
           <a
             class="fr-btn fr-btn--icon-right fr-icon-external-link-line"
             href={dataset.url}
@@ -86,13 +88,8 @@
           >
             Voir les données
           </a>
-        </AsideItem>
+        {/if}
 
-        <AsideItem
-          icon="fr-icon-x-open-data"
-          label="Licence de réutilisation"
-          value={dataset.license}
-        />
         <h6 class="fr-mt-4w fr-mb-2w">Informations générales</h6>
 
         <AsideItem
@@ -106,6 +103,28 @@
           label="Couverture géographique"
           value={dataset.geographicalCoverage}
         />
+
+        <h6 class="fr-mt-4w fr-mb-2w">Sources et formats</h6>
+
+        <AsideItem
+          icon="fr-icon-database-line"
+          label="SI source"
+          value={dataset.technicalSource}
+        />
+
+        <AsideItem
+          icon="fr-icon-file-text-line"
+          label="Formats disponibles"
+          value={dataset.formats.join(", ")}
+        >
+          <ul class="fr-raw-list">
+            {#each dataset.formats as fmt}
+              <li>
+                {DATA_FORMAT_LABELS[fmt]}
+              </li>
+            {/each}
+          </ul>
+        </AsideItem>
 
         <h6 class="fr-mt-4w fr-mb-2w">Mise à jour</h6>
 
