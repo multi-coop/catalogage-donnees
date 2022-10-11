@@ -1,7 +1,3 @@
-import datetime as dt
-import io
-from typing import Any, Dict, Tuple
-
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, Response
@@ -11,9 +7,9 @@ from server.application.catalogs.queries import GetCatalogBySiret, GetCatalogExp
 from server.application.catalogs.views import CatalogView
 from server.config.di import resolve
 from server.domain.catalogs.exceptions import CatalogAlreadyExists, CatalogDoesNotExist
-from server.domain.common.datetime import now
 from server.domain.organizations.exceptions import OrganizationDoesNotExist
 from server.domain.organizations.types import Siret
+from server.infrastructure.catalogs.caching import ExportCache
 from server.seedwork.application.messages import MessageBus
 
 from ..auth.permissions import HasAPIKey, IsAuthenticated
@@ -62,29 +58,17 @@ async def get_catalog(siret: Siret) -> CatalogView:
         raise HTTPException(404, detail=str(exc))
 
 
-export_cache: Dict[str, Tuple[dt.datetime, Any]] = {}
-
-
 @router.get("/{siret}/export.csv")
 async def export_catalog(siret: Siret) -> Response:
+    export_cache = resolve(ExportCache)
 
-    max_age = dt.timedelta(days=1)
-    cache_control_header = f"max-age={int(max_age.total_seconds())}"
+    content = export_cache.get(siret)
 
-    if siret in export_cache:
-        expiry_date, content = export_cache[siret]
-
-        if expiry_date > now():
-            return Response(
-                content,
-                headers={
-                    "content-type": "text/csv",
-                    "X-Cache": "hit",
-                    "Cache-Control": cache_control_header,
-                },
-            )
-        else:
-            del export_cache[siret]
+    if content is not None:
+        return Response(
+            content,
+            headers={"content-type": "text/csv", **export_cache.hit_headers},
+        )
 
     bus = resolve(MessageBus)
 
@@ -93,13 +77,11 @@ async def export_catalog(siret: Siret) -> Response:
     except CatalogDoesNotExist as exc:
         raise HTTPException(404, detail=str(exc))
 
-    f = io.StringIO()
-    to_csv(export, f)
-    content = f.getvalue()
+    content = to_csv(export)
 
-    export_cache[siret] = (now() + max_age, content)
+    export_cache.set(siret, content)
 
     return Response(
         content,
-        headers={"content-type": "text/csv", "Cache-Control": cache_control_header},
+        headers={"content-type": "text/csv", **export_cache.miss_headers},
     )

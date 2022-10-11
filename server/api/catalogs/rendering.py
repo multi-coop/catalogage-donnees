@@ -1,10 +1,10 @@
 import csv
-from typing import TextIO
+import io
 
 from server.application.catalogs.views import CatalogExportView
 
 
-def to_csv(export: CatalogExportView, f: TextIO) -> None:
+def to_csv(export: CatalogExportView) -> str:
     fieldnames = [
         "titre",
         "description",
@@ -23,6 +23,7 @@ def to_csv(export: CatalogExportView, f: TextIO) -> None:
 
     fieldnames.extend(extra_field.name for extra_field in export.catalog.extra_fields)
 
+    f = io.StringIO()
     writer = csv.DictWriter(f, fieldnames=fieldnames)
     writer.writeheader()
 
@@ -58,3 +59,5 @@ def to_csv(export: CatalogExportView, f: TextIO) -> None:
             row[extra_field.name] = extra_field_value_by_id.get(extra_field.id, "")
 
         writer.writerow(row)
+
+    return f.getvalue()

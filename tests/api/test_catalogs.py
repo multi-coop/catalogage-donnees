@@ -481,7 +481,19 @@ async def test_export_catalog(client: httpx.AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
-async def test_export_catalog_with_cache(client: httpx.AsyncClient) -> None:
+async def test_export_catalog_not_found(client: httpx.AsyncClient) -> None:
+    bus = resolve(MessageBus)
+
+    response = await client.get(f"/catalogs/{fake.siret()}/export.csv")
+    assert response.status_code == 404
+
+    siret = await bus.execute(CreateOrganizationFactory.build())
+    response = await client.get(f"/catalogs/{siret}/export.csv")
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_export_catalog_cache(client: httpx.AsyncClient) -> None:
     bus = resolve(MessageBus)
 
     siret = await bus.execute(CreateOrganizationFactory.build(name="Org 1"))
@@ -492,6 +504,8 @@ async def test_export_catalog_with_cache(client: httpx.AsyncClient) -> None:
 
     assert response.status_code == 200
     assert "X-Cache" not in response.headers
+    assert response.headers["Cache-Control"] == "max-age=86400"
 
     response = await client.get(f"/catalogs/{siret}/export.csv")
     assert "X-Cache" in response.headers
+    assert response.headers["Cache-Control"] == "max-age=86400"
