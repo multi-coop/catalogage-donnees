@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { page } from "$app/stores";
-  import { siteDescription, siteTitle } from "$lib/site";
+  import { SITE_DESCRIPTION, SITE_TITLE } from "src/constants";
   import { pageTitle } from "$lib/stores/layout/title";
 
   // CSS
@@ -35,13 +35,13 @@
   <!-- Meta tags for Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content={title} />
-  <meta name="description" content={siteDescription} />
-  <meta property="og:description" content={siteDescription} />
+  <meta name="description" content={SITE_DESCRIPTION} />
+  <meta property="og:description" content={SITE_DESCRIPTION} />
   <meta
     property="og:image"
     content="https://systeme-de-design.gouv.fr/src/img/systeme-de-design.gouv.fr.jpg"
   />
-  <meta property="og:image:alt" content="République Française - {siteTitle}" />
+  <meta property="og:image:alt" content="République Française - {SITE_TITLE}" />
   <meta property="og:url" content={$page.url.toString()} />
 
   <!-- Meta tags for Twitter -->

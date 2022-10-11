@@ -1,6 +1,6 @@
 <script lang="ts">
   import paths from "$lib/paths";
-  import { siteDescription } from "$lib/site";
+  import { SITE_DESCRIPTION } from "src/constants";
 </script>
 
 <footer class="fr-footer" role="contentinfo" id="footer">
@@ -16,7 +16,7 @@
       </div>
       <div class="fr-footer__content">
         <p class="fr-footer__content-desc">
-          {siteDescription}
+          {SITE_DESCRIPTION}
         </p>
         <ul class="fr-footer__content-list">
           <li class="fr-footer__content-item">

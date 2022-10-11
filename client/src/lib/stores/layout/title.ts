@@ -1,13 +1,13 @@
 import { writable, derived } from "svelte/store";
 import { Maybe } from "$lib/util/maybe";
-import { siteTitle } from "$lib/site";
+import { SITE_TITLE } from "src/constants";
 
 export const siteSection = writable<Maybe<string>>(null);
 
 export const pageTitle = derived(siteSection, (siteSectionValue): string => {
   if (Maybe.Some(siteSectionValue)) {
-    return `${siteSectionValue} - ${siteTitle}`;
+    return `${siteSectionValue} - ${SITE_TITLE}`;
   } else {
-    return siteTitle;
+    return SITE_TITLE;
   }
 });
