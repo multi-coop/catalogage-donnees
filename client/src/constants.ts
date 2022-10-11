@@ -8,6 +8,7 @@ export const SITE_DESCRIPTION =
 export const HOME_SECTION_NAME = "Accueil";
 
 const STATIC_PAGES = [
+  "/mentions-legales",
   "/login",
   "/auth/datapass/create-organization",
   "/auth/datapass/login",

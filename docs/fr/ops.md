@@ -57,7 +57,6 @@ Les différents déploiements sont organisés en _environnements_ (copies de l'i
 |---------|-------------|-----|-------------------|
 | prod    | Environnement de production | https://catalogue.data.gouv.fr | `master` |
 | demo    | Environnement de démo | https://demo.catalogue.multi.coop | `master` |
-| sandbox | Environnement "bac à sable" destiné à des utilisateurs test | https://catalogue.multi.coop | `master` |
 | staging | Environnement de staging | https://staging.catalogue.multi.coop | `staging` |
 
 Voici, à date, une liste des ressources pour chaque environnement et leur localisation.
@@ -153,9 +152,10 @@ Un environnement peut devenir obsolète, par exemple parce qu'il n'est plus util
 Il s'agit alors de :
 
 * S'assurer que l'environnement n'est plus utilisé et qu'il peut être supprimé définitivement.
+* Ouvrir, passer en revue et merger une PR incluant les modifications suivantes :
+  * Retirer le dossier de l'environnement de `ops/ansible`.
+  * Retirer l'environnement de la présente documentation.
 * Retirer les ressources informatiques allouées à cet environnement (voir [Liste des environnements](#liste-des-environnements)).
-* Mettre à jour la présente documentation en retirant l'environnement.
-* Retirer le dossier de l'environnement de `ops/ansible`.
 
 ## Intégrations
 
@@ -172,7 +172,6 @@ Dans les [secrets](#secrets) de chaque environnement est configuré un couple d'
 | prod          | production                |
 | staging       | staging                   |
 | demo          | staging                   |
-| sandbox       | production                |
 
 En local, il est possible de copier les identifiants `staging` (depuis les secrets de l'environnement) dans son `.env` (voir [Configuration (Démarrage)](./demarrage.md#configuration)) pour développer avec l'authentification par DataPass.
 
