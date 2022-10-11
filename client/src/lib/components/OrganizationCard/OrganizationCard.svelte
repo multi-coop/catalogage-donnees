@@ -27,3 +27,11 @@
     </div>
   </div>
 </div>
+
+<style>
+  @media (max-width: 991px) {
+    .fr-card__body {
+      padding: 0 1rem;
+    }
+  }
+</style>

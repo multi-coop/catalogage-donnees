@@ -90,14 +90,14 @@
 <section class="fr-container fr-py-8w">
   <h3>Ils utilisent notre service</h3>
   <div class="fr-grid-row fr-grid-row--gutters">
-    <div class="fr-col-3">
+    <div class="fr-col-6 fr-col-md-3">
       <OrganizationCard
         name="Ministère de la Culture"
         src={logoMC}
         status="catalog"
       />
     </div>
-    <div class="fr-col-3">
+    <div class="fr-col-6 fr-col-md-3">
       <OrganizationCard name="ADEME" src={logoAdeme} status="pending" />
     </div>
   </div>
@@ -109,8 +109,8 @@
   }
 
   .flow-chart {
-    width: 414px;
-    height: 428px;
+    max-width: 350px;
+    height: auto;
   }
 
   .books-image {
@@ -127,6 +127,7 @@
   .button-container {
     gap: 8px;
   }
+
   .title-container,
   .button-container {
     display: flex;
@@ -135,5 +136,12 @@
   .title-container {
     align-items: center;
     gap: 15px;
+  }
+
+  @media (max-width: 991px) {
+    .title-container,
+    .button-container {
+      flex-direction: column;
+    }
   }
 </style>
