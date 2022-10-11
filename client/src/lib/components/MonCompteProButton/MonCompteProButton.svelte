@@ -3,16 +3,12 @@
 </script>
 
 <div>
-  <button
-    class="fr-mb-1w"
-    aria-label="s'identifier avec Mon Compte Pro"
-    on:click
-  >
+  <button class="fr-mb-1w" aria-label="s'identifier avec MonComptePro" on:click>
     <img class="padlock" alt="" src={franceConnect} />
 
     <p class="fr-pl-1w">
       S'identifier avec <br />
-      <span class="fr-text--bold">Mon Compte Pro</span>
+      <span class="fr-text--bold">MonComptePro</span>
     </p>
   </button>
 
@@ -21,7 +17,7 @@
     href="http://mon-compte-pro.beta.gouv.fr/"
     target="_blank"
   >
-    Qu'est-ce que Mon Compte Pro ?</a
+    Qu'est-ce que MonComptePro ?</a
   >
 </div>
 
