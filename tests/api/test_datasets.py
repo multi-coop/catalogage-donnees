@@ -8,6 +8,7 @@ from sqlalchemy import select
 from server.application.catalogs.commands import CreateCatalog
 from server.application.catalogs.queries import GetCatalogBySiret
 from server.application.datasets.queries import GetDatasetByID
+from server.application.organizations.views import OrganizationView
 from server.application.tags.commands import CreateTag
 from server.application.tags.queries import GetTagByID
 from server.config.di import resolve
@@ -15,7 +16,6 @@ from server.domain.catalogs.entities import ExtraFieldValue, TextExtraField
 from server.domain.common.types import ID, Skip, id_factory
 from server.domain.datasets.entities import DataFormat, UpdateFrequency
 from server.domain.datasets.exceptions import DatasetDoesNotExist
-from server.domain.organizations.entities import LEGACY_ORGANIZATION
 from server.domain.organizations.types import Siret
 from server.infrastructure.catalogs.models import ExtraFieldValueModel
 from server.infrastructure.database import Database
@@ -89,10 +89,12 @@ from ..helpers import TestPasswordUser, create_test_password_user, to_payload
 )
 async def test_create_dataset_invalid(
     client: httpx.AsyncClient,
+    temp_org: OrganizationView,
     temp_user: TestPasswordUser,
     payload: dict,
     expected_errors_attrs: list,
 ) -> None:
+    payload = {"organization_siret": str(temp_org.siret), **payload}
     response = await client.post("/datasets/", json=payload, auth=temp_user.auth)
     assert response.status_code == 422
 
@@ -115,11 +117,7 @@ async def test_create_dataset_invalid_catalog_does_not_exist(
         CreatePasswordUserFactory.build(organization_siret=siret)
     )
 
-    payload = to_payload(
-        CreateDatasetPayloadFactory.build(
-            account=user.account, organization_siret=siret
-        )
-    )
+    payload = to_payload(CreateDatasetPayloadFactory.build(organization_siret=siret))
     response = await client.post("/datasets/", json=payload, auth=user.auth)
     assert response.status_code == 400
     data = response.json()
@@ -128,12 +126,16 @@ async def test_create_dataset_invalid_catalog_does_not_exist(
 
 @pytest.mark.asyncio
 async def test_dataset_crud(
-    client: httpx.AsyncClient, temp_user: TestPasswordUser, admin_user: TestPasswordUser
+    client: httpx.AsyncClient,
+    temp_org: OrganizationView,
+    temp_user: TestPasswordUser,
+    admin_user: TestPasswordUser,
 ) -> None:
     last_updated_at = fake.date_time_tz()
 
     payload = to_payload(
         CreateDatasetPayloadFactory.build(
+            organization_siret=temp_org.siret,
             title="Example title",
             description="Example description",
             service="Example service",
@@ -161,7 +163,7 @@ async def test_dataset_crud(
         "id": pk,
         "catalog_record": {
             **data["catalog_record"],
-            "organization": LEGACY_ORGANIZATION.dict(),
+            "organization": temp_org.dict(),
         },
         "title": "Example title",
         "description": "Example description",
@@ -206,10 +208,14 @@ async def test_dataset_crud(
 
 @pytest.mark.asyncio
 class TestDatasetPermissions:
-    async def test_create_not_authenticated(self, client: httpx.AsyncClient) -> None:
+    async def test_create_not_authenticated(
+        self, temp_org: OrganizationView, client: httpx.AsyncClient
+    ) -> None:
         response = await client.post(
             "/datasets/",
-            json=to_payload(CreateDatasetPayloadFactory.build()),
+            json=to_payload(
+                CreateDatasetPayloadFactory.build(organization_siret=temp_org.siret)
+            ),
         )
         assert response.status_code == 401
 
@@ -358,6 +364,7 @@ class TestDatasetPermissions:
 )
 async def test_dataset_pagination(
     client: httpx.AsyncClient,
+    temp_org: OrganizationView,
     temp_user: TestPasswordUser,
     tags: list,
     params: dict,
@@ -372,7 +379,10 @@ async def test_dataset_pagination(
         tag_ids = [tag.id for tag in random.choices(tags, k=random.randint(0, 2))]
         await bus.execute(
             CreateDatasetFactory.build(
-                account=temp_user.account, title=f"Dataset {k}", tag_ids=tag_ids
+                account=temp_user.account,
+                organization_siret=temp_org.siret,
+                title=f"Dataset {k}",
+                tag_ids=tag_ids,
             )
         )
 
@@ -390,18 +400,18 @@ async def test_dataset_pagination(
 
 @pytest.mark.asyncio
 async def test_dataset_get_all_uses_reverse_chronological_order(
-    client: httpx.AsyncClient, temp_user: TestPasswordUser
+    client: httpx.AsyncClient, temp_org: OrganizationView, temp_user: TestPasswordUser
 ) -> None:
     bus = resolve(MessageBus)
-    await bus.execute(
-        CreateDatasetFactory.build(account=temp_user.account, title="Oldest")
-    )
-    await bus.execute(
-        CreateDatasetFactory.build(account=temp_user.account, title="Intermediate")
-    )
-    await bus.execute(
-        CreateDatasetFactory.build(account=temp_user.account, title="Newest")
-    )
+
+    for title in ("Oldest", "Intermediate", "Newest"):
+        await bus.execute(
+            CreateDatasetFactory.build(
+                account=temp_user.account,
+                organization_siret=temp_org.siret,
+                title=title,
+            )
+        )
 
     response = await client.get("/datasets/", auth=temp_user.auth)
     assert response.status_code == 200
@@ -424,11 +434,16 @@ class TestDatasetOptionalFields:
     async def test_optional_fields_missing_uses_defaults(
         self,
         client: httpx.AsyncClient,
+        temp_org: OrganizationView,
         temp_user: TestPasswordUser,
         field: str,
         default: Any,
     ) -> None:
-        payload = to_payload(CreateDatasetFactory.build(account=temp_user.account))
+        payload = to_payload(
+            CreateDatasetFactory.build(
+                account=temp_user.account, organization_siret=temp_org.siret
+            )
+        )
         payload.pop(field)
         response = await client.post("/datasets/", json=payload, auth=temp_user.auth)
         assert response.status_code == 201
@@ -436,12 +451,19 @@ class TestDatasetOptionalFields:
         assert dataset[field] == default
 
     async def test_optional_fields_invalid(
-        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
+        self,
+        client: httpx.AsyncClient,
+        temp_org: OrganizationView,
+        temp_user: TestPasswordUser,
     ) -> None:
         response = await client.post(
             "/datasets/",
             json={
-                **to_payload(CreateDatasetFactory.build(account=temp_user.account)),
+                **to_payload(
+                    CreateDatasetFactory.build(
+                        account=temp_user.account, organization_siret=temp_org.siret
+                    )
+                ),
                 "contact_emails": ["notanemail", "valid@mydomain.org"],
                 "update_frequency": "not_in_enum",
                 "last_updated_at": "not_a_datetime",
@@ -476,11 +498,16 @@ class TestDatasetUpdate:
         assert response.status_code == 404
 
     async def test_full_entity_expected(
-        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
+        self,
+        client: httpx.AsyncClient,
+        temp_org: OrganizationView,
+        temp_user: TestPasswordUser,
     ) -> None:
         bus = resolve(MessageBus)
         dataset_id = await bus.execute(
-            CreateDatasetFactory.build(account=temp_user.account)
+            CreateDatasetFactory.build(
+                account=temp_user.account, organization_siret=temp_org.siret
+            )
         )
 
         # Apply PUT semantics, which expect a full entity.
@@ -511,13 +538,18 @@ class TestDatasetUpdate:
             assert error["type"] == "value_error.missing", field
 
     async def test_fields_empty_invalid(
-        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
+        self,
+        client: httpx.AsyncClient,
+        temp_org: OrganizationView,
+        temp_user: TestPasswordUser,
     ) -> None:
         bus = resolve(MessageBus)
 
         last_updated_at = fake.date_time_tz()
         command = CreateDatasetFactory.build(
-            account=temp_user.account, last_updated_at=last_updated_at
+            account=temp_user.account,
+            organization_siret=temp_org.siret,
+            last_updated_at=last_updated_at,
         )
 
         dataset_id = await bus.execute(command)
@@ -558,11 +590,16 @@ class TestDatasetUpdate:
         assert "empty" in err_service["msg"]
 
     async def test_update(
-        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
+        self,
+        client: httpx.AsyncClient,
+        temp_org: OrganizationView,
+        temp_user: TestPasswordUser,
     ) -> None:
         bus = resolve(MessageBus)
         dataset_id = await bus.execute(
-            CreateDatasetFactory.build(account=temp_user.account)
+            CreateDatasetFactory.build(
+                account=temp_user.account, organization_siret=temp_org.siret
+            )
         )
 
         other_last_updated_at = fake.date_time_tz()
@@ -597,7 +634,7 @@ class TestDatasetUpdate:
             "id": str(dataset_id),
             "catalog_record": {
                 **data["catalog_record"],
-                "organization": LEGACY_ORGANIZATION.dict(),
+                "organization": temp_org.dict(),
             },
             "title": "Other title",
             "description": "Other description",
@@ -636,11 +673,15 @@ class TestDatasetUpdate:
 @pytest.mark.asyncio
 class TestFormats:
     async def test_formats_add(
-        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
+        self,
+        client: httpx.AsyncClient,
+        temp_org: OrganizationView,
+        temp_user: TestPasswordUser,
     ) -> None:
         bus = resolve(MessageBus)
         command = CreateDatasetFactory.build(
             account=temp_user.account,
+            organization_siret=temp_org.siret,
             formats=[DataFormat.WEBSITE, DataFormat.API],
         )
         dataset_id = await bus.execute(command)
@@ -660,11 +701,15 @@ class TestFormats:
         assert sorted(response.json()["formats"]) == ["api", "file_gis", "website"]
 
     async def test_formats_remove(
-        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
+        self,
+        client: httpx.AsyncClient,
+        temp_org: OrganizationView,
+        temp_user: TestPasswordUser,
     ) -> None:
         bus = resolve(MessageBus)
         command = CreateDatasetFactory.build(
             account=temp_user.account,
+            organization_siret=temp_org.siret,
             formats=[DataFormat.WEBSITE, DataFormat.API],
         )
         dataset_id = await bus.execute(command)
@@ -687,11 +732,16 @@ class TestFormats:
 @pytest.mark.asyncio
 class TestTags:
     async def test_tags_add(
-        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
+        self,
+        client: httpx.AsyncClient,
+        temp_org: OrganizationView,
+        temp_user: TestPasswordUser,
     ) -> None:
         bus = resolve(MessageBus)
 
-        command = CreateDatasetFactory.build(account=temp_user.account)
+        command = CreateDatasetFactory.build(
+            account=temp_user.account, organization_siret=temp_org.siret
+        )
         dataset_id = await bus.execute(command)
         tag_architecture_id = await bus.execute(CreateTag(name="Architecture"))
         tag_architecture = await bus.execute(GetTagByID(id=tag_architecture_id))
@@ -715,13 +765,17 @@ class TestTags:
         assert dataset.tags == [tag_architecture]
 
     async def test_tags_remove(
-        self, client: httpx.AsyncClient, temp_user: TestPasswordUser
+        self,
+        client: httpx.AsyncClient,
+        temp_org: OrganizationView,
+        temp_user: TestPasswordUser,
     ) -> None:
         bus = resolve(MessageBus)
 
         tag_architecture_id = await bus.execute(CreateTag(name="Architecture"))
         command = CreateDatasetFactory.build(
             account=temp_user.account,
+            organization_siret=temp_org.siret,
             tag_ids=[str(tag_architecture_id)],
         )
         dataset_id = await bus.execute(command)
@@ -877,13 +931,16 @@ class TestDeleteDataset:
     async def test_delete(
         self,
         client: httpx.AsyncClient,
+        temp_org: OrganizationView,
         temp_user: TestPasswordUser,
         admin_user: TestPasswordUser,
     ) -> None:
         bus = resolve(MessageBus)
 
         dataset_id = await bus.execute(
-            CreateDatasetFactory.build(account=temp_user.account)
+            CreateDatasetFactory.build(
+                account=temp_user.account, organization_siret=temp_org.siret
+            )
         )
 
         response = await client.delete(f"/datasets/{dataset_id}/", auth=admin_user.auth)

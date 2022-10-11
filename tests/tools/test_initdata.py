@@ -10,6 +10,7 @@ from server.application.auth.commands import DeletePasswordUser
 from server.application.auth.queries import LoginPasswordUser
 from server.application.datasets.commands import UpdateDataset
 from server.application.datasets.queries import GetAllDatasets, GetDatasetByID
+from server.application.organizations.views import OrganizationView
 from server.config.di import resolve
 from server.domain.common.types import ID, Skip
 from server.seedwork.application.messages import MessageBus
@@ -47,7 +48,10 @@ async def test_initdata_empty(tmp_path: Path) -> None:
     ],
 )
 async def test_initdata_env_password_invalid(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, value: str
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    temp_org: OrganizationView,
+    value: str,
 ) -> None:
     path = tmp_path / "initdata.yml"
     path.write_text(
@@ -57,11 +61,14 @@ async def test_initdata_env_password_invalid(
         users:
           - id: 9c2cefce-ea47-4e6e-8c79-8befd4495f45
             params:
+              organization_siret: "{siret}"
               email: test@admin.org
               password: __env__
         tags: []
         datasets: []
-        """
+        """.format(
+            siret=temp_org.siret
+        )
     )
 
     monkeypatch.setenv("TOOLS_PASSWORDS", value)
@@ -72,7 +79,7 @@ async def test_initdata_env_password_invalid(
 
 @pytest.mark.asyncio
 async def test_initdata_env_password(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, temp_org: OrganizationView
 ) -> None:
     bus = resolve(MessageBus)
 
@@ -84,12 +91,15 @@ async def test_initdata_env_password(
         users:
           - id: 9c2cefce-ea47-4e6e-8c79-8befd4495f45
             params:
+              organization_siret: "{siret}"
               email: test@admin.org
               password: __env__
         tags: []
         datasets: []
 
-        """
+        """.format(
+            siret=temp_org.siret
+        )
     )
 
     # Env variable is used to create the user.

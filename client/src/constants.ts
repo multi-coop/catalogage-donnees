@@ -1,6 +1,7 @@
 import type { DataFormat, UpdateFrequency } from "./definitions/datasets";
 
 const STATIC_PAGES = [
+  "/mentions-legales",
   "/login",
   "/auth/datapass/create-organization",
   "/auth/datapass/login",
@@ -40,3 +41,5 @@ export const DATASETS_PER_PAGE = 50;
 
 export const USER_DOCUMENTATION_LINK =
   "https://github.com/etalab/catalogage-donnees/wiki/Documentation-%C3%A0-destination-des-utilisateurs";
+export const REGISTER_ORGANIZATION_LINK =
+  "https://github.com/etalab/catalogage-donnees/wiki/Documentation-%C3%A0-destination-des-utilisateurs#comment-enregistrer-une-organisation-sur-cataloguedatagouvfr";
