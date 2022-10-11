@@ -7,6 +7,9 @@ test.describe("Datapass", () => {
     page,
   }) => {
     await page.goto("/auth/datapass/create-organization");
+    await expect(page).toHaveTitle(
+      "Connexion avec MonComptePro - catalogue.data.gouv.fr"
+    );
 
     await page
       .locator(
@@ -47,6 +50,9 @@ test.describe("Datapass", () => {
       `/auth/datapass/pick-organization?token=${token}&info=${encodeURIComponent(
         JSON.stringify(info)
       )}`
+    );
+    await expect(page).toHaveTitle(
+      "Connexion avec MonComptePro - catalogue.data.gouv.fr"
     );
 
     await page

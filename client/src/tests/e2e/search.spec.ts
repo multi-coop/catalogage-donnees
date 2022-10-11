@@ -38,6 +38,13 @@ const performASearch = async (
 test.describe("Search", () => {
   test.use({ storageState: STATE_AUTHENTICATED });
 
+  test("Search page meta", async ({ page }) => {
+    await page.goto("/fiches/search");
+    await expect(page).toHaveTitle(
+      "Rechercher un jeu de données - catalogue.data.gouv.fr"
+    );
+  });
+
   test("Performs a search from the home page", async ({ page, dataset }) => {
     await page.goto("/");
 
@@ -47,7 +54,6 @@ test.describe("Search", () => {
     expect(items.length).toBeGreaterThanOrEqual(1);
     expect(items[0].title).toBe(dataset.title);
 
-    await expect(page).toHaveTitle("Rechercher un jeu de données");
     await expect(page).toHaveURL("/fiches/search?q=title");
     await page
       .locator(`text=/${items.length} fiche(s)? de données/i`)
@@ -57,6 +63,7 @@ test.describe("Search", () => {
 
   test("Visits the search page and sees default results", async ({ page }) => {
     await page.goto("/fiches/search");
+
     const response = await page.waitForResponse("**/datasets/?**");
     const { items } = await response.json();
     expect(items.length).toBeGreaterThanOrEqual(4);
@@ -76,7 +83,6 @@ test.describe("Search", () => {
     await link.click();
     await page.waitForLoadState();
 
-    await expect(page).toHaveTitle("Rechercher un jeu de données");
     await expect(page).toHaveURL("/fiches/search");
 
     // First search.

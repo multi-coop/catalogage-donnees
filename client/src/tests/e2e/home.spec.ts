@@ -5,7 +5,7 @@ import { test } from "./fixtures.js";
 test.describe("Landing Page", () => {
   test("Visits the home page without being logged in", async ({ page }) => {
     await page.goto("/");
-
+    await expect(page).toHaveTitle("Accueil - catalogue.data.gouv.fr");
     await page
       .locator(
         "text=Bienvenue sur le service de catalogage de données de l’État"
@@ -20,8 +20,6 @@ test.describe("Catalog list", () => {
 
   test("Visits the home page", async ({ page }) => {
     await page.goto("/");
-
-    await expect(page).toHaveTitle("Catalogue");
 
     await page.locator("data-test-id=dataset-list-item").first().click();
 

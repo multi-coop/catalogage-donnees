@@ -1,11 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { page } from "$app/stores";
-  import {
-    pageTitle,
-    siteDescription,
-    siteTitle,
-  } from "$lib/stores/layout/title";
+  import { siteDescription, siteTitle } from "$lib/site";
+  import { pageTitle } from "$lib/stores/layout/title";
 
   // CSS
   import "../app.css";

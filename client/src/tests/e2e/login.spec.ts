@@ -20,8 +20,7 @@ test.describe("Login", () => {
 
   test("Logs in", async ({ page }) => {
     await page.goto("/login");
-
-    await expect(page).toHaveTitle("Connexion");
+    await expect(page).toHaveTitle("Connexion - catalogue.data.gouv.fr");
 
     const email = page.locator("form [name=email]");
     await email.fill(TEST_EMAIL);

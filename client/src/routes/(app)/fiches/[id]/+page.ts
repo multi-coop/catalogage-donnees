@@ -4,7 +4,7 @@ import { getDatasetByID } from "$lib/repositories/datasets";
 import { getCatalogBySiret } from "$lib/repositories/catalogs";
 import { Maybe } from "$lib/util/maybe";
 import { apiToken as apiTokenStore } from "$lib/stores/auth";
-import { sections } from "$lib/stores/layout/title";
+import { siteSection } from "$lib/stores/layout/title";
 
 export const load: PageLoad = async ({ fetch, params }) => {
   const apiToken = get(apiTokenStore);
@@ -15,9 +15,9 @@ export const load: PageLoad = async ({ fetch, params }) => {
     id: params.id,
   });
 
-  sections.set([
-    Maybe.Some(dataset) ? dataset.title : "Fiche de jeu de données",
-  ]);
+  siteSection.set(
+    Maybe.Some(dataset) ? dataset.title : "Fiche de jeu de données"
+  );
 
   const catalog = await Maybe.map(dataset, (dataset) =>
     getCatalogBySiret({

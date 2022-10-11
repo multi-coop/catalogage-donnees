@@ -1,6 +1,6 @@
 <script lang="ts">
   import paths from "$lib/paths";
-  import { siteDescription } from "$lib/stores/layout/title";
+  import { siteDescription } from "$lib/site";
 </script>
 
 <footer class="fr-footer" role="contentinfo" id="footer">

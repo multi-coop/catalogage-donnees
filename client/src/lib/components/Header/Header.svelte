@@ -3,7 +3,7 @@
   import { page } from "$app/stores";
   import { logout, account } from "$lib/stores/auth";
   import { navigationItems } from "$lib/stores/layout/navigation";
-  import { getSectionName, homeSectionName, siteTitle } from "$lib/site";
+  import { homeSectionName, siteTitle } from "$lib/site";
   import paths from "$lib/paths";
   import { Maybe } from "$lib/util/maybe";
 

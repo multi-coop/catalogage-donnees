@@ -14,6 +14,9 @@ test.describe("Edit dataset", () => {
 
   test("Visits the edit page", async ({ page, dataset }) => {
     await page.goto(`/fiches/${dataset.id}/edit`);
+    await expect(page).toHaveTitle(
+      "Modifier la fiche de jeu de données - catalogue.data.gouv.fr"
+    );
 
     await page.locator("text=Ministère de la Culture").waitFor();
 

@@ -7,12 +7,12 @@ import { getLicenses } from "src/lib/repositories/licenses";
 import { getDatasetFiltersInfo } from "src/lib/repositories/datasetFilters";
 import { apiToken as apiTokenStore } from "$lib/stores/auth";
 import { Maybe } from "$lib/util/maybe";
-import { sections } from "src/lib/stores/layout/title";
+import { siteSection } from "src/lib/stores/layout/title";
 
 export const load: PageLoad = async ({ fetch, params }) => {
   const title = "Modifier la fiche de jeu de données";
 
-  sections.set([title]);
+  siteSection.set(title);
 
   const apiToken = get(apiTokenStore);
 

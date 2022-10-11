@@ -1,6 +1,6 @@
 import type { LayoutLoad } from "./$types";
-import { sections } from "$lib/stores/layout/title";
+import { siteSection } from "$lib/stores/layout/title";
 
 export const load: LayoutLoad = () => {
-  sections.set(["Connexion avec MonComptePro"]);
+  siteSection.set("Connexion avec MonComptePro");
 };
