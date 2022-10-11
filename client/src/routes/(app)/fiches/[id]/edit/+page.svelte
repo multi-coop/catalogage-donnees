@@ -12,7 +12,7 @@
 
   export let data: PageData;
 
-  $: ({ catalog, dataset, tags, licenses, filtersInfo } = data);
+  $: ({ title, catalog, dataset, tags, licenses, filtersInfo } = data);
 
   let modalControlId = "stop-editing-form-modal";
 
@@ -74,7 +74,7 @@
   <header class="fr-p-4w">
     <div class="fr-col">
       <h5 class="fr-grid-row fr-text--regular">
-        Modifier la fiche de jeu de données
+        {title}
       </h5>
       <p class="fr-grid-row fr-text--sm fr-text-mention--grey">
         Catalogue : {dataset.catalogRecord.organization.name}

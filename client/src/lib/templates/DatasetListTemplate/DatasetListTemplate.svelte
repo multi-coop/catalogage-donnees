@@ -20,10 +20,6 @@
   };
 </script>
 
-<svelte:head>
-  <title>Catalogue</title>
-</svelte:head>
-
 <section class="fr-background-alt--grey fr-mb-6w">
   <div class="fr-container fr-grid-row fr-grid-row--center fr-py-6w">
     <div class="fr-col-10">

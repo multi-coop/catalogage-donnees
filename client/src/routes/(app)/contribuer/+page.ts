@@ -7,8 +7,13 @@ import { get } from "svelte/store";
 import { account } from "src/lib/stores/auth";
 import { apiToken as apiTokenStore } from "$lib/stores/auth";
 import { Maybe } from "$lib/util/maybe";
+import { sections } from "src/lib/stores/layout/title";
 
 export const load: PageLoad = async ({ fetch }) => {
+  const title = "Contribuer une fiche de jeu de données";
+
+  sections.set([title]);
+
   const apiToken = get(apiTokenStore);
   const siret = Maybe.expect(get(account), "$account").organizationSiret;
 
@@ -20,6 +25,7 @@ export const load: PageLoad = async ({ fetch }) => {
   ]);
 
   return {
+    title,
     catalog,
     tags,
     licenses,

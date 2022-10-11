@@ -2,7 +2,8 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
   import { logout, account } from "$lib/stores/auth";
-  import { navigationItems } from "$lib/stores/layout";
+  import { navigationItems } from "$lib/stores/layout/navigation";
+  import { getSectionName, homeSectionName, siteTitle } from "$lib/site";
   import paths from "$lib/paths";
   import { Maybe } from "$lib/util/maybe";
 
@@ -40,14 +41,14 @@
             </div>
           </div>
           <div class="fr-header__service">
-            <a href={paths.home} title="Accueil - catalogue.data.gouv.fr">
-              <p class="fr-header__service-title">catalogue.data.gouv.fr</p>
+            <a href={paths.home} title="{homeSectionName} - {siteTitle}">
+              <p class="fr-header__service-title">{siteTitle}</p>
               <p
                 class="fr-badge fr-badge--success fr-badge--sm fr-badge--no-icon"
               >
                 Bêta
-              </p></a
-            >
+              </p>
+            </a>
           </div>
         </div>
         <div class="fr-header__tools tools-container">

@@ -1,5 +1,6 @@
 <script lang="ts">
   import paths from "$lib/paths";
+  import { siteDescription } from "$lib/stores/layout/title";
 </script>
 
 <footer class="fr-footer" role="contentinfo" id="footer">
@@ -15,8 +16,7 @@
       </div>
       <div class="fr-footer__content">
         <p class="fr-footer__content-desc">
-          Un service pour aider les administrations à créer, gérer et ouvrir
-          leurs catalogues.
+          {siteDescription}
         </p>
         <ul class="fr-footer__content-list">
           <li class="fr-footer__content-item">
