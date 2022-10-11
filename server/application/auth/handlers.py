@@ -1,3 +1,5 @@
+from typing import Optional
+
 from server.application.auth.views import AccountView, AuthenticatedAccountView
 from server.application.organizations.queries import GetOrganizationBySiret
 from server.config.di import resolve
@@ -15,6 +17,7 @@ from server.domain.auth.repositories import (
 )
 from server.domain.common.types import ID
 from server.domain.organizations.exceptions import OrganizationDoesNotExist
+from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 
 from .commands import (
@@ -27,6 +30,34 @@ from .passwords import PasswordEncoder, generate_api_token
 from .queries import GetAccountByEmail, LoginDataPassUser, LoginPasswordUser
 
 
+async def _maybe_reuse_account_of_existing_datapass_user(
+    email: str, organization_siret: Siret
+) -> Optional[Account]:
+    datapass_user_repository = resolve(DataPassUserRepository)
+
+    # Reuse any account tied to an existing DataPassUser.
+    datapass_user = await datapass_user_repository.get_by_email(email)
+
+    if datapass_user is None:
+        return None
+
+    account = datapass_user.account
+
+    # Ensure the existing account is linked to the same organization.
+    # A misconfigured initdata.yml could allow different organizations.
+    # See: https://github.com/etalab/catalogage-donnees/issues/414
+    if account.organization_siret != organization_siret:
+        raise RuntimeError(
+            f"Found account for {email=!r} "
+            f"in organization {account.organization_siret!r}, "
+            "but requested to create a PasswordUser "
+            f"in different organization {organization_siret!r}. "
+            "HINT: This is most likely an initdata setup issue on the developer side."
+        )
+
+    return account
+
+
 async def create_password_user(
     command: CreatePasswordUser, *, id_: ID = None, role: UserRole = UserRole.USER
 ) -> ID:
@@ -36,30 +67,32 @@ async def create_password_user(
     account_repository = resolve(AccountRepository)
     password_encoder = resolve(PasswordEncoder)
 
-    email = command.email
-    account = await account_repository.get_by_email(email)
-
-    if account is not None:
-        raise EmailAlreadyExists(email)
-
     siret = command.organization_siret
     organization = await bus.execute(GetOrganizationBySiret(siret=siret))
 
     if organization is None:
         raise OrganizationDoesNotExist(siret)
 
+    email = command.email
+
+    account = await _maybe_reuse_account_of_existing_datapass_user(email, siret)
+
+    if account is None:
+        account = await account_repository.get_by_email(email)
+
+        if account is not None:
+            raise EmailAlreadyExists(email)
+
+        account = Account(
+            id=id_ if id_ is not None else account_repository.make_id(),
+            organization_siret=command.organization_siret,
+            email=email,
+            role=role,
+            api_token=generate_api_token(),
+        )
+        await account_repository.insert(account)
+
     password_hash = password_encoder.hash(command.password)
-    api_token = generate_api_token()
-
-    account = Account(
-        id=id_ if id_ is not None else account_repository.make_id(),
-        organization_siret=siret,
-        email=email,
-        role=role,
-        api_token=api_token,
-    )
-
-    await account_repository.insert(account)
 
     password_user = PasswordUser(
         account_id=account.id,
