@@ -30,8 +30,14 @@
             Ce service permet aux administrations centrales et aux opérateurs
             sous leur tutelle de créer, gérer et ouvrir leurs catalogues de
             données dans le cadre notamment de leur stratégie en matière de
-            politique de la donnée. Votre organisation doit être enregistrée
-            pour vous identifier.
+            politique de la donnée.
+          </p>
+
+          <p>
+            <strong
+              >Votre organisation doit être enregistrée pour vous identifier.<strong
+              />
+            </strong>
           </p>
 
           <div class="button-container">
