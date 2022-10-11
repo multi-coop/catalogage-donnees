@@ -58,7 +58,7 @@
       <h3>Comment accéder aux catalogues ?</h3>
 
       <p>
-        L’accès aux catalogues s’effectue via le compte Mon Compte Pro. Il est
+        L’accès aux catalogues s’effectue via le compte MonComptePro. Il est
         pour l’instant possible uniquement aux agents des organisations
         enregistrées. Pour en savoir plus sur les moyens de s’enregistrer et
         intégrer son catalogue, vous pouvez consulter <a
