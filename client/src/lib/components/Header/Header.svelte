@@ -26,7 +26,21 @@
                 <br />Française
               </p>
             </div>
-            <div class="fr-header__navbar" />
+
+            {#if Maybe.Some($account)}
+              <div class="fr-header__navbar">
+                <button
+                  class="fr-btn--menu fr-btn"
+                  data-fr-opened="false"
+                  aria-controls="modal-menu"
+                  aria-haspopup="menu"
+                  title="Menu"
+                  id="fr-btn-menu-mobile"
+                >
+                  Menu
+                </button>
+              </div>
+            {/if}
           </div>
           <div class="fr-header__service">
             <a href={paths.home} title="Accueil - catalogue.data.gouv.fr">
@@ -108,10 +122,6 @@
   a {
     display: flex;
     gap: 15px;
-  }
-
-  .fr-header__body-row {
-    margin: 0;
   }
 
   @media (max-width: 1440px) and (min-width: 768px) {
