@@ -45,7 +45,10 @@
             <div>
               <a
                 target="_blank"
+<<<<<<< HEAD
                 rel="noopener"
+=======
+>>>>>>> 0785ba9 (refacto: rework landing page (add texts, add new schema, ...))
                 class="fr-btn fr-btn--secondary fr-btn--icon-right fr-icon-edit-fill"
                 href={REGISTER_ORGANIZATION_LINK}
                 >Enregistrer mon organisation</a
@@ -64,7 +67,11 @@
       <h3>Comment accéder aux catalogues ?</h3>
 
       <p>
+<<<<<<< HEAD
         L’accès aux catalogues s’effectue via le compte MonComptePro. Il est
+=======
+        L’accès aux catalogues s’effectue via le compte Mon Compte Pro. Il est
+>>>>>>> 0785ba9 (refacto: rework landing page (add texts, add new schema, ...))
         pour l’instant possible uniquement aux agents des organisations
         enregistrées. Pour en savoir plus sur les moyens de s’enregistrer et
         intégrer son catalogue, vous pouvez consulter <a
