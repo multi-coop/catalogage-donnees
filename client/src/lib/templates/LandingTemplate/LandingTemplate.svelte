@@ -18,13 +18,13 @@
   };
 </script>
 
-<section class="banner fr-py-8w">
+<section class="banner fr-py-5w fr-md-8w">
   <div class="fr-container">
     <div class="fr-grid-row">
       <div class="fr-col-12 title-container">
         <img class="books-image" alt="" src={books} />
 
-        <div class="fr-pl-3w">
+        <div class="fr-mt-3w fr-mt-md-0 fr-ml-md-3w">
           <h1>Bienvenue sur le service de catalogage de données de l’État</h1>
           <p>
             Ce service permet aux administrations centrales et aux opérateurs
@@ -75,7 +75,11 @@
       </p>
 
       <div class="flow-chart-container fr-pt-5w">
-        <img class="flow-chart" alt="" src={flowChart} />
+        <img
+          class="flow-chart fr-responsive-img"
+          alt="Pour pouvoir utiliser cette application vous devez faire partie d'une organisation préalablement enregistrée et avoir créé un compte MonComptePro. Si votre organisation n'est pas encore enregistrée veuillez cliquer sur le lien 'documentation détaillée' pour savoir comment procéder"
+          src={flowChart}
+        />
       </div>
     </div>
   </div>
@@ -83,14 +87,14 @@
 <section class="fr-container fr-py-8w">
   <h3>Ils utilisent notre service</h3>
   <div class="fr-grid-row fr-grid-row--gutters">
-    <div class="fr-col-3">
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-3">
       <OrganizationCard
         name="Ministère de la Culture"
         src={logoMC}
         status="catalog"
       />
     </div>
-    <div class="fr-col-3">
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-3">
       <OrganizationCard name="ADEME" src={logoAdeme} status="pending" />
     </div>
   </div>
@@ -102,8 +106,8 @@
   }
 
   .flow-chart {
-    width: 414px;
-    height: 428px;
+    max-width: 30rem;
+    height: auto;
   }
 
   .books-image {
@@ -118,15 +122,27 @@
   }
 
   .button-container {
-    gap: 8px;
-  }
-  .title-container,
-  .button-container {
     display: flex;
+    flex-flow: column;
+    gap: var(--sp-3w);
   }
 
+  @media (min-width: 912px) {
+    .button-container {
+      flex-flow: row;
+      gap: var(--sp-1w);
+    }
+  }
   .title-container {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 15px;
+  }
+
+  @media (min-width: 768px) {
+    .title-container {
+      flex-direction: row;
+    }
   }
 </style>

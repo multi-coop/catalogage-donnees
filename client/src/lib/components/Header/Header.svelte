@@ -27,18 +27,21 @@
                 <br />Française
               </p>
             </div>
-            <div class="fr-header__navbar">
-              <button
-                class="fr-btn--menu fr-btn"
-                data-fr-opened="false"
-                aria-controls="modal-menu"
-                aria-haspopup="menu"
-                title="Menu"
-                id="fr-btn-menu-mobile"
-              >
-                Menu
-              </button>
-            </div>
+
+            {#if Maybe.Some($account)}
+              <div class="fr-header__navbar">
+                <button
+                  class="fr-btn--menu fr-btn"
+                  data-fr-opened="false"
+                  aria-controls="modal-menu"
+                  aria-haspopup="menu"
+                  title="Menu"
+                  id="fr-btn-menu-mobile"
+                >
+                  Menu
+                </button>
+              </div>
+            {/if}
           </div>
           <div class="fr-header__service">
             <a href={paths.home} title="Accueil - {SITE_TITLE}">
@@ -117,10 +120,6 @@
 </header>
 
 <style>
-  header {
-    overflow-x: hidden; /* Prevent beta banner from overflowing */
-  }
-
   a {
     display: flex;
     gap: 15px;

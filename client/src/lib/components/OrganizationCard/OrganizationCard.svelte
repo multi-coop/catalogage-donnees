@@ -22,8 +22,17 @@
     </div>
   </div>
   <div class="fr-card__header">
-    <div class="fr-card__img">
+    <div class="fr-card__img card-image">
       <img class="fr-responsive-img fr-p-2w" {src} alt="logo {name}" />
     </div>
   </div>
 </div>
+
+<style>
+  .card-image {
+    display: flex;
+    justify-content: center;
+    max-width: 20rem;
+    margin: 0 auto;
+  }
+</style>
