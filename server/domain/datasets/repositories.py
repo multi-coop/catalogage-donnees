@@ -24,7 +24,7 @@ class DatasetRepository(Repository):
         return id_factory()
 
     async def get_all(
-        self, *, page: Page = Page(), spec: DatasetSpec = DatasetSpec()
+        self, *, page: Optional[Page] = Page(), spec: DatasetSpec = DatasetSpec()
     ) -> Tuple[List[Tuple[Dataset, DatasetGetAllExtras]], int]:
         raise NotImplementedError  # pragma: no cover
 

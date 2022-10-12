@@ -1,3 +1,5 @@
+import csv
+import datetime as dt
 from typing import List
 
 import httpx
@@ -8,7 +10,13 @@ from server.application.catalogs.queries import GetCatalogBySiret
 from server.application.datasets.queries import GetDatasetByID
 from server.application.organizations.views import OrganizationView
 from server.config.di import resolve
-from server.domain.catalogs.entities import ExtraFieldType, TextExtraField
+from server.domain.catalogs.entities import (
+    ExtraFieldType,
+    ExtraFieldValue,
+    TextExtraField,
+)
+from server.domain.common.types import Skip, id_factory
+from server.domain.datasets.entities import DataFormat, UpdateFrequency
 from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 
@@ -16,6 +24,7 @@ from ..factories import (
     CreateDatasetFactory,
     CreateOrganizationFactory,
     CreatePasswordUserFactory,
+    CreateTagFactory,
     fake,
 )
 from ..helpers import TestPasswordUser, api_key_auth, create_test_password_user
@@ -371,3 +380,129 @@ class TestCatalogPermissions:
     ) -> None:
         response = await client.get(f"/catalogs/{temp_org.siret}/")
         assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_export_catalog(client: httpx.AsyncClient) -> None:
+    bus = resolve(MessageBus)
+
+    siret = await bus.execute(CreateOrganizationFactory.build(name="Org 1"))
+
+    domaine_id = id_factory()
+
+    await bus.execute(
+        CreateCatalog(
+            organization_siret=siret,
+            extra_fields=[
+                TextExtraField(
+                    organization_siret=siret,
+                    name="domaine",
+                    title="Domaine",
+                    hint_text="Domaine associé au jeu de données",
+                )
+            ],
+        ),
+        extra_field_ids_by_name={"domaine": domaine_id},
+    )
+
+    tag1_id = await bus.execute(CreateTagFactory.build(name="Musées"))
+    tag2_id = await bus.execute(CreateTagFactory.build(name="Salles de concert"))
+
+    await bus.execute(
+        CreateDatasetFactory.build(
+            account=Skip(),
+            organization_siret=siret,
+            title="Example title",
+            description="Example description",
+            service="Example service",
+            geographical_coverage="France métropolitaine",
+            formats=[DataFormat.WEBSITE, DataFormat.OTHER],
+            technical_source="Example database",
+            producer_email="example.service@mydomain.org",
+            contact_emails=["example.person@mydomain.org"],
+            update_frequency=UpdateFrequency.WEEKLY,
+            last_updated_at=dt.datetime(2022, 10, 6, 15, 0, 0),
+            url="https://example.org",
+            license="Licence Ouverte",
+            tag_ids=[tag1_id, tag2_id],
+            extra_field_values=[
+                ExtraFieldValue(extra_field_id=domaine_id, value="Patrimoine"),
+            ],
+        )
+    )
+
+    response = await client.get(f"/catalogs/{siret}/export.csv")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "text/csv"
+
+    reader = csv.DictReader(response.text.splitlines())
+
+    assert reader.fieldnames == [
+        "titre",
+        "description",
+        "service",
+        "couv_geo",
+        "format",
+        "si",
+        "contact_service",
+        "contact_personne",
+        "freq_maj",
+        "date_maj",
+        "url",
+        "licence",
+        "mots_cles",
+        "domaine",
+    ]
+
+    rows = list(reader)
+    assert len(rows) == 1
+    (row,) = rows
+
+    assert row == {
+        "titre": "Example title",
+        "description": "Example description",
+        "service": "Example service",
+        "couv_geo": "France métropolitaine",
+        "format": "website, other",
+        "si": "Example database",
+        "contact_service": "example.service@mydomain.org",
+        "contact_personne": "example.person@mydomain.org",
+        "freq_maj": "weekly",
+        "date_maj": "06/10/2022",
+        "url": "https://example.org",
+        "licence": "Licence Ouverte",
+        "mots_cles": "Musées, Salles de concert",
+        "domaine": "Patrimoine",
+    }
+
+
+@pytest.mark.asyncio
+async def test_export_catalog_not_found(client: httpx.AsyncClient) -> None:
+    bus = resolve(MessageBus)
+
+    response = await client.get(f"/catalogs/{fake.siret()}/export.csv")
+    assert response.status_code == 404
+
+    siret = await bus.execute(CreateOrganizationFactory.build())
+    response = await client.get(f"/catalogs/{siret}/export.csv")
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_export_catalog_cache(client: httpx.AsyncClient) -> None:
+    bus = resolve(MessageBus)
+
+    siret = await bus.execute(CreateOrganizationFactory.build(name="Org 1"))
+
+    await bus.execute(CreateCatalog(organization_siret=siret))
+
+    response = await client.get(f"/catalogs/{siret}/export.csv")
+
+    assert response.status_code == 200
+    assert "X-Cache" not in response.headers
+    assert response.headers["Cache-Control"] == "max-age=86400"
+
+    response = await client.get(f"/catalogs/{siret}/export.csv")
+    assert "X-Cache" in response.headers
+    assert response.headers["Cache-Control"] == "max-age=86400"

@@ -1,9 +1,13 @@
-from typing import List
+import datetime as dt
+from typing import List, Optional
 
 from pydantic import BaseModel
 
+from server.application.datasets.views import ExtraFieldValueView
+from server.application.tags.views import TagView
 from server.domain.catalogs.entities import ExtraFieldType
 from server.domain.common.types import ID
+from server.domain.datasets.entities import DataFormat, UpdateFrequency
 
 from ..organizations.views import OrganizationView
 
@@ -20,3 +24,25 @@ class ExtraFieldView(BaseModel):
 class CatalogView(BaseModel):
     organization: OrganizationView
     extra_fields: List[ExtraFieldView]
+
+
+class DatasetExportView(BaseModel):
+    title: str
+    description: str
+    service: str
+    geographical_coverage: str
+    formats: List[DataFormat]
+    technical_source: Optional[str]
+    producer_email: Optional[str]
+    contact_emails: List[str]
+    update_frequency: Optional[UpdateFrequency]
+    last_updated_at: Optional[dt.datetime]
+    url: Optional[str]
+    license: Optional[str]
+    tags: List[TagView]
+    extra_field_values: List[ExtraFieldValueView]
+
+
+class CatalogExportView(BaseModel):
+    catalog: CatalogView
+    datasets: List[DatasetExportView]
