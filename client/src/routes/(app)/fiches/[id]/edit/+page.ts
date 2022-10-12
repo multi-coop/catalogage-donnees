@@ -1,5 +1,6 @@
 import { get } from "svelte/store";
 import type { PageLoad } from "./$types";
+import { SITE_TITLE } from "src/constants";
 import { getCatalogBySiret } from "src/lib/repositories/catalogs";
 import { getDatasetByID } from "$lib/repositories/datasets";
 import { getTags } from "src/lib/repositories/tags";
@@ -27,6 +28,7 @@ export const load: PageLoad = async ({ fetch, params }) => {
   ]);
 
   return {
+    title: `Modifier la fiche de jeu de données - ${SITE_TITLE}`,
     catalog,
     dataset,
     tags,

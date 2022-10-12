@@ -1,5 +1,6 @@
 import { get } from "svelte/store";
 import type { PageLoad } from "./$types";
+import { SITE_TITLE } from "src/constants";
 import { getDatasets } from "$lib/repositories/datasets";
 import { apiToken } from "$lib/stores/auth";
 import { getPageFromParams } from "$lib/util/pagination";
@@ -25,6 +26,7 @@ export const load: PageLoad = async ({ fetch, url }) => {
   ]);
 
   return {
+    title: `Rechercher un jeu de données - ${SITE_TITLE}`,
     paginatedDatasets,
     filtersInfo,
     filtersValue,

@@ -23,6 +23,9 @@ test.describe("Basic form submission", () => {
     const extraSousDomaineOption = "Danse";
 
     await page.goto("/contribuer");
+    await expect(page).toHaveTitle(
+      "Contribuer une fiche de jeu de données - catalogue.data.gouv.fr"
+    );
 
     await page.locator("text=Ministère de la Culture").waitFor();
 

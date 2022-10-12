@@ -8,6 +8,9 @@ test.describe("Dataset details", () => {
 
     test("Displays dataset details", async ({ page, dataset }) => {
       await page.goto(`/fiches/${dataset.id}`);
+      await expect(page).toHaveTitle(
+        `${dataset.title} - catalogue.data.gouv.fr`
+      );
 
       const title = page.locator("h1");
       await expect(title).toHaveText(dataset.title);

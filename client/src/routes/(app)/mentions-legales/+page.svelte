@@ -1,7 +1,3 @@
-<svelte:head>
-  <title>Mentions légales</title>
-</svelte:head>
-
 <div class="fr-container fr-mt-8w">
   <h1>Mentions légales</h1>
 
