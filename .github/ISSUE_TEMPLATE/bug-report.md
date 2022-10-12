@@ -4,7 +4,7 @@ about: Signaler un problème détecté dans l'application
 labels: bug
 ---
 
-## Description du bug
+## Description du bug
 
 <!-- Décrire le bug de façon concise, en une ou deux phrases -->
 
