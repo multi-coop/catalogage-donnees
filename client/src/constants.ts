@@ -42,4 +42,4 @@ export const DATASETS_PER_PAGE = 50;
 export const USER_DOCUMENTATION_LINK =
   "https://github.com/etalab/catalogage-donnees/wiki/Documentation-%C3%A0-destination-des-utilisateurs";
 export const REGISTER_ORGANIZATION_LINK =
-  "https://github.com/etalab/catalogage-donnees/wiki/Documentation-%C3%A0-destination-des-utilisateurs#comment-enregistrer-une-organisation-sur-cataloguedatagouvfr";
+  "https://github.com/etalab/catalogage-donnees/wiki/Documentation-%C3%A0-destination-des-utilisateurs#comment-enregistrer-une-organisation-sur-cataloguedatagouvfr-";
