@@ -75,7 +75,11 @@
       </p>
 
       <div class="flow-chart-container fr-pt-5w">
-        <img class="flow-chart fr-responsive-img" alt="" src={flowChart} />
+        <img
+          class="flow-chart fr-responsive-img"
+          alt="Pour pouvoir utiliser cette application vous devez faire partie d'une organisation préalablement enregistrée et avoir créé un compte MonComptePro. Si votre organisation n'est pas encore enregistrée veuillez cliquer sur le lien 'documentation détaillée' pour savoir comment procéder"
+          src={flowChart}
+        />
       </div>
     </div>
   </div>
@@ -128,11 +132,6 @@
       flex-flow: row;
       gap: var(--sp-1w);
     }
-  }
-
-  .title-container,
-  .button-container {
-    display: flex;
   }
   .title-container {
     display: flex;
