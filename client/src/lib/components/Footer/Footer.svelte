@@ -58,10 +58,9 @@
           </a>
         </li>
         <li class="fr-footer__bottom-item">
-          <a class="fr-footer__bottom-link" href="#">Données personnelles</a>
-        </li>
-        <li class="fr-footer__bottom-item">
-          <a class="fr-footer__bottom-link" href="#">Gestion des cookies</a>
+          <a class="fr-footer__bottom-link" href={paths.viePrivee}>
+            Vie privée
+          </a>
         </li>
       </ul>
       <div class="fr-footer__bottom-copy">

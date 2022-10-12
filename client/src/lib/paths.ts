@@ -3,6 +3,7 @@ import { path } from "./util/paths";
 export default {
   home: "/",
   mentionsLegales: "/mentions-legales",
+  viePrivee: "/vie-privee",
   login: "/login",
   contribute: "/contribuer",
   datasetDetail: path("/fiches/:id"),

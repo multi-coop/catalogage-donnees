@@ -6,6 +6,6 @@ export const ssr = true;
 
 export const load: PageLoad = () => {
   return {
-    title: `Mentions légales - ${SITE_TITLE}`,
+    title: `Vie privée - ${SITE_TITLE}`,
   };
 };
