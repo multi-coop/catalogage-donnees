@@ -9,6 +9,7 @@ export const HOME_SECTION_NAME = "Accueil";
 
 const STATIC_PAGES = [
   "/mentions-legales",
+  "/vie-privee",
   "/login",
   "/auth/datapass/create-organization",
   "/auth/datapass/login",
