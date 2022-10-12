@@ -1,5 +1,6 @@
 import type { PageLoad } from "./$types";
 import { get } from "svelte/store";
+import { SITE_TITLE } from "src/constants";
 import { getDatasetByID } from "$lib/repositories/datasets";
 import { getCatalogBySiret } from "$lib/repositories/catalogs";
 import { Maybe } from "$lib/util/maybe";
@@ -23,6 +24,9 @@ export const load: PageLoad = async ({ fetch, params }) => {
   );
 
   return {
+    title: `${
+      Maybe.Some(dataset) ? dataset.title : "Fiche de jeu de données"
+    } - ${SITE_TITLE}`,
     catalog,
     dataset,
   };

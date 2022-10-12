@@ -1,5 +1,12 @@
 import type { DataFormat, UpdateFrequency } from "./definitions/datasets";
 
+export const SITE_TITLE = "catalogue.data.gouv.fr";
+
+export const SITE_DESCRIPTION =
+  "Un service pour aider les administrations à créer, gérer et ouvrir leurs catalogues.";
+
+export const HOME_SECTION_NAME = "Accueil";
+
 const STATIC_PAGES = [
   "/mentions-legales",
   "/login",
