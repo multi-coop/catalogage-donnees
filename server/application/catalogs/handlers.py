@@ -5,13 +5,15 @@ from server.domain.catalogs.entities import Catalog
 from server.domain.catalogs.exceptions import CatalogAlreadyExists, CatalogDoesNotExist
 from server.domain.catalogs.repositories import CatalogRepository
 from server.domain.common.types import ID
+from server.domain.datasets.repositories import DatasetRepository
+from server.domain.datasets.specifications import DatasetSpec
 from server.domain.organizations.exceptions import OrganizationDoesNotExist
 from server.domain.organizations.repositories import OrganizationRepository
 from server.domain.organizations.types import Siret
 
 from .commands import CreateCatalog
-from .queries import GetAllCatalogs, GetCatalogBySiret
-from .views import CatalogView
+from .queries import GetAllCatalogs, GetCatalogBySiret, GetCatalogExport
+from .views import CatalogExportView, CatalogView, DatasetExportView
 
 
 async def get_catalog_by_siret(query: GetCatalogBySiret) -> CatalogView:
@@ -64,3 +66,23 @@ async def create_catalog(
     )
 
     return await repository.insert(catalog)
+
+
+async def get_catalog_export(query: GetCatalogExport) -> CatalogExportView:
+    repository = resolve(CatalogRepository)
+    dataset_repository = resolve(DatasetRepository)
+
+    siret = query.siret
+    catalog = await repository.get_by_siret(siret)
+
+    if catalog is None:
+        raise CatalogDoesNotExist(siret)
+
+    datasets, _ = await dataset_repository.get_all(
+        page=None, spec=DatasetSpec(organization_siret=siret)
+    )
+
+    return CatalogExportView(
+        catalog=CatalogView(**catalog.dict()),
+        datasets=[DatasetExportView(**dataset.dict()) for (dataset, _) in datasets],
+    )

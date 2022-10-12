@@ -58,6 +58,7 @@ Or in routes:
 
 Or in any custom scripts as seems fit.
 """
+import datetime as dt
 from typing import Type, TypeVar
 
 from server.application.auth.passwords import PasswordEncoder, Signer
@@ -88,6 +89,7 @@ from server.infrastructure.auth.repositories import (
 from server.infrastructure.catalog_records.repositories import (
     SqlCatalogRecordRepository,
 )
+from server.infrastructure.catalogs.caching import ExportCache
 from server.infrastructure.catalogs.repositories import SqlCatalogRepository
 from server.infrastructure.database import Database
 from server.infrastructure.datasets.repositories import SqlDatasetRepository
@@ -164,6 +166,9 @@ def configure(container: "Container") -> None:
     container.register_instance(TagRepository, SqlTagRepository(db))
     container.register_instance(OrganizationRepository, SqlOrganizationRepository(db))
     container.register_instance(CatalogRepository, SqlCatalogRepository(db))
+
+    # Caching
+    container.register_instance(ExportCache, ExportCache(max_age=dt.timedelta(days=1)))
 
 
 _CONTAINER = Container(configure)
