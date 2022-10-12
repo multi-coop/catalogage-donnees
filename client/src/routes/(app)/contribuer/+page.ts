@@ -1,4 +1,5 @@
 import type { PageLoad } from "./$types";
+import { SITE_TITLE } from "src/constants";
 import { getCatalogBySiret } from "src/lib/repositories/catalogs";
 import { getTags } from "src/lib/repositories/tags";
 import { getLicenses } from "src/lib/repositories/licenses";
@@ -7,13 +8,8 @@ import { get } from "svelte/store";
 import { account } from "src/lib/stores/auth";
 import { apiToken as apiTokenStore } from "$lib/stores/auth";
 import { Maybe } from "$lib/util/maybe";
-import { siteSection } from "src/lib/stores/layout/title";
 
 export const load: PageLoad = async ({ fetch }) => {
-  const title = "Contribuer une fiche de jeu de données";
-
-  siteSection.set(title);
-
   const apiToken = get(apiTokenStore);
   const siret = Maybe.expect(get(account), "$account").organizationSiret;
 
@@ -25,7 +21,7 @@ export const load: PageLoad = async ({ fetch }) => {
   ]);
 
   return {
-    title,
+    title: `Contribuer une fiche de jeu de données - ${SITE_TITLE}`,
     catalog,
     tags,
     licenses,

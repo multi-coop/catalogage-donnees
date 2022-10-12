@@ -1,15 +1,13 @@
 import { get } from "svelte/store";
 import type { PageLoad } from "./$types";
+import { SITE_TITLE } from "src/constants";
 import { getDatasets } from "$lib/repositories/datasets";
 import { apiToken } from "$lib/stores/auth";
-import { siteSection } from "$lib/stores/layout/title";
 import { getPageFromParams } from "$lib/util/pagination";
 import { getDatasetFiltersInfo } from "src/lib/repositories/datasetFilters";
 import { toFiltersValue } from "src/lib/transformers/datasetFilters";
 
 export const load: PageLoad = async ({ fetch, url }) => {
-  siteSection.set("Rechercher un jeu de données");
-
   const page = getPageFromParams(url.searchParams);
   const q = url.searchParams.get("q") || "";
   const filtersValue = toFiltersValue(url.searchParams);
@@ -28,6 +26,7 @@ export const load: PageLoad = async ({ fetch, url }) => {
   ]);
 
   return {
+    title: `Rechercher un jeu de données - ${SITE_TITLE}`,
     paginatedDatasets,
     filtersInfo,
     filtersValue,

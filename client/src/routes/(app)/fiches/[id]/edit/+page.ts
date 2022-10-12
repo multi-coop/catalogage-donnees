@@ -1,5 +1,6 @@
 import { get } from "svelte/store";
 import type { PageLoad } from "./$types";
+import { SITE_TITLE } from "src/constants";
 import { getCatalogBySiret } from "src/lib/repositories/catalogs";
 import { getDatasetByID } from "$lib/repositories/datasets";
 import { getTags } from "src/lib/repositories/tags";
@@ -7,13 +8,8 @@ import { getLicenses } from "src/lib/repositories/licenses";
 import { getDatasetFiltersInfo } from "src/lib/repositories/datasetFilters";
 import { apiToken as apiTokenStore } from "$lib/stores/auth";
 import { Maybe } from "$lib/util/maybe";
-import { siteSection } from "src/lib/stores/layout/title";
 
 export const load: PageLoad = async ({ fetch, params }) => {
-  const title = "Modifier la fiche de jeu de données";
-
-  siteSection.set(title);
-
   const apiToken = get(apiTokenStore);
 
   const dataset = await getDatasetByID({ fetch, apiToken, id: params.id });
@@ -32,7 +28,7 @@ export const load: PageLoad = async ({ fetch, params }) => {
   ]);
 
   return {
-    title,
+    title: `Modifier la fiche de jeu de données - ${SITE_TITLE}`,
     catalog,
     dataset,
     tags,

@@ -1,8 +1,8 @@
 import type { PageLoad } from "./$types";
-import { siteSection } from "$lib/stores/layout/title";
-
-export const ssr = true;
+import { SITE_TITLE } from "src/constants";
 
 export const load: PageLoad = () => {
-  siteSection.set("Connexion");
+  return {
+    title: `Connexion - ${SITE_TITLE}`,
+  };
 };

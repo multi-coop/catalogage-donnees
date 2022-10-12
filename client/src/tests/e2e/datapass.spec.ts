@@ -8,7 +8,7 @@ test.describe("Datapass", () => {
   }) => {
     await page.goto("/auth/datapass/create-organization");
     await expect(page).toHaveTitle(
-      "Connexion avec MonComptePro - catalogue.data.gouv.fr"
+      "Connexion avec MonComptePro : aucune organisation enregistrée - catalogue.data.gouv.fr"
     );
 
     await page
@@ -52,7 +52,7 @@ test.describe("Datapass", () => {
       )}`
     );
     await expect(page).toHaveTitle(
-      "Connexion avec MonComptePro - catalogue.data.gouv.fr"
+      "Connexion avec MonComptePro : choisir une organisation - catalogue.data.gouv.fr"
     );
 
     await page

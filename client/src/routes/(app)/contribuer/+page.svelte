@@ -19,7 +19,7 @@
 
   export let data: PageData;
 
-  $: ({ title, catalog, tags, licenses, filtersInfo } = data);
+  $: ({ catalog, tags, licenses, filtersInfo } = data);
 
   const onSave = async (event: CustomEvent<DatasetFormData>) => {
     try {
@@ -51,7 +51,7 @@
 <header class="fr-p-4w">
   <div class="fr-col">
     <h5 class="fr-grid-row fr-text--regular">
-      {title}
+      Contribuer une fiche de jeu de données
     </h5>
     {#if Maybe.Some(catalog)}
       <p class="fr-grid-row fr-text--sm fr-text-mention--grey">

@@ -2,7 +2,6 @@
   import { onMount } from "svelte";
   import { page } from "$app/stores";
   import { SITE_DESCRIPTION, SITE_TITLE } from "src/constants";
-  import { pageTitle } from "$lib/stores/layout/title";
 
   // CSS
   import "../app.css";
@@ -19,7 +18,7 @@
     await import("@gouvfr/dsfr/dist/dsfr/dsfr.module.min.js");
   });
 
-  $: title = $pageTitle;
+  $: title = $page.data.title || "catalogue.data.gouv.fr";
 </script>
 
 <svelte:head>
@@ -37,10 +36,6 @@
   <meta property="og:title" content={title} />
   <meta name="description" content={SITE_DESCRIPTION} />
   <meta property="og:description" content={SITE_DESCRIPTION} />
-  <meta
-    property="og:image"
-    content="https://systeme-de-design.gouv.fr/src/img/systeme-de-design.gouv.fr.jpg"
-  />
   <meta property="og:image:alt" content="République Française - {SITE_TITLE}" />
   <meta property="og:url" content={$page.url.toString()} />
 
