@@ -9,8 +9,6 @@ input_csv:
 organization_siret: "11004601800013"
 
 ignore_fields:
-  - nom_orga
-  - siret_orga
   - id_alt_orga
   - date_pub
 

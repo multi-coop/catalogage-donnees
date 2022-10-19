@@ -197,6 +197,8 @@ async def main(config_path: Path, out_path: Path) -> int:
     common_fields = {
         "titre",
         "description",
+        "siret_orga",
+        "nom_orga",
         "service",
         "couv_geo",
         "format",
@@ -221,12 +223,16 @@ async def main(config_path: Path, out_path: Path) -> int:
     tags_to_create: List[dict] = []
     datasets = []
 
-    for row in rows:
-        if "siret_orga" in row:
-            assert row["siret_orga"] == organization.siret
+    for k, row in enumerate(rows):
+        if (siret_orga := row["siret_orga"]) != organization.siret:
+            raise ValueError(
+                f"at row {k}: {siret_orga=!r} does not match {organization.siret=!r}"
+            )
 
-        if "nom_orga" in row:
-            assert row["nom_orga"] == organization.name
+        if "nom_orga" in row and (nom_orga := row["nom_orga"]) != organization.name:
+            raise ValueError(
+                f"at row {k}: {nom_orga=!r} does not match {organization.name=!r}"
+            )
 
         import_notes = io.StringIO()
 
