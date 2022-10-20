@@ -21,4 +21,11 @@ test.describe("Static pages", () => {
       page.locator("role=heading[level=1] >> text=Vie privée")
     ).toBeVisible();
   });
+
+  test("Visits the '404' page", async ({ page }) => {
+    await page.goto("/tata");
+    await expect(
+      page.locator("role=heading[level=1] >> text=Page non trouvée")
+    ).toBeVisible();
+  });
 });
