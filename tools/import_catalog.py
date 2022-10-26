@@ -180,9 +180,7 @@ async def main(config_path: Path, out_path: Path) -> int:
     bus = resolve(MessageBus)
 
     with config_path.open() as f:
-        initdata = yaml.safe_load(f)
-
-    config = Config(**initdata)
+        config = Config(**yaml.safe_load(f))
 
     organization = await bus.execute(
         GetOrganizationBySiret(siret=config.organization_siret)
