@@ -1,0 +1,30 @@
+input_csv:
+  path: REPLACE_ME
+  encoding: utf-8
+  delimiter: ";"
+  na_values:
+    - "Information manquante"
+    - "NSP"
+
+organization_siret: "11004601800013"
+
+ignore_fields:
+  - id_alt_orga
+  - date_pub
+
+formats:
+  list_map:
+    "oracle et shp": [database, file_gis]
+
+  map:
+    "xls": file_tabular
+    "geojson": file_gis
+
+update_frequency:
+  map:
+    "aucune": never
+    "en continu": realtime
+    "annuelle": yearly
+
+last_updated_at:
+  format: "%Y-%M-%d"  # See: https://docs.python.org/fr/3/library/datetime.html#strftime-and-strptime-format-codes
