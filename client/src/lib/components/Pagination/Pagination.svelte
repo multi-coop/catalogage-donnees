@@ -9,7 +9,7 @@
   $: pagination = makePagination({ currentPage, totalPages, numSiblings: 2 });
 </script>
 
-<nav role="navigation" class="fr-pagination" aria-label="Pagination">
+<nav class="fr-pagination" aria-label="Pagination">
   <ul class="fr-pagination__list" data-testid="pagination-list">
     <li>
       <a

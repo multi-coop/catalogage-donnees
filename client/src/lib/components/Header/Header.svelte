@@ -15,6 +15,7 @@
   };
 </script>
 
+<!-- svelte-ignore a11y-no-redundant-roles // This is the main app header so we keep the role explicit -->
 <header role="banner" class="fr-header">
   <div class="fr-header__body">
     <div class="fr-container">

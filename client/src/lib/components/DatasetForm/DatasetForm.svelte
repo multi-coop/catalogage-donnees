@@ -288,7 +288,6 @@
       aria-describedby={hasError($errors.dataFormats)
         ? "dataformats-desc-error"
         : null}
-      role="group"
     >
       <legend
         class="fr-fieldset__legend fr-text--regular"
