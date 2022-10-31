@@ -22,6 +22,15 @@ test.describe("Static pages", () => {
     ).toBeVisible();
   });
 
+  test("Visits the 'Declaration d'accessibilité' page", async ({ page }) => {
+    await page.goto("/");
+    await page.click("text=Accessibilité: non conforme");
+
+    await expect(page).toHaveTitle(
+      "Déclaration accessibilité  - catalogue.data.gouv.fr"
+    );
+  });
+
   test("Visits the '404' page", async ({ page }) => {
     await page.goto("/tata");
     await expect(

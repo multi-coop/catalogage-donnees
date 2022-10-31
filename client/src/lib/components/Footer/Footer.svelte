@@ -45,8 +45,13 @@
     </div>
     <div class="fr-footer__bottom">
       <ul class="fr-footer__bottom-list">
-        <li class="fr-footer__bottom-item fr-footer__bottom-link">
-          Accessibilité: non conforme
+        <li class="fr-footer__bottom-item">
+          <a
+            href={paths.declarationAccessibilite}
+            class="fr-footer__bottom-link"
+          >
+            Accessibilité: non conforme
+          </a>
         </li>
         <li class="fr-footer__bottom-item">
           <a class="fr-footer__bottom-link" href={paths.mentionsLegales}>

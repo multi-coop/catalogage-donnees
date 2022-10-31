@@ -11,6 +11,7 @@ const STATIC_PAGES = [
   "/mentions-legales",
   "/vie-privee",
   "/login",
+  "/declaration-daccessibilite",
   "/auth/datapass/create-organization",
   "/auth/datapass/login",
   "/auth/datapass/pick-organization",
