@@ -1,7 +1,7 @@
 <div class="fr-container fr-mt-8w">
   <div class="fr-grid-row">
     <div class="fr-col">
-      <h1>Déclaration de conformité</h1>
+      <h1>Déclaration d’accessibilité</h1>
 
       <h2>État de conformité</h2>
 
