@@ -65,7 +65,7 @@
         <li>
           <a
             class="fr-btn fr-btn--secondary fr-icon-mail-line"
-            title="Contacter le producter du jeu de données par email"
+            title="Contacter le producteur du jeu de données par email"
             href={buildMailToString(
               removeEmptyValues([
                 ...dataset.contactEmails,
