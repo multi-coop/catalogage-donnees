@@ -72,7 +72,7 @@
                 dataset.producerEmail,
               ]),
               `[catalogue.data.gouv.fr] : à propos du jeu de données ${dataset.title}`,
-              `Bonjour,%0D%0AJe prends contact avec vous à propos de ce jeu de données : https://catalogue.data.gouv.fr/fiches/${datasetId}.%0D%0A%0D%0A Saisissez votre message ici...`
+              `Bonjour,%0D%0AJe prends contact avec vous à propos de ce jeu de données : https://catalogue.data.gouv.fr/fiches/${datasetId}.%0D%0ASaisissez votre message ici...`
             )}
           >
             Contacter le producteur
