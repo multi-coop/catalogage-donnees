@@ -8,6 +8,8 @@
   import { canEditDataset } from "$lib/permissions";
   import AsideItem from "./_AsideItem.svelte";
   import ExtraFieldsList from "./_ExtraFieldsList.svelte";
+  import { removeEmptyValues } from "src/lib/util/array";
+  import { buildMailToString } from "src/lib/util/mail";
 
   export let data: PageData;
 
@@ -16,6 +18,8 @@
   $: editUrl = Maybe.map(dataset, (dataset) =>
     paths.datasetEdit({ id: dataset.id })
   );
+
+  $: datasetId = Maybe.map(dataset, (dataset) => dataset.id);
 </script>
 
 <section class="fr-container">
@@ -62,7 +66,14 @@
           <a
             class="fr-btn fr-btn--secondary fr-icon-mail-line"
             title="Contacter le producter du jeu de données par email"
-            href="mailto:{dataset.producerEmail}"
+            href={buildMailToString(
+              removeEmptyValues([
+                ...dataset.contactEmails,
+                dataset.producerEmail,
+              ]),
+              `[catalogue.data.gouv.fr] : à propos du jeu de données ${dataset.title}`,
+              `Bonjour,%0D%0AJe prends contact avec vous à propos de ce jeu de données : https://catalogue.data.gouv.fr/fiches/${datasetId}.%0D%0A%0D%0A Saisissez votre message ici...`
+            )}
           >
             Contacter le producteur
           </a>

@@ -25,3 +25,6 @@ export const first = <T>(arr: ArrayWithItems<T>): T => {
 export const last = <T>(arr: ArrayWithItems<T>): T => {
   return arr[arr.length - 1];
 };
+
+export const removeEmptyValues = (items: Array<string | null>): Array<string> =>
+  items.filter((item) => item) as string[];
