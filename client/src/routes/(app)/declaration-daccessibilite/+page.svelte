@@ -3,14 +3,31 @@
     <div class="fr-col">
       <h1>Déclaration d’accessibilité</h1>
 
+      <p>Établie le 3 novembre 2022</p>
+
+      <p>
+        Etalab s’engage à rendre son site internet accessibles conformément à
+        l’article 47 de la loi n° 2005-102 du 11 février 2005. À cette fin, il
+        met en œuvre une stratégie et des actions décrite à <a
+          href="https://github.com/etalab/catalogage-donnees/issues/517"
+          target="_blank"
+          rel="noopener"
+        >
+          cette adresse
+        </a>
+        . Cette déclaration d’accessibilité s’applique au service https://catalogue.data.gouv.fr/
+      </p>
+
       <h2>État de conformité</h2>
 
       <p>
-        Le site https://catalogue.data.gouv.fr/ est non conforme avec le
-        référentiel général d’amélioration de l’accessibilité pour les
-        administrations, RGAA version 4 car il n’existe aucun résultat d’audit
-        en cours de validité permettant de mesurer le respect des critères. Les
-        corrections des non-conformités sont en cours dans <a
+        Le site https://catalogue.data.gouv.fr/ est <strong>non conforme</strong
+        >
+        avec le référentiel général d’amélioration de l’accessibilité pour les administrations,
+        RGAA version 4 car il n’existe aucun résultat d’audit en cours de validité
+        permettant de mesurer le respect des critères. Les corrections des non-conformités
+        sont en cours dans
+        <a
           href="https://github.com/etalab/catalogage-donnees/issues/517"
           target="_blank"
           rel="noopener"
@@ -60,6 +77,21 @@
         ><br />
         En l’absence d’audit aucune page n’a fait l’objet de la vérification de conformité.
       </p>
+
+      <h2>Retour d’information et contact</h2>
+      <p>
+        Si vous n’arrivez pas à accéder à un contenu ou à un service, vous
+        pouvez contacter le responsable du site internet pour être orienté vers
+        une alternative accessible ou obtenir le contenu sous une autre forme.
+      </p>
+      <ul>
+        <li>
+          Contacter <a
+            href="mailo:catalogue@data.gouv.fr&subject=[catalogage]: Au sujet de l'accessibilité"
+            >Etalab</a
+          >
+        </li>
+      </ul>
 
       <h2>Amélioration et contacts</h2>
 
