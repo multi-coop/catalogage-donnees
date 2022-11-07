@@ -3,7 +3,10 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "module": "es2020",
-    "lib": ["es2020", "DOM"],
+    "lib": [
+      "es2020",
+      "DOM"
+    ],
     "target": "es2020",
     /**
 			svelte-preprocess cannot figure out whether you have a value or a type, so tell TypeScript
@@ -25,11 +28,25 @@
     "allowJs": true,
     "checkJs": true,
     "paths": {
-      "src/*": ["src/*"],
-      "$lib": ["src/lib"],
-      "$lib/*": ["src/lib/*"]
+      "src/*": [
+        "src/*"
+      ],
+      "$lib": [
+        "src/lib"
+      ],
+      "$lib/*": [
+        "src/lib/*"
+      ]
     }
   },
-  "include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.svelte"],
-  "exclude": ["src/lib/js/*.js"]
+  "include": [
+    "src/**/*.d.ts",
+    "src/**/*.js",
+    "src/**/*.ts",
+    "src/**/*.svelte",
+    "playwright.config.ts"
+  ],
+  "exclude": [
+    "src/lib/js/*.js"
+  ]
 }
