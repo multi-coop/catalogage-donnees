@@ -12,7 +12,7 @@
     "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
     "test": "vitest run",
     "start-server": "cd .. && make serve",
-    "test-e2e": "playwright test",
+    "test-e2e": "playwright test  client/src/tests/e2e/a11y.spec.ts",
     "test-e2e:ci": "start-server-and-test start-server '3579/docs|3000' test-e2e",
     "test:watch": "vitest watch",
     "test:coverage": "npm run test -- --coverage"
@@ -45,9 +45,9 @@
     "vite": "^3.1.0",
     "vitest": "^0.23.2"
   },
-  "type": "module",
   "dependencies": {
     "@gouvfr/dsfr": "^1.8.4",
+    "@axe-core/playwright": "^4.5.0",
     "date-fns": "^2.28.0",
     "snarkdown": "^2.0.0",
     "svelte-forms-lib": "^2.0.1",
