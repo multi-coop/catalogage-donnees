@@ -1,5 +1,5 @@
 import type { Organization } from "src/definitions/organization";
-import { getToolsPassword } from "./helpers";
+import { getToolsPassword } from "./helpers.js";
 
 export const TEST_EMAIL = "catalogue.demo@yopmail.com";
 export const TEST_PASSWORD = "password1234";

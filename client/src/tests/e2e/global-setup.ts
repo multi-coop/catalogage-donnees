@@ -18,8 +18,8 @@ import {
   TEST_EMAIL_SANTE,
   TEST_PASSWORD,
   TEST_PASSWORD_SANTE,
-} from "./constants";
-import type { AppTestArgs } from "./fixtures";
+} from "./constants.js";
+import type { AppTestArgs } from "./fixtures.js";
 
 export default async function globalSetup(
   config: FullConfig<AppTestArgs>
