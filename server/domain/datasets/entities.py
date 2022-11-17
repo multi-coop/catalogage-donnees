@@ -30,6 +30,13 @@ class UpdateFrequency(enum.Enum):
     YEARLY = "yearly"
 
 
+class PublicationRestriction(enum.Enum):
+    DRAFT = "draft"  # the dataset is a draft
+    LEGAL_RESTRICTION = (
+        "legal_restriction"  # the dataset is not published for legal reason
+    )
+
+
 class Dataset(Entity):
     id: ID
     catalog_record: CatalogRecord
@@ -42,6 +49,7 @@ class Dataset(Entity):
     producer_email: Optional[str]
     contact_emails: List[str]
     update_frequency: Optional[UpdateFrequency] = None
+    publication_restriction: Optional[PublicationRestriction] = None
     last_updated_at: Optional[dt.datetime] = None
     url: Optional[str] = None
     license: Optional[str] = None
@@ -67,6 +75,7 @@ class Dataset(Entity):
         license: Optional[str],
         tags: List[Tag],
         extra_field_values: List[ExtraFieldValue],
+        publication_restriction: Optional[PublicationRestriction],
     ) -> None:
         self.title = title
         self.description = description
@@ -82,3 +91,4 @@ class Dataset(Entity):
         self.license = license
         self.tags = tags
         self.extra_field_values = extra_field_values
+        self.publication_restriction = publication_restriction

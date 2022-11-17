@@ -15,7 +15,11 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import ARRAY, TSVECTOR, UUID
 from sqlalchemy.orm import Mapped, relationship
 
-from server.domain.datasets.entities import DataFormat, UpdateFrequency
+from server.domain.datasets.entities import (
+    DataFormat,
+    PublicationRestriction,
+    UpdateFrequency,
+)
 
 from ..database import Base, mapper_registry
 from ..tags.models import TagModel, dataset_tag
@@ -77,6 +81,9 @@ class DatasetModel(Base):
     producer_email = Column(String, nullable=True)
     contact_emails = Column(ARRAY(String), server_default="{}", nullable=False)
     update_frequency = Column(Enum(UpdateFrequency, enum="update_frequency_enum"))
+    publication_restriction = Column(
+        Enum(PublicationRestriction, enum="publication_restriction_enum")
+    )
     last_updated_at = Column(DateTime(timezone=True))
     url = Column(String)
     license = Column(String)
