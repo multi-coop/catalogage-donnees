@@ -16,7 +16,7 @@ from server.domain.tags.repositories import TagRepository
 from server.seedwork.application.messages import MessageBus
 
 from .commands import CreateDataset, DeleteDataset, UpdateDataset
-from .exceptions import CannotCreateDataset, CannotUpdateDataset
+from .exceptions import CannotCreateDataset, CannotSeeDataset, CannotUpdateDataset
 from .queries import GetAllDatasets, GetDatasetByID, GetDatasetFilters
 from .specifications import can_create_dataset, can_update_dataset
 from .views import DatasetFiltersView, DatasetView
@@ -135,9 +135,14 @@ async def get_all_datasets(query: GetAllDatasets) -> Pagination[DatasetView]:
 
 async def get_dataset_by_id(query: GetDatasetByID) -> DatasetView:
     repository = resolve(DatasetRepository)
-
-    id = query.id
     dataset = await repository.get_by_id(id)
+    id = query.id
+    if not isinstance(query.account, Skip) and not can_create_dataset(
+        dataset, query.account
+    ):
+        raise CannotSeeDataset(
+            f"{query.account.organization_siret=}, {query.organization.siret=}"
+        )
 
     if dataset is None:
         raise DatasetDoesNotExist(id)

@@ -1,5 +1,8 @@
+from typing import List, Optional, Union
+
+from server.domain.auth.entities import Account
 from server.domain.common.pagination import Page, Pagination
-from server.domain.common.types import ID
+from server.domain.common.types import ID, Skip
 from server.domain.datasets.specifications import DatasetSpec
 from server.seedwork.application.queries import Query
 
@@ -12,6 +15,7 @@ class GetAllDatasets(Query[Pagination[DatasetView]]):
 
 
 class GetDatasetByID(Query[DatasetView]):
+    account: Union[Account, Skip]
     id: ID
 
 
