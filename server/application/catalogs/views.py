@@ -7,7 +7,11 @@ from server.application.datasets.views import ExtraFieldValueView
 from server.application.tags.views import TagView
 from server.domain.catalogs.entities import ExtraFieldType
 from server.domain.common.types import ID
-from server.domain.datasets.entities import DataFormat, UpdateFrequency
+from server.domain.datasets.entities import (
+    DataFormat,
+    PublicationRestriction,
+    UpdateFrequency,
+)
 
 from ..organizations.views import OrganizationView
 
@@ -41,6 +45,7 @@ class DatasetExportView(BaseModel):
     license: Optional[str]
     tags: List[TagView]
     extra_field_values: List[ExtraFieldValueView]
+    publication_restriction: Optional[PublicationRestriction]
 
 
 class CatalogExportView(BaseModel):

@@ -15,8 +15,9 @@ branch_labels = None
 depends_on = None
 
 publication_restriction_enum = sa.Enum(
-    "LEGAL",
+    "LEGAL_RESTRICTION",
     "DRAFT",
+    "NO_RESTRICTION",
     name="publication_restriction_enum",
 )
 
@@ -29,8 +30,9 @@ def upgrade():
         "dataset",
         sa.Column(
             "publication_restriction",
-            sa.Enum("DRAFT", "LEGAL_RESTRICTION", name="publication_restriction_enum"),
-            nullable=True,
+            publication_restriction_enum,
+            nullable=False,
+            server_default="NO_RESTRICTION",
         ),
     )
     # ### end Alembic commands ###

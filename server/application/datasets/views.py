@@ -4,7 +4,11 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 from server.domain.common.types import ID
-from server.domain.datasets.entities import DataFormat, UpdateFrequency
+from server.domain.datasets.entities import (
+    DataFormat,
+    PublicationRestriction,
+    UpdateFrequency,
+)
 from server.domain.datasets.repositories import DatasetHeadlines
 
 from ..catalog_records.views import CatalogRecordView
@@ -34,6 +38,7 @@ class DatasetView(BaseModel):
     license: Optional[str]
     tags: List[TagView]
     extra_field_values: List[ExtraFieldValueView]
+    publication_restriction: PublicationRestriction
 
     # Extras
     headlines: Optional[DatasetHeadlines] = None

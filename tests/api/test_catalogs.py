@@ -16,7 +16,11 @@ from server.domain.catalogs.entities import (
     TextExtraField,
 )
 from server.domain.common.types import Skip, id_factory
-from server.domain.datasets.entities import DataFormat, UpdateFrequency
+from server.domain.datasets.entities import (
+    DataFormat,
+    PublicationRestriction,
+    UpdateFrequency,
+)
 from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 
@@ -428,6 +432,30 @@ async def test_export_catalog(client: httpx.AsyncClient) -> None:
             extra_field_values=[
                 ExtraFieldValue(extra_field_id=domaine_id, value="Patrimoine"),
             ],
+            publication_restriction=PublicationRestriction.LEGAL_RESTRICTION,
+        )
+    )
+
+    await bus.execute(
+        CreateDatasetFactory.build(
+            account=Skip(),
+            organization_siret=siret,
+            title="Example title",
+            description="Example description",
+            service="Example service",
+            geographical_coverage="France métropolitaine",
+            formats=[DataFormat.WEBSITE, DataFormat.OTHER],
+            technical_source="Example database",
+            producer_email="example.service@mydomain.org",
+            contact_emails=["example.person@mydomain.org"],
+            update_frequency=UpdateFrequency.WEEKLY,
+            last_updated_at=dt.datetime(2022, 10, 6, 15, 0, 0),
+            url="https://example.org",
+            license="Licence Ouverte",
+            tag_ids=[tag1_id, tag2_id],
+            extra_field_values=[
+                ExtraFieldValue(extra_field_id=domaine_id, value="Patrimoine"),
+            ],
         )
     )
 
@@ -456,6 +484,7 @@ async def test_export_catalog(client: httpx.AsyncClient) -> None:
     ]
 
     rows = list(reader)
+    # the dataset with restricted visibility should not be part of the export
     assert len(rows) == 1
     (row,) = rows
 

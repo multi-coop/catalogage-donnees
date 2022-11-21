@@ -35,6 +35,7 @@ class PublicationRestriction(enum.Enum):
     LEGAL_RESTRICTION = (
         "legal_restriction"  # the dataset is not published for legal reason
     )
+    NO_RESTRICTION = "no_restriction"  # the dataset has no publication restriction
 
 
 class Dataset(Entity):
@@ -49,7 +50,9 @@ class Dataset(Entity):
     producer_email: Optional[str]
     contact_emails: List[str]
     update_frequency: Optional[UpdateFrequency] = None
-    publication_restriction: Optional[PublicationRestriction] = None
+    publication_restriction: Optional[
+        PublicationRestriction
+    ] = PublicationRestriction.NO_RESTRICTION
     last_updated_at: Optional[dt.datetime] = None
     url: Optional[str] = None
     license: Optional[str] = None

@@ -71,6 +71,11 @@ class GetAllQuery:
         if (services := spec.service__in) is not None:
             whereclauses.append(DatasetModel.service.in_(services))
 
+        if (publication_restriction := spec.publication_restriction) is not None:
+            whereclauses.append(
+                DatasetModel.publication_restriction == publication_restriction
+            )
+
         if (formats := spec.format__in) is not None:
             joinclauses.append((DatasetModel.formats, {"isouter": True}))
             whereclauses.append(DataFormatModel.name.in_(formats))
