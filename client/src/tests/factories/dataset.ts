@@ -22,5 +22,6 @@ export const getFakeDataset = (dataset: Partial<Dataset> = {}): Dataset => {
     license: dataset.license || null,
     tags: dataset.tags || [buildFakeTag()],
     extraFieldValues: [],
+    publicationRestriction: "no_restriction",
   };
 };
