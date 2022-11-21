@@ -13,7 +13,7 @@ from server.application.datasets.commands import CreateDataset, UpdateDataset
 from server.application.organizations.commands import CreateOrganization
 from server.application.tags.commands import CreateTag
 from server.domain.common import datetime as dtutil
-from server.domain.datasets.entities import DataFormat
+from server.domain.datasets.entities import DataFormat, PublicationRestriction
 from server.domain.licenses.entities import BUILTIN_LICENSE_SUGGESTIONS
 
 T = TypeVar("T", bound=BaseModel)
@@ -80,6 +80,7 @@ class _BaseCreateDatasetFactory:
     license = Use(random.choice, [None, *BUILTIN_LICENSE_SUGGESTIONS])
     tag_ids = Use(lambda: [])
     extra_field_values = Use(lambda: [])
+    publication_restriction = PublicationRestriction.NO_RESTRICTION
 
 
 class CreateDatasetFactory(_BaseCreateDatasetFactory, Factory[CreateDataset]):

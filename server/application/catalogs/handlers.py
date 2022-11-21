@@ -5,6 +5,7 @@ from server.domain.catalogs.entities import Catalog
 from server.domain.catalogs.exceptions import CatalogAlreadyExists, CatalogDoesNotExist
 from server.domain.catalogs.repositories import CatalogRepository
 from server.domain.common.types import ID
+from server.domain.datasets.entities import PublicationRestriction
 from server.domain.datasets.repositories import DatasetRepository
 from server.domain.datasets.specifications import DatasetSpec
 from server.domain.organizations.exceptions import OrganizationDoesNotExist
@@ -79,7 +80,11 @@ async def get_catalog_export(query: GetCatalogExport) -> CatalogExportView:
         raise CatalogDoesNotExist(siret)
 
     datasets, _ = await dataset_repository.get_all(
-        page=None, spec=DatasetSpec(organization_siret=siret)
+        page=None,
+        spec=DatasetSpec(
+            organization_siret=siret,
+            publication_restriction=PublicationRestriction.NO_RESTRICTION,
+        ),
     )
 
     return CatalogExportView(

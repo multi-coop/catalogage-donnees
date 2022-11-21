@@ -14,7 +14,11 @@ from server.application.tags.queries import GetTagByID
 from server.config.di import resolve
 from server.domain.catalogs.entities import ExtraFieldValue, TextExtraField
 from server.domain.common.types import ID, Skip, id_factory
-from server.domain.datasets.entities import DataFormat, UpdateFrequency
+from server.domain.datasets.entities import (
+    DataFormat,
+    PublicationRestriction,
+    UpdateFrequency,
+)
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.organizations.types import Siret
 from server.infrastructure.catalogs.models import ExtraFieldValueModel
@@ -180,6 +184,7 @@ async def test_dataset_crud(
         "tags": [],
         "extra_field_values": [],
         "headlines": None,
+        "publication_restriction": PublicationRestriction.NO_RESTRICTION.value,
     }
 
     non_existing_id = id_factory()
@@ -529,6 +534,7 @@ class TestDatasetUpdate:
             "url",
             "license",
             "tag_ids",
+            "publication_restriction"
             # extra_field_values -- empty OK until frontend is implemented
         ]
         errors = response.json()["detail"]
@@ -589,7 +595,7 @@ class TestDatasetUpdate:
         assert err_url["loc"] == ["body", "url"]
         assert "empty" in err_service["msg"]
 
-    async def test_update(
+    async def test_update_1(
         self,
         client: httpx.AsyncClient,
         temp_org: OrganizationView,
@@ -620,6 +626,7 @@ class TestDatasetUpdate:
                 license="ODC Open Database License",
                 tag_ids=[],
                 extra_field_values=[],
+                publication_restriction=PublicationRestriction.LEGAL_RESTRICTION,
             )
         )
 
@@ -651,6 +658,7 @@ class TestDatasetUpdate:
             "tags": [],
             "extra_field_values": [],
             "headlines": None,
+            "publication_restriction": PublicationRestriction.LEGAL_RESTRICTION.value,
         }
 
         # Entity was indeed updated
