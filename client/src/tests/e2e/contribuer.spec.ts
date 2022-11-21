@@ -189,7 +189,9 @@ test.describe("Basic form submission", () => {
 
     // Scroll to bottom.
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await expect(activeSidebarItem).toHaveText("Informations complémentaires");
+    await expect(activeSidebarItem).toHaveText(
+      "Visibilité de cette fiche catalogue"
+    );
 
     // Move to a particular section using click.
     // Purposefully test a small-size section: it should become active

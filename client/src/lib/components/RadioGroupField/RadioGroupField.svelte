@@ -8,10 +8,15 @@
   export let hintText: string | TrustedHtml = "";
   export let options: SelectOption<string>[];
   export let value: string;
+  export let displayOptionsInline = true;
 </script>
 
 <div class="fr-form-group">
-  <fieldset class="fr-fieldset fr-fieldset--inline" role="radiogroup">
+  <fieldset
+    class="fr-fieldset"
+    class:fr-fieldset--inline={displayOptionsInline}
+    role="radiogroup"
+  >
     <legend class="fr-fieldset__legend fr-text--regular" id="{name}-legend">
       {label}
       {#if hintText}

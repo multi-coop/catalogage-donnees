@@ -1,4 +1,8 @@
-import type { DataFormat, UpdateFrequency } from "./definitions/datasets";
+import type {
+  DataFormat,
+  PublicationRestriction,
+  UpdateFrequency,
+} from "./definitions/datasets";
 
 export const SITE_TITLE = "catalogue.data.gouv.fr";
 
@@ -35,6 +39,15 @@ export const DATA_FORMAT_SHORT_NAMES: { [K in DataFormat]: string } = {
   database: "BDD",
   website: "Web",
   other: "Autre",
+};
+
+export const PUBLICATION_RESTRICTIONS: {
+  [K in PublicationRestriction]: string;
+} = {
+  no_restriction: "non",
+  draft: "Oui, car cette fiche n’est pas achevée",
+  legal_restriction:
+    "Oui, car les informations contribuées contiennent des secrets légaux",
 };
 
 export const UPDATE_FREQUENCY_LABELS: { [K in UpdateFrequency]: string } = {
