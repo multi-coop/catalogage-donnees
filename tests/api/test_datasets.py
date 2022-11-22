@@ -325,6 +325,55 @@ class TestDatasetPermissions:
         response = await client.delete(f"/datasets/{pk}/", auth=temp_user.auth)
         assert response.status_code == 403
 
+    async def test_can_no_see_dataset_of_other_organizations_with_restricted_publication(
+        self,
+        client: httpx.AsyncClient,
+        temp_org: OrganizationView,
+    ) -> None:
+
+        bus = resolve(MessageBus)
+        command = CreateDatasetFactory.build(
+            organization_siret=temp_org.siret,
+            publication_restriction=PublicationRestriction.DRAFT,
+            account=Skip(),
+        )
+        dataset_id = await bus.execute(command)
+
+        siret = await bus.execute(CreateOrganizationFactory.build())
+
+        user = await create_test_password_user(
+            CreatePasswordUserFactory.build(organization_siret=siret)
+        )
+
+        response = await client.get(f"/datasets/{dataset_id}/", auth=user.auth)
+
+        assert response.status_code == 403
+    
+    async def test_can_see_dataset_of_other_organizations_without_publication_restriction(
+        self,
+        client: httpx.AsyncClient,
+        temp_org: OrganizationView,
+        temp_user: TestPasswordUser,
+    ) -> None:
+
+        bus = resolve(MessageBus)
+        command = CreateDatasetFactory.build(
+            organization_siret=temp_org.siret,
+            publication_restriction=PublicationRestriction.NO_RESTRICTION,
+            account=Skip(),
+        )
+        dataset_id = await bus.execute(command)
+
+        siret = await bus.execute(CreateOrganizationFactory.build())
+
+        user = await create_test_password_user(
+            CreatePasswordUserFactory.build(organization_siret=siret)
+        )
+
+        response = await client.get(f"/datasets/{dataset_id}/", auth=user.auth)
+
+        assert response.status_code == 200
+
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
@@ -662,7 +711,7 @@ class TestDatasetUpdate:
         }
 
         # Entity was indeed updated
-        query = GetDatasetByID(id=dataset_id)
+        query = GetDatasetByID(id=dataset_id, account=temp_user.account)
         dataset = await bus.execute(query)
         assert dataset.title == "Other title"
         assert dataset.description == "Other description"
@@ -769,7 +818,9 @@ class TestTags:
             {"id": str(tag_architecture.id), "name": "Architecture"},
         ]
 
-        dataset = await bus.execute(GetDatasetByID(id=dataset_id))
+        dataset = await bus.execute(
+            GetDatasetByID(id=dataset_id, account=temp_user.account)
+        )
         assert dataset.tags == [tag_architecture]
 
     async def test_tags_remove(
@@ -801,7 +852,9 @@ class TestTags:
         assert response.status_code == 200
         assert response.json()["tags"] == []
 
-        dataset = await bus.execute(GetDatasetByID(id=dataset_id))
+        dataset = await bus.execute(
+            GetDatasetByID(id=dataset_id, account=temp_user.account)
+        )
         assert dataset.tags == []
 
 
@@ -867,7 +920,7 @@ class TestExtraFieldValues:
             account=user.account, organization_siret=siret
         )
         dataset_id = await bus.execute(command)
-        dataset = await bus.execute(GetDatasetByID(id=dataset_id))
+        dataset = await bus.execute(GetDatasetByID(id=dataset_id, account=user.account))
         assert not dataset.extra_field_values
 
         payload = to_payload(
@@ -908,7 +961,7 @@ class TestExtraFieldValues:
             ],
         )
         dataset_id = await bus.execute(command)
-        dataset = await bus.execute(GetDatasetByID(id=dataset_id))
+        dataset = await bus.execute(GetDatasetByID(id=dataset_id, account=user.account))
         assert len(dataset.extra_field_values) == 1
 
         payload = to_payload(
@@ -955,7 +1008,7 @@ class TestDeleteDataset:
         assert response.status_code == 204
 
         with pytest.raises(DatasetDoesNotExist):
-            await bus.execute(GetDatasetByID(id=dataset_id))
+            await bus.execute(GetDatasetByID(id=dataset_id, account=temp_user.account))
 
     async def test_idempotent(
         self, client: httpx.AsyncClient, admin_user: TestPasswordUser

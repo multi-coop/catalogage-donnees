@@ -5,6 +5,7 @@ import pytest
 
 from server.application.datasets.queries import GetDatasetByID
 from server.config.di import resolve
+from server.domain.common.types import Skip
 from server.domain.organizations.types import Siret
 from server.infrastructure.catalogs.caching import ExportCache
 from server.infrastructure.catalogs.models import CatalogModel
@@ -45,7 +46,7 @@ async def test_catalog_creation_and_relationships() -> None:
         CreateDatasetFactory.build(account=user.account, organization_siret=siret)
     )
 
-    dataset = await bus.execute(GetDatasetByID(id=dataset_id))
+    dataset = await bus.execute(GetDatasetByID(id=dataset_id, account=Skip()))
     assert dataset.catalog_record.organization.siret == siret
 
 

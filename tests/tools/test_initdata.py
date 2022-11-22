@@ -150,7 +150,7 @@ async def test_repo_initdata(
     assert captured.out.count("created") == num_entities
 
     pk = ID(uuid.UUID("16b398af-f8c7-48b9-898a-18ad3404f528"))
-    dataset = await bus.execute(GetDatasetByID(id=pk))
+    dataset = await bus.execute(GetDatasetByID(id=pk, account=Skip()))
     assert dataset.title == "Données brutes de l'inventaire forestier"
 
     # Run a second time, without changes.
@@ -167,7 +167,7 @@ async def test_repo_initdata(
         title="Changed",
     )
     await bus.execute(command)
-    dataset = await bus.execute(GetDatasetByID(id=pk))
+    dataset = await bus.execute(GetDatasetByID(id=pk, account=Skip()))
     assert dataset.title == "Changed"
 
     # No reset: dataset left unchanged

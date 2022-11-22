@@ -12,4 +12,7 @@ def can_update_dataset(dataset: Dataset, account: Account) -> bool:
 
 
 def can_see_dataset(dataset: Dataset, account: Account) -> bool:
-    dataset.publication_restriction == PublicationRestriction.NO_RESTRICTION or dataset.catalog_record.organization.siret == account.organization_siret
+    return (
+        dataset.publication_restriction == PublicationRestriction.NO_RESTRICTION
+        or dataset.catalog_record.organization.siret == account.organization_siret
+    )

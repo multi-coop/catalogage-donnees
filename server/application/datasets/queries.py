@@ -15,8 +15,8 @@ class GetAllDatasets(Query[Pagination[DatasetView]]):
 
 
 class GetDatasetByID(Query[DatasetView]):
-    account: Union[Account, Skip]
     id: ID
+    account: Union[Account, Skip]
 
 
 class GetDatasetFilters(Query[DatasetFiltersView]):

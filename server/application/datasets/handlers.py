@@ -18,7 +18,7 @@ from server.seedwork.application.messages import MessageBus
 from .commands import CreateDataset, DeleteDataset, UpdateDataset
 from .exceptions import CannotCreateDataset, CannotSeeDataset, CannotUpdateDataset
 from .queries import GetAllDatasets, GetDatasetByID, GetDatasetFilters
-from .specifications import can_create_dataset, can_update_dataset
+from .specifications import can_create_dataset, can_see_dataset, can_update_dataset
 from .views import DatasetFiltersView, DatasetView
 
 # This organization typically holds password users used by the development team.
@@ -135,16 +135,17 @@ async def get_all_datasets(query: GetAllDatasets) -> Pagination[DatasetView]:
 
 async def get_dataset_by_id(query: GetDatasetByID) -> DatasetView:
     repository = resolve(DatasetRepository)
-    dataset = await repository.get_by_id(id)
     id = query.id
-    if not isinstance(query.account, Skip) and not can_create_dataset(
-        dataset, query.account
-    ):
-        raise CannotSeeDataset(
-            f"{query.account.organization_siret=}, {query.organization.siret=}"
-        )
+    dataset = await repository.get_by_id(id)
 
     if dataset is None:
         raise DatasetDoesNotExist(id)
+
+    if not isinstance(query.account, Skip) and not can_see_dataset(
+        dataset, query.account
+    ):
+        raise CannotSeeDataset(
+            f"{query.account.organization_siret=}, {id=}"
+        )
 
     return DatasetView(**dataset.dict())

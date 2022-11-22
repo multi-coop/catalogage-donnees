@@ -2,6 +2,7 @@ from typing import List, Optional, Set, Tuple
 
 from typing_extensions import TypedDict
 
+from server.domain.auth.entities import Account
 from server.seedwork.domain.repositories import Repository
 
 from ..common.pagination import Page
