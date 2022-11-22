@@ -144,8 +144,6 @@ async def get_dataset_by_id(query: GetDatasetByID) -> DatasetView:
     if not isinstance(query.account, Skip) and not can_see_dataset(
         dataset, query.account
     ):
-        raise CannotSeeDataset(
-            f"{query.account.organization_siret=}, {id=}"
-        )
+        raise CannotSeeDataset(f"{query.account.organization_siret=}, {id=}")
 
     return DatasetView(**dataset.dict())

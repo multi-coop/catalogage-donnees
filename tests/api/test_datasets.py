@@ -348,7 +348,7 @@ class TestDatasetPermissions:
         response = await client.get(f"/datasets/{dataset_id}/", auth=user.auth)
 
         assert response.status_code == 403
-    
+
     async def test_can_see_dataset_of_other_organizations_without_publication_restriction(
         self,
         client: httpx.AsyncClient,

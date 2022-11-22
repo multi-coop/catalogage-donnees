@@ -40,7 +40,10 @@ catalogs:
               - Radio
               - Presse
               - Télévision
-
+  - params:
+      organization_siret: "13001653800014"
+      extra_fields: []
+      
 users:
   - id: "c33cc0bb-975c-45a1-ac2a-7fed9971ce6a"
     params:
@@ -193,3 +196,25 @@ datasets:
         - "2b8f8d14-1ec5-4014-839d-d6dd3718d2b5"
       extra_field_values: []
       publication_restriction: "no_restriction"
+
+    id: "9a17706c-b947-401b-acfe-90d40683d3e7"
+    params:
+      organization_siret: "13001653800014"
+      title: Catalogue des enquêtes réalisées par la DARES
+      description: |
+        Présentation sous forme de fiches répertoriées par thèmes des enquêtes menées par la DARES avec reprise des objectifs, de la périodicité, de la taille de l'échantillon, des publications.
+      service: Service enquêtes
+      geographical_coverage: France
+      formats:
+        - other
+      technical_source: Catalogue des fiches de la DARES
+      producer_email: null
+      contact_emails: [dares.person@mydomain.org]
+      update_frequency: null
+      last_updated_at: null
+      url: "https://www.data.gouv.fr/fr/datasets/catalogue-des-enquetes-realisees-par-la-dares-2012-572205/"
+      license: Licence Ouverte
+      tag_ids:
+        - "2b8f8d14-1ec5-4014-839d-d6dd3718d2b5"
+      extra_field_values: []
+      publication_restriction: "legal_restriction"
