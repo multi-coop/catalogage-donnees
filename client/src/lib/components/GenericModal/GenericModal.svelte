@@ -4,7 +4,6 @@
 
 <dialog
   aria-labelledby="fr-modal-title-modal-1"
-  role="dialog"
   id={controlId}
   class="fr-modal"
 >

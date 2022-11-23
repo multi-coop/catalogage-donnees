@@ -3,6 +3,7 @@
   import { SITE_DESCRIPTION } from "src/constants";
 </script>
 
+<!-- svelte-ignore a11y-no-redundant-roles // This is the main app's footer so we keep the role explicit -->
 <footer class="fr-footer" role="contentinfo" id="footer">
   <div class="fr-container">
     <div class="fr-footer__body">
@@ -45,12 +46,12 @@
     <div class="fr-footer__bottom">
       <ul class="fr-footer__bottom-list">
         <li class="fr-footer__bottom-item">
-          <a class="fr-footer__bottom-link" href="#">Plan du site</a>
-        </li>
-        <li class="fr-footer__bottom-item">
-          <a class="fr-footer__bottom-link" href="#"
-            >Accessibilité: non conforme</a
+          <a
+            href={paths.declarationAccessibilite}
+            class="fr-footer__bottom-link"
           >
+            Accessibilité: non conforme
+          </a>
         </li>
         <li class="fr-footer__bottom-item">
           <a class="fr-footer__bottom-link" href={paths.mentionsLegales}>

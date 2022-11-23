@@ -11,6 +11,7 @@ const STATIC_PAGES = [
   "/mentions-legales",
   "/vie-privee",
   "/login",
+  "/declaration-daccessibilite",
   "/auth/datapass/create-organization",
   "/auth/datapass/login",
   "/auth/datapass/pick-organization",
@@ -51,3 +52,5 @@ export const USER_DOCUMENTATION_LINK =
   "https://github.com/etalab/catalogage-donnees/wiki/Documentation-%C3%A0-destination-des-utilisateurs";
 export const REGISTER_ORGANIZATION_LINK =
   "https://github.com/etalab/catalogage-donnees/wiki/Documentation-%C3%A0-destination-des-utilisateurs#comment-enregistrer-une-organisation-sur-cataloguedatagouvfr-";
+
+export const CONTACT_EMAIL = "catalogue@data.gouv.fr";

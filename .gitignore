@@ -31,3 +31,7 @@ __pycache__
 
 # IDE - VSCode
 .vscode
+
+# Svelte kit
+
+vite.config.js*

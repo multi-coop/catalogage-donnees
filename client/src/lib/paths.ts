@@ -3,6 +3,7 @@ import { path } from "./util/paths";
 export default {
   home: "/",
   mentionsLegales: "/mentions-legales",
+  declarationAccessibilite: "/declaration-daccessibilite",
   viePrivee: "/vie-privee",
   login: "/login",
   contribute: "/contribuer",

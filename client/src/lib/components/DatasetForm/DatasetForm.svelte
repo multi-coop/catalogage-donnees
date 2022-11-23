@@ -186,8 +186,8 @@
   };
 
   const handleFieldChange = async (event: Event) => {
-    dispatch("touched", true);
     handleChange(event);
+    dispatch("touched", true);
   };
 
   const hasError = (error: string | string[]) => {
@@ -248,7 +248,6 @@
       value={$form.title}
       error={$errors.title}
       on:input={handleFieldChange}
-      on:blur={handleFieldChange}
     />
 
     <TextareaField
@@ -259,7 +258,6 @@
       value={$form.description}
       error={$errors.description}
       on:input={handleFieldChange}
-      on:blur={handleFieldChange}
     />
 
     <InputField
@@ -270,7 +268,6 @@
       value={$form.service}
       error={$errors.service}
       on:input={handleFieldChange}
-      on:blur={handleFieldChange}
     />
 
     <GeographicalCoverageField
@@ -291,7 +288,6 @@
       aria-describedby={hasError($errors.dataFormats)
         ? "dataformats-desc-error"
         : null}
-      role="group"
     >
       <legend
         class="fr-fieldset__legend fr-text--regular"
@@ -337,7 +333,6 @@
       value={$form.technicalSource}
       error={$errors.technicalSource}
       on:input={handleFieldChange}
-      on:blur={handleFieldChange}
     />
   </div>
 
@@ -435,7 +430,6 @@
       value={$form.url}
       error={$errors.url}
       on:input={handleFieldChange}
-      on:blur={handleFieldChange}
     />
 
     <LicenseField

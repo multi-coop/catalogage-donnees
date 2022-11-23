@@ -18,7 +18,7 @@
 
   let loading = false;
 
-  let formHasBeenTouched = false;
+  let formHasbeenTouched = false;
 
   const onSave = async (event: CustomEvent<DatasetFormData>) => {
     if (!Maybe.Some(dataset)) {
@@ -80,8 +80,7 @@
         Catalogue : {dataset.catalogRecord.organization.name}
       </p>
     </div>
-
-    {#if formHasBeenTouched}
+    {#if formHasbeenTouched}
       <button
         class="fr-btn fr-icon-close-line fr-btn--icon fr-btn--secondary"
         data-fr-opened="false"
@@ -117,7 +116,7 @@
       submitLabel="Enregistrer les modifications"
       loadingLabel="Modification en cours..."
       on:save={onSave}
-      on:touched={() => (formHasBeenTouched = true)}
+      on:touched={() => (formHasbeenTouched = true)}
     />
 
     {#if $isAdmin}

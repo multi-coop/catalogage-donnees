@@ -19,7 +19,7 @@
     </h1>
     <p>
       Il semblerait que vous ayez effectué des modifications non sauvegardées
-      sur cette fiche de données. souhaitez-vous vraiment quitter ce formulaire
+      sur cette fiche de données. Souhaitez-vous vraiment quitter ce formulaire
       et perdre votre saisie ?
     </p>
   </div>

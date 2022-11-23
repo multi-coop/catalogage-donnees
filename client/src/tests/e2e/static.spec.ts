@@ -21,4 +21,20 @@ test.describe("Static pages", () => {
       page.locator("role=heading[level=1] >> text=Vie privée")
     ).toBeVisible();
   });
+
+  test("Visits the 'Declaration d'accessibilité' page", async ({ page }) => {
+    await page.goto("/");
+    await page.click("text=Accessibilité: non conforme");
+
+    await expect(page).toHaveTitle(
+      "Déclaration accessibilité  - catalogue.data.gouv.fr"
+    );
+  });
+
+  test("Visits the '404' page", async ({ page }) => {
+    await page.goto("/tata");
+    await expect(
+      page.locator("role=heading[level=1] >> text=Page non trouvée")
+    ).toBeVisible();
+  });
 });

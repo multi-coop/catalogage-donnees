@@ -19,6 +19,7 @@
 
 <LayoutProviders>
   <div class="fr-skiplinks">
+    <!-- svelte-ignore a11y-no-redundant-roles // This is the main app's nav so we keep the role explicit -->
     <nav class="fr-container" role="navigation" aria-label="Accès rapide">
       <ul class="fr-skiplinks__list">
         <li>
