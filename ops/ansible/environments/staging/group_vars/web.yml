@@ -5,4 +5,4 @@ initdata_src: "{{ inventory_dir }}/assets/initdata.yml"
 git_version: staging
 
 client_url: "https://staging.catalogue.multi.coop"
-datapass_url: "https://auth-staging.api.gouv.fr"
+datapass_url: "https://app-staging.moncomptepro.beta.gouv.fr"
