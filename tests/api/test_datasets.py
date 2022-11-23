@@ -325,7 +325,7 @@ class TestDatasetPermissions:
         response = await client.delete(f"/datasets/{pk}/", auth=temp_user.auth)
         assert response.status_code == 403
 
-    async def test_can_no_see_dataset_of_other_organizations_with_restricted_publication(
+    async def test_can_no_see_dataset_of_other_organizations_with_restricted_publication(  # noqa: E501
         self,
         client: httpx.AsyncClient,
         temp_org: OrganizationView,
@@ -349,7 +349,7 @@ class TestDatasetPermissions:
 
         assert response.status_code == 403
 
-    async def test_can_see_dataset_of_other_organizations_without_publication_restriction(
+    async def test_can_see_dataset_of_other_organizations_without_publication_restriction(  # noqa: E501
         self,
         client: httpx.AsyncClient,
         temp_org: OrganizationView,
@@ -437,6 +437,7 @@ async def test_dataset_pagination(
                 organization_siret=temp_org.siret,
                 title=f"Dataset {k}",
                 tag_ids=tag_ids,
+                publication_restriction=PublicationRestriction.NO_RESTRICTION,
             )
         )
 
@@ -453,7 +454,7 @@ async def test_dataset_pagination(
 
 
 @pytest.mark.asyncio
-async def test_dataset_get_all_uses_reverse_chronological_order(
+async def test_dataset_get_all_uses_reverse_chronological_order(  # noqa: E501
     client: httpx.AsyncClient, temp_org: OrganizationView, temp_user: TestPasswordUser
 ) -> None:
     bus = resolve(MessageBus)
@@ -471,6 +472,82 @@ async def test_dataset_get_all_uses_reverse_chronological_order(
     assert response.status_code == 200
     titles = [dataset["title"] for dataset in response.json()["items"]]
     assert titles == ["Newest", "Intermediate", "Oldest"]
+
+
+@pytest.mark.asyncio
+async def test_get_datasets_without_publication_restriction(
+    client: httpx.AsyncClient, temp_org: OrganizationView, temp_user: TestPasswordUser
+) -> None:
+    bus = resolve(MessageBus)
+
+    siret = await bus.execute(CreateOrganizationFactory.build())
+
+    user = await create_test_password_user(
+        CreatePasswordUserFactory.build(organization_siret=siret)
+    )
+
+    for publication_restriction in (
+        PublicationRestriction.DRAFT,
+        PublicationRestriction.LEGAL_RESTRICTION,
+        PublicationRestriction.NO_RESTRICTION,
+    ):
+        await bus.execute(
+            CreateDatasetFactory.build(
+                account=temp_user.account,
+                organization_siret=temp_org.siret,
+                title=f"Title {publication_restriction}",
+                publication_restriction=publication_restriction,
+            )
+        )
+
+    response = await client.get("/datasets/", auth=user.auth)
+    assert response.status_code == 200
+    publication_restriction_data = [
+        dataset["publication_restriction"] for dataset in response.json()["items"]
+    ]
+
+    assert not set(
+        [
+            PublicationRestriction.LEGAL_RESTRICTION.value,
+            PublicationRestriction.DRAFT.value,
+        ]
+    ).issubset(set(publication_restriction_data))
+    assert PublicationRestriction.NO_RESTRICTION.value in publication_restriction_data
+
+
+@pytest.mark.asyncio
+async def test_get_datasets_with_publications_restrictions_of_my_organization_only_including_those_without_publication_restriction(  # noqa: E501
+    client: httpx.AsyncClient, temp_org: OrganizationView, temp_user: TestPasswordUser
+) -> None:
+    bus = resolve(MessageBus)
+
+    for publication_restriction in (
+        PublicationRestriction.DRAFT,
+        PublicationRestriction.LEGAL_RESTRICTION,
+        PublicationRestriction.NO_RESTRICTION,
+    ):
+        await bus.execute(
+            CreateDatasetFactory.build(
+                account=temp_user.account,
+                organization_siret=temp_org.siret,
+                title=f"Title {publication_restriction}",
+                publication_restriction=publication_restriction,
+            )
+        )
+
+    response = await client.get("/datasets/", auth=temp_user.auth)
+    assert response.status_code == 200
+    publication_restriction_data = [
+        dataset["publication_restriction"] for dataset in response.json()["items"]
+    ]
+
+    assert set(
+        [
+            PublicationRestriction.LEGAL_RESTRICTION.value,
+            PublicationRestriction.DRAFT.value,
+            PublicationRestriction.NO_RESTRICTION.value,
+        ]
+    ).issubset(set(publication_restriction_data))
 
 
 @pytest.mark.asyncio

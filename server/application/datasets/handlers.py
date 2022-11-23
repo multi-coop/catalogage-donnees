@@ -124,9 +124,11 @@ async def get_dataset_filters(query: GetDatasetFilters) -> DatasetFiltersView:
 
 
 async def get_all_datasets(query: GetAllDatasets) -> Pagination[DatasetView]:
-    repository = resolve(DatasetRepository)
+    dataset_repository = resolve(DatasetRepository)
 
-    datasets, count = await repository.get_all(page=query.page, spec=query.spec)
+    datasets, count = await dataset_repository.get_all(
+        page=query.page, spec=query.spec, account=query.account
+    )
 
     views = [DatasetView(**dataset.dict(), **extras) for dataset, extras in datasets]
 

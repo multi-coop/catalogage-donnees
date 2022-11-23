@@ -1,13 +1,13 @@
-from typing import List, Optional, Set, Tuple
+from typing import List, Optional, Set, Tuple, Union
 
-from sqlalchemy import or_, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import contains_eager, selectinload
 
 from server.domain.auth.entities import Account
 from server.domain.common.pagination import Page
-from server.domain.common.types import ID
-from server.domain.datasets.entities import Dataset, PublicationRestriction
+from server.domain.common.types import ID, Skip
+from server.domain.datasets.entities import Dataset
 from server.domain.datasets.repositories import DatasetGetAllExtras, DatasetRepository
 from server.domain.datasets.specifications import DatasetSpec
 
@@ -30,12 +30,13 @@ class SqlDatasetRepository(DatasetRepository):
     async def get_all(
         self,
         *,
+        account: Union[Account, Skip] = Skip(),
         page: Optional[Page] = Page(),
         spec: DatasetSpec = DatasetSpec(),
     ) -> Tuple[List[Tuple[Dataset, DatasetGetAllExtras]], int]:
 
         async with self._db.session() as session:
-            query = GetAllQuery(spec)
+            query = GetAllQuery(spec, account=account)
             stmt = query.statement
 
             count = await get_count_from(stmt, session)

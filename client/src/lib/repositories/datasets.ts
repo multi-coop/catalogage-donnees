@@ -19,7 +19,6 @@ import { toPaginated } from "$lib/transformers/pagination";
 import { toFiltersParams } from "$lib/transformers/datasetFilters";
 import { Maybe } from "$lib/util/maybe";
 import type { QueryParamRecord } from "src/definitions/url";
-import { getFakeDataset } from "src/tests/factories/dataset";
 
 type GetDatasetByID = (opts: {
   fetch: Fetch;

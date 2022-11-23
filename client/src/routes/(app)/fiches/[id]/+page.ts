@@ -32,7 +32,7 @@ export const load: PageLoad = async ({ fetch, params }) => {
       catalog,
       dataset,
     };
-  } catch (response: Response) {
+  } catch (response) {
     console.log(response);
 
     if (response.status === 403) {

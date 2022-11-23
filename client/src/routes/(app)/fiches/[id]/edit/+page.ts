@@ -37,7 +37,7 @@ export const load: PageLoad = async ({ fetch, params }) => {
       licenses,
       filtersInfo,
     };
-  } catch (response: Response) {
+  } catch (response) {
     if (response.status === 403) {
       throw error(404);
     }

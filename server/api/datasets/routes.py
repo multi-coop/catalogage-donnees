@@ -43,6 +43,7 @@ router.include_router(filters.router)
     response_model=Pagination[DatasetView],
 )
 async def list_datasets(
+    request: "APIRequest",
     params: DatasetListParams = Depends(),
 ) -> Pagination[DatasetView]:
     bus = resolve(MessageBus)
@@ -60,8 +61,8 @@ async def list_datasets(
             technical_source__in=params.technical_source,
             tag__id__in=params.tag_id,
             license=params.license,
-            publication_restriction=params.publication_restriction,
         ),
+        account=request.user.account,
     )
 
     return await bus.execute(query)
