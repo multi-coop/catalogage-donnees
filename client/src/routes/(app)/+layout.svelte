@@ -18,24 +18,7 @@
 </script>
 
 <LayoutProviders>
-  <div class="fr-skiplinks">
-    <!-- svelte-ignore a11y-no-redundant-roles // This is the main app's nav so we keep the role explicit -->
-    <nav class="fr-container" role="navigation" aria-label="Accès rapide">
-      <ul class="fr-skiplinks__list">
-        <li>
-          <a class="fr-nav__link" href="#contenu">Contenu</a>
-        </li>
-        <li>
-          <a class="fr-nav__link" href="#header-navigation">Menu</a>
-        </li>
-        <li>
-          <a class="fr-nav__link" href="#footer">Pied de page</a>
-        </li>
-      </ul>
-    </nav>
-  </div>
-
-  <Header />
+  <Header account={$account} />
 
   <main id="contenu" class="fr-mb-8w">
     <slot />

@@ -15,7 +15,6 @@
   };
 </script>
 
-<!-- svelte-ignore a11y-no-redundant-roles // This is the main app header so we keep the role explicit -->
 <header role="banner" class="fr-header">
   <div class="fr-header__body">
     <div class="fr-container">
@@ -23,10 +22,12 @@
         <div class="fr-header__brand fr-enlarge-link">
           <div class="fr-header__brand-top">
             <div class="fr-header__logo">
-              <p class="fr-logo">
-                République
-                <br />Française
-              </p>
+              <a href="/" aria-label="Accueil - Etalab">
+                <p class="fr-logo">
+                  République
+                  <br />Française
+                </p>
+              </a>
             </div>
 
             {#if Maybe.Some($account)}
@@ -34,33 +35,27 @@
                 <button
                   class="fr-btn--menu fr-btn"
                   data-fr-opened="false"
-                  aria-controls="modal-menu"
+                  aria-controls="modal-491"
                   aria-haspopup="menu"
+                  id="button-492"
                   title="Menu"
-                  id="fr-btn-menu-mobile"
                 >
                   Menu
                 </button>
               </div>
             {/if}
           </div>
+
           <div class="fr-header__service">
-            <a href={paths.home} title="Accueil - {SITE_TITLE}">
+            <a href="/" title={`Accueil - ${SITE_TITLE}- Etalab`}>
               <p class="fr-header__service-title">{SITE_TITLE}</p>
-              <p
-                class="fr-badge fr-badge--success fr-badge--sm fr-badge--no-icon"
-              >
-                Bêta
-              </p>
             </a>
           </div>
         </div>
-        <div class="fr-header__tools tools-container">
-          <div class="fr-header__tools-links">
-            {#if Maybe.Some($account)}
-              <p>
-                {$account.email}
-              </p>
+
+        {#if Maybe.Some($account)}
+          <div class="fr-header__tools">
+            <div class="fr-header__tools-links">
               <ul class="fr-btns-group">
                 <li>
                   <button
@@ -71,65 +66,48 @@
                   </button>
                 </li>
               </ul>
-            {/if}
+            </div>
           </div>
-        </div>
+        {/if}
       </div>
     </div>
   </div>
   <div
     class="fr-header__menu fr-modal"
-    id="modal-menu"
-    data-fr-js-modal="true"
-    data-fr-js-header-modal="true"
-    aria-labelledby="fr-btn-menu-mobile"
+    id="modal-491"
+    aria-labelledby="button-492"
   >
-    <div class="fr-container">
-      <button
-        class="fr-btn fr-btn--close"
-        aria-controls="modal-menu"
-        data-fr-js-modal-button="true">Fermer</button
-      >
+    {#if Maybe.Some($account)}
+      <div class="fr-container">
+        <button
+          class="fr-btn--close fr-btn"
+          aria-controls="modal-491"
+          title="Fermer"
+        >
+          Fermer
+        </button>
 
-      <div class="fr-header__menu-links" />
-
-      {#if Maybe.Some($account)}
+        <div class="fr-header__menu-links" />
         <nav
           class="fr-nav"
+          id="navigation-494"
           role="navigation"
           aria-label="Menu principal"
-          id="header-navigation"
-          data-fr-js-navigation="true"
         >
           <ul class="fr-nav__list">
             {#each $navigationItems as { label, href }}
-              <li class="fr-nav__item" data-fr-js-navigaton-item="true">
+              <li data-fr-js-navigaton-item="true">
                 <a
-                  {href}
-                  class="fr-nav__link"
                   aria-current={href === path ? "page" : undefined}
+                  class="fr-nav__link"
+                  {href}
+                  target="_self">{label}</a
                 >
-                  {label}
-                </a>
               </li>
             {/each}
           </ul>
         </nav>
-      {/if}
-    </div>
+      </div>
+    {/if}
   </div>
 </header>
-
-<style>
-  a {
-    display: flex;
-    gap: 15px;
-  }
-
-  @media (max-width: 1440px) and (min-width: 768px) {
-    /* To give a bit space between the beta banner and the tools (login/out button, email adress) only for LG and MD screen */
-    .tools-container {
-      padding-right: 80px;
-    }
-  }
-</style>
