@@ -11,19 +11,23 @@
         {name}
       </h3>
       <div class="fr-card__start">
-        {#if status == "catalog"}
-          <p class="fr-badge fr-badge--success">Catalogue activé</p>
-        {:else if status == "registered"}
-          <p class="fr-badge fr-badge--info">Enregistré</p>
-        {:else if status == "pending"}
-          <p class="fr-badge fr-badge--new">En cours</p>
-        {/if}
+        <ul class="fr-badge-group">
+          <li>
+            {#if status == "catalog"}
+              <p class="fr-badge fr-badge--success">Catalogue activé</p>
+            {:else if status == "registered"}
+              <p class="fr-badge fr-badge--info">Enregistré</p>
+            {:else if status == "pending"}
+              <p class="fr-badge fr-badge--new">En cours</p>
+            {/if}
+          </li>
+        </ul>
       </div>
     </div>
   </div>
   <div class="fr-card__header">
-    <div class="fr-card__img card-image">
-      <img class="fr-responsive-img fr-p-2w" {src} alt="logo {name}" />
+    <div class="fr-card__img">
+      <img class="fr-card__img card-image fr-p-2w" {src} alt="logo {name}" />
     </div>
   </div>
 </div>
@@ -34,5 +38,6 @@
     justify-content: center;
     max-width: 20rem;
     margin: 0 auto;
+    object-fit: cover;
   }
 </style>
