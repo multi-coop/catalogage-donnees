@@ -1,7 +1,13 @@
 <script lang="ts">
   import type { PageData } from "./$types";
+
   import paths from "$lib/paths";
-  import { DATA_FORMAT_LABELS, UPDATE_FREQUENCY_LABELS } from "src/constants";
+  import {
+    DATA_FORMAT_LABELS,
+    PUBLICATION_RESTRICTION,
+    PUBLICATION_RESTRICTIONS_TOOL_TIP_INFO,
+    UPDATE_FREQUENCY_LABELS,
+  } from "src/constants";
   import { formatFullDate, splitParagraphs } from "src/lib/util/format";
   import { account } from "$lib/stores/auth";
   import { Maybe } from "$lib/util/maybe";
@@ -10,6 +16,7 @@
   import ExtraFieldsList from "./_ExtraFieldsList.svelte";
   import { removeEmptyValues } from "src/lib/util/array";
   import { buildMailToString } from "src/lib/util/mail";
+  import InfoBanner from "src/lib/components/InfoBanner/InfoBanner.svelte";
 
   export let data: PageData;
 
@@ -83,6 +90,30 @@
 
     <div class="fr-grid-row fr-grid-row--gutters">
       <aside class="fr-col-md-4">
+        {#if dataset.publicationRestriction != PUBLICATION_RESTRICTION.no_restriction}
+          <div class="fr-mb-2w">
+            <InfoBanner>
+              <span class="fr-icon-eye-off-fill" aria-hidden="true" />
+              <p class="info-container-body fr-px-2w">Visibilité restreinte</p>
+
+              <div
+                aria-label={PUBLICATION_RESTRICTIONS_TOOL_TIP_INFO[
+                  dataset.publicationRestriction
+                ]}
+                data-microtip-position="top"
+                role="tooltip"
+                id="tooltip"
+              >
+                <span
+                  aria-labelledby="tooltip"
+                  class="fr-icon-information-fill"
+                  aria-hidden="true"
+                />
+              </div>
+            </InfoBanner>
+          </div>
+        {/if}
+
         <h6 class="fr-mb-2w">Accès aux données</h6>
 
         <AsideItem
@@ -187,5 +218,10 @@
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+  }
+
+  .info-container-body {
+    padding: 0;
+    margin: 0;
   }
 </style>

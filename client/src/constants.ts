@@ -41,13 +41,30 @@ export const DATA_FORMAT_SHORT_NAMES: { [K in DataFormat]: string } = {
   other: "Autre",
 };
 
-export const PUBLICATION_RESTRICTIONS: {
+export const PUBLICATION_RESTRICTIONS_OPTIONS: {
   [K in PublicationRestriction]: string;
 } = {
   no_restriction: "non",
   draft: "Oui, car cette fiche n’est pas achevée",
   legal_restriction:
     "Oui, car les informations contribuées contiennent des secrets légaux",
+};
+
+export const PUBLICATION_RESTRICTIONS_TOOL_TIP_INFO: {
+  [K in PublicationRestriction]: string;
+} = {
+  no_restriction: "Ce jeu de donnée est publique",
+  draft: "Ce jeu de donnée est encore à l'état de brouillon",
+  legal_restriction:
+    "Ce jeu de donnée n'est pas diffusé pour des raisons légales",
+};
+
+export const PUBLICATION_RESTRICTION: {
+  [K in PublicationRestriction]: string;
+} = {
+  no_restriction: "no_restriction",
+  draft: "draft",
+  legal_restriction: "legal_restriction",
 };
 
 export const UPDATE_FREQUENCY_LABELS: { [K in UpdateFrequency]: string } = {

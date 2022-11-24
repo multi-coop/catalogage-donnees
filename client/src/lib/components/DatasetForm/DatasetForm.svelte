@@ -12,7 +12,7 @@
   import type { Tag } from "src/definitions/tag";
   import {
     DATA_FORMAT_LABELS,
-    PUBLICATION_RESTRICTIONS,
+    PUBLICATION_RESTRICTIONS_OPTIONS,
     UPDATE_FREQUENCY_LABELS,
   } from "src/constants";
   import { formatHTMLDate } from "$lib/util/format";
@@ -488,7 +488,7 @@
       name="publicationRestriction"
       label="L’accès aux informations contribuées sur ce formulaire doit-il être restreint ?"
       hintText="Si le contenu que vous avez saisi contient des données sensibles ou à caractère personnel, il vous est possible de faire en sorte que seuls les membres de votre organisation aient accès à cette fiche."
-      options={toSelectOptions(PUBLICATION_RESTRICTIONS)}
+      options={toSelectOptions(PUBLICATION_RESTRICTIONS_OPTIONS)}
       value={$form.publicationRestriction}
       on:change={handleFieldChange}
       on:blur={handleFieldChange}
