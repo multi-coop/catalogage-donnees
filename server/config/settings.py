@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     server_mode: ServerMode = "local"
     database_url: str = "postgresql+asyncpg://localhost:5432/catalogage"
     client_url: str = "http://localhost:3000"
-    datapass_url: str = "https://auth-staging.api.gouv.fr"
+    datapass_url: str = "https://app-staging.moncomptepro.beta.gouv.fr"
     datapass_client_id: str = "<define-me>"
     datapass_client_secret: str = "<define-me>"
     host: str = "localhost"
