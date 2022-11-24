@@ -18,7 +18,12 @@ from server.seedwork.application.messages import MessageBus
 from .commands import CreateDataset, DeleteDataset, UpdateDataset
 from .exceptions import CannotCreateDataset, CannotSeeDataset, CannotUpdateDataset
 from .queries import GetAllDatasets, GetDatasetByID, GetDatasetFilters
-from .specifications import can_create_dataset, can_see_dataset, can_update_dataset
+from .specifications import (
+    can_create_dataset,
+    can_not_change_publication_restriction_level,
+    can_see_dataset,
+    can_update_dataset,
+)
 from .views import DatasetFiltersView, DatasetView
 
 # This organization typically holds password users used by the development team.
@@ -79,6 +84,17 @@ async def update_dataset(command: UpdateDataset) -> None:
 
     if not isinstance(command.account, Skip) and not can_update_dataset(
         dataset, command.account
+    ):
+        raise CannotUpdateDataset(f"{command.account=}, {dataset=}")
+
+    if (
+        not isinstance(command.account, Skip)
+        and command.publication_restriction is not None
+        and can_not_change_publication_restriction_level(
+            dataset=dataset,
+            account=command.account,
+            new_publication_restriction_level=command.publication_restriction,
+        )
     ):
         raise CannotUpdateDataset(f"{command.account=}, {dataset=}")
 

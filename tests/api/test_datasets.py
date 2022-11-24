@@ -803,6 +803,55 @@ class TestDatasetUpdate:
         assert dataset.url == "https://data.gouv.fr/datasets/other"
         assert dataset.license == "ODC Open Database License"
 
+    async def test_can_not_update_publication_restriction_if_i_do_not_belong_to_the_organization(  # noqa: E501
+        self,
+        client: httpx.AsyncClient,
+        temp_org: OrganizationView,
+        temp_user: TestPasswordUser,
+    ) -> None:
+        bus = resolve(MessageBus)
+
+        siret = await bus.execute(CreateOrganizationFactory.build())
+
+        user = await create_test_password_user(
+            CreatePasswordUserFactory.build(organization_siret=siret)
+        )
+
+        dataset_id = await bus.execute(
+            CreateDatasetFactory.build(
+                account=temp_user.account,
+                organization_siret=temp_org.siret,
+                publication_restriction=PublicationRestriction.NO_RESTRICTION,
+            )
+        )
+
+        other_last_updated_at = fake.date_time_tz()
+
+        payload = to_payload(
+            UpdateDatasetPayloadFactory.build(
+                title="Other title",
+                description="Other description",
+                service="Other service",
+                geographical_coverage="Hauts-de-France",
+                formats=[DataFormat.DATABASE],
+                technical_source="Other information system",
+                producer_email="other.service@mydomain.org",
+                contact_emails=["other.person@mydomain.org"],
+                update_frequency=UpdateFrequency.WEEKLY,
+                last_updated_at=other_last_updated_at.isoformat(),
+                url="https://data.gouv.fr/datasets/other",
+                license="ODC Open Database License",
+                tag_ids=[],
+                extra_field_values=[],
+                publication_restriction=PublicationRestriction.LEGAL_RESTRICTION.value,
+            )
+        )
+
+        response = await client.put(
+            f"/datasets/{dataset_id}/", json=payload, auth=user.auth
+        )
+        assert response.status_code == 403
+
 
 @pytest.mark.asyncio
 class TestFormats:
