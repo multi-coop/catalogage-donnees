@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.domain.common.types import ID, id_factory
@@ -43,6 +43,21 @@ class SqlTagRepository(TagRepository):
                 return None
 
             return make_entity(instance)
+
+    async def delete_by_id(self, id_: ID) -> ID:
+
+        async with self._db.session() as session:
+            stmt = delete(TagModel).where(TagModel.id == id_)
+            await session.execute(stmt)
+
+            return id
+
+    async def delete_many_by_id(self, ids_: List[ID]) -> List[ID]:
+        async with self._db.session() as session:
+            stmt = delete(TagModel).where(TagModel.id.in_(ids_))
+            await session.execute(stmt)
+
+            return id
 
     async def insert(self, entity: Tag) -> ID:
         async with self._db.session() as session:
