@@ -45,7 +45,7 @@ compose-down: #- Stop and teardown Docker Compose setup
 	docker-compose down
 
 migrate: #- Apply pending migrations
-	${bin}alembic upgrade head
+	${bin}alembic downgrade head
 
 migration: #- Create a migration
 	${bin}alembic revision --autogenerate -m $(name)
