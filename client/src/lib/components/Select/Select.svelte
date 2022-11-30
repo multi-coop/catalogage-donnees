@@ -7,7 +7,7 @@
   export let label: string;
   export let id: string;
   export let name: string;
-  export let options: SelectOption[];
+  export let options: SelectOption<string | TrustedHtml>[];
 
   export let placeholder = "";
   export let hintText: string | TrustedHtml = "";

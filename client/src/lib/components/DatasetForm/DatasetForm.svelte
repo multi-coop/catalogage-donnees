@@ -473,14 +473,16 @@
     </h2>
 
     <Alert title="Qui peut voir cette fiche ?">
-      Par défaut, les fiches catalogues publiées sont accessibles au public
-      (fichier CSV).
+      Par défaut, les fiches catalogues publiées sont accessibles au public (<a
+        href="https://catalogue.data.gouv.fr/api/docs#/catalogs/export_catalog_catalogs__siret__export_csv_get"
+        target="_blank"
+        rel="noopener"
+        >via API
+      </a>).
       <br /> <br />
       <strong>
-        La visibilité de la fiche concerne les infomations qui la décrivent. Si
-        aucun accès n’est exposé publiquement aux jeux de données et que les
-        informations saisies ne contiennent pas de secrets légaux, il n’y a
-        alors pas de raison de masquer cette fiche aux autres organisations.
+        Une fiche catalogue contient les informations concernant un jeu de
+        données. Il ne s’agit pas de son contenu.
       </strong>
     </Alert>
 

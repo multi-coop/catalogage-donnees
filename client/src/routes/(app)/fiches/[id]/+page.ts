@@ -33,8 +33,6 @@ export const load: PageLoad = async ({ fetch, params }) => {
       dataset,
     };
   } catch (response) {
-    console.log(response);
-
     if (response.status === 403) {
       throw error(404);
     }

@@ -1,3 +1,5 @@
+# flake8: noqa E501
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, Response
@@ -60,6 +62,11 @@ async def get_catalog(siret: Siret) -> CatalogView:
 
 @router.get("/{siret}/export.csv")
 async def export_catalog(siret: Siret) -> Response:
+    """
+    This route will generate CSV export of all dataset published without publication restriction
+
+    The generated export uses a 24h cache. That means that changes made to a dataset might be only taken into account 24 hours later
+    """
     export_cache = resolve(ExportCache)
 
     content = export_cache.get(siret)

@@ -3,6 +3,7 @@ import type {
   PublicationRestriction,
   UpdateFrequency,
 } from "./definitions/datasets";
+import type { TrustedHtml } from "./lib/util/html";
 
 export const SITE_TITLE = "catalogue.data.gouv.fr";
 
@@ -42,21 +43,15 @@ export const DATA_FORMAT_SHORT_NAMES: { [K in DataFormat]: string } = {
 };
 
 export const PUBLICATION_RESTRICTIONS_OPTIONS: {
-  [K in PublicationRestriction]: string;
+  [K in PublicationRestriction]: string | TrustedHtml;
 } = {
   no_restriction: "non",
   draft: "Oui, car cette fiche n’est pas achevée",
-  legal_restriction:
-    "Oui, car les informations contribuées contiennent des secrets légaux",
-};
-
-export const PUBLICATION_RESTRICTIONS_TOOL_TIP_INFO: {
-  [K in PublicationRestriction]: string;
-} = {
-  no_restriction: "Ce jeu de donnée est publique",
-  draft: "Ce jeu de donnée est encore à l'état de brouillon",
-  legal_restriction:
-    "Ce jeu de donnée n'est pas diffusé pour des raisons légales",
+  legal_restriction: {
+    content:
+      "Oui, car les informations contribuées contiennent des &nbsp; <a href='https://guides.etalab.gouv.fr/juridique/ouverture/#que-faire-si-mes-documents-administratifs-contiennent-des-secrets-legaux' rel='noopener' target='_blank'> secrets légaux</a>",
+    isHtml: true,
+  },
 };
 
 export const PUBLICATION_RESTRICTION: {
