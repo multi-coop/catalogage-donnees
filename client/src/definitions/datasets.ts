@@ -20,6 +20,11 @@ export type UpdateFrequency =
   | "monthly"
   | "yearly";
 
+export type PublicationRestriction =
+  | "legal_restriction"
+  | "draft"
+  | "no_restriction";
+
 export interface DatasetHeadlines {
   title: string;
   description: Maybe<string>;
@@ -43,6 +48,7 @@ export type Dataset = {
   license: string | null;
   tags: Tag[];
   extraFieldValues: ExtraFieldValue[];
+  publicationRestriction: PublicationRestriction;
 };
 
 export type DatasetFormInitial = Omit<Dataset, "id">;

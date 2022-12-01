@@ -205,6 +205,7 @@ describe("Test the dataset form", () => {
       license: "Licence Ouverte",
       tags: [fakeTag],
       extraFieldValues: [{ extraFieldId: "<extraField1Id>", value: "Réponse" }],
+      publicationRestriction: "draft",
     };
     const props = { catalog: catalogWithExtraFields, initial };
 
@@ -297,6 +298,7 @@ describe("Test the dataset form", () => {
       license: null,
       tags: [buildFakeTag()],
       extraFieldValues: [{ extraFieldId: "<extraField1Id>", value: "" }],
+      publicationRestriction: "draft",
     };
     const props = { catalog, initial };
     const { getByLabelText, getByRole, component } = render(DatasetForm, {

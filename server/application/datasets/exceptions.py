@@ -4,3 +4,7 @@ class CannotCreateDataset(Exception):
 
 class CannotUpdateDataset(Exception):
     pass
+
+
+class CannotSeeDataset(Exception):
+    pass

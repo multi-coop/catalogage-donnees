@@ -50,6 +50,7 @@
     "@gouvfr/dsfr": "^1.8.4",
     "@axe-core/playwright": "^4.5.0",
     "date-fns": "^2.28.0",
+    "microtip": "^0.2.2",
     "snarkdown": "^2.0.0",
     "svelte-forms-lib": "^2.0.1",
     "yup": "^0.32.11"

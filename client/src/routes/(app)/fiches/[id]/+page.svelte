@@ -1,7 +1,12 @@
 <script lang="ts">
   import type { PageData } from "./$types";
+
   import paths from "$lib/paths";
-  import { DATA_FORMAT_LABELS, UPDATE_FREQUENCY_LABELS } from "src/constants";
+  import {
+    DATA_FORMAT_LABELS,
+    PUBLICATION_RESTRICTION,
+    UPDATE_FREQUENCY_LABELS,
+  } from "src/constants";
   import { formatFullDate, splitParagraphs } from "src/lib/util/format";
   import { account } from "$lib/stores/auth";
   import { Maybe } from "$lib/util/maybe";
@@ -10,6 +15,8 @@
   import ExtraFieldsList from "./_ExtraFieldsList.svelte";
   import { removeEmptyValues } from "src/lib/util/array";
   import { buildMailToString } from "src/lib/util/mail";
+  import InfoBanner from "src/lib/components/InfoBanner/InfoBanner.svelte";
+  import Tooltip from "src/lib/components/Tooltip/Tooltip.svelte";
 
   export let data: PageData;
 
@@ -83,6 +90,21 @@
 
     <div class="fr-grid-row fr-grid-row--gutters">
       <aside class="fr-col-md-4">
+        {#if dataset.publicationRestriction != PUBLICATION_RESTRICTION.no_restriction}
+          <div class="fr-mb-2w">
+            <InfoBanner>
+              <span class="fr-icon-eye-off-fill" aria-hidden="true" />
+              <p class="info-container-body fr-px-2w">Visibilité restreinte</p>
+
+              <Tooltip
+                tooltipContent="Seules les personnes faisant partie de votre organisation peuvent lire ces informations"
+              >
+                <span class="fr-icon-information-fill" aria-hidden="true" />
+              </Tooltip>
+            </InfoBanner>
+          </div>
+        {/if}
+
         <h6 class="fr-mb-2w">Accès aux données</h6>
 
         <AsideItem
@@ -187,5 +209,10 @@
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+  }
+
+  .info-container-body {
+    padding: 0;
+    margin: 0;
   }
 </style>

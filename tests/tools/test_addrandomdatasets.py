@@ -3,6 +3,7 @@ import pytest
 from server.application.datasets.queries import GetAllDatasets
 from server.application.organizations.views import OrganizationView
 from server.config.di import resolve
+from server.domain.common.types import Skip
 from server.seedwork.application.messages import MessageBus
 from tools import addrandomdatasets
 
@@ -12,10 +13,10 @@ from tools import addrandomdatasets
 async def test_addrandomdatasets(temp_org: OrganizationView) -> None:
     bus = resolve(MessageBus)
 
-    pagination = await bus.execute(GetAllDatasets())
+    pagination = await bus.execute(GetAllDatasets(account=Skip()))
     assert pagination.total_items == 0
 
     await addrandomdatasets.main(n=20, siret=temp_org.siret)
 
-    pagination = await bus.execute(GetAllDatasets())
+    pagination = await bus.execute(GetAllDatasets(account=Skip()))
     assert pagination.total_items == 20

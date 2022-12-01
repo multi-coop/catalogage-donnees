@@ -114,6 +114,7 @@ export async function makeApiRequestOrFail(
 
   if (!response.ok) {
     pushApiError(response);
+
     return Promise.reject(response);
   }
   return response;

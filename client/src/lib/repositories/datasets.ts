@@ -7,7 +7,12 @@ import type { DatasetFiltersValue } from "src/definitions/datasetFilters";
 import type { Fetch } from "src/definitions/fetch";
 import type { Paginated } from "src/definitions/pagination";
 import { DATASETS_PER_PAGE } from "src/constants";
-import { getHeaders, getApiUrl, makeApiRequest } from "$lib/fetch";
+import {
+  getHeaders,
+  getApiUrl,
+  makeApiRequest,
+  makeApiRequestOrFail,
+} from "$lib/fetch";
 import { toQueryString } from "$lib/util/urls";
 import { toDataset, toPayload } from "$lib/transformers/dataset";
 import { toPaginated } from "$lib/transformers/pagination";
@@ -19,7 +24,7 @@ type GetDatasetByID = (opts: {
   fetch: Fetch;
   apiToken: string;
   id: string;
-}) => Promise<Maybe<Dataset>>;
+}) => Promise<Dataset>;
 
 export const getDatasetByID: GetDatasetByID = async ({
   fetch,
@@ -31,11 +36,12 @@ export const getDatasetByID: GetDatasetByID = async ({
     headers: new Headers(getHeaders(apiToken)),
   });
 
-  const response = await makeApiRequest(fetch, request);
-
-  return Maybe.map(response, async (response) =>
-    toDataset(await response.json())
-  );
+  try {
+    const response = await makeApiRequestOrFail(fetch, request);
+    return toDataset(await response.json());
+  } catch (error) {
+    return Promise.reject(error);
+  }
 };
 
 type GetDatasets = (opts: {

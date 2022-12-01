@@ -6,12 +6,17 @@
   export let name: string;
   export let label: string;
   export let hintText: string | TrustedHtml = "";
-  export let options: SelectOption<string>[];
+  export let options: SelectOption<string | TrustedHtml>[];
   export let value: string;
+  export let displayOptionsInline = true;
 </script>
 
 <div class="fr-form-group">
-  <fieldset class="fr-fieldset fr-fieldset--inline" role="radiogroup">
+  <fieldset
+    class="fr-fieldset"
+    class:fr-fieldset--inline={displayOptionsInline}
+    role="radiogroup"
+  >
     <legend class="fr-fieldset__legend fr-text--regular" id="{name}-legend">
       {label}
       {#if hintText}
@@ -33,7 +38,9 @@
             on:change
             on:blur
           />
-          <label class="fr-label" for={id}>{option.label}</label>
+          <label class="fr-label" for={id}>
+            <TextOrHtml value={option.label} /></label
+          >
         </div>
       {/each}
     </div>

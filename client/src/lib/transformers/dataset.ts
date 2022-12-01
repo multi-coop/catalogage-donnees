@@ -44,6 +44,7 @@ export const toDataset = (item: any): Dataset => {
     update_frequency,
     last_updated_at,
     geographical_coverage,
+    publication_restriction,
     technical_source,
     url,
     extra_field_values,
@@ -67,5 +68,6 @@ export const toDataset = (item: any): Dataset => {
       extraFieldId: extra_field_id,
       value,
     })),
+    publicationRestriction: publication_restriction,
   };
 };
