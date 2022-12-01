@@ -1,4 +1,9 @@
-import type { DataFormat, UpdateFrequency } from "./definitions/datasets";
+import type {
+  DataFormat,
+  PublicationRestriction,
+  UpdateFrequency,
+} from "./definitions/datasets";
+import type { TrustedHtml } from "./lib/util/html";
 
 export const SITE_TITLE = "catalogue.data.gouv.fr";
 
@@ -35,6 +40,26 @@ export const DATA_FORMAT_SHORT_NAMES: { [K in DataFormat]: string } = {
   database: "BDD",
   website: "Web",
   other: "Autre",
+};
+
+export const PUBLICATION_RESTRICTIONS_OPTIONS: {
+  [K in PublicationRestriction]: string | TrustedHtml;
+} = {
+  no_restriction: "non",
+  draft: "Oui, car cette fiche n’est pas achevée",
+  legal_restriction: {
+    content:
+      "Oui, car les informations contribuées contiennent des &nbsp; <a href='https://guides.etalab.gouv.fr/juridique/ouverture/#que-faire-si-mes-documents-administratifs-contiennent-des-secrets-legaux' rel='noopener' target='_blank'> secrets légaux</a>",
+    isHtml: true,
+  },
+};
+
+export const PUBLICATION_RESTRICTION: {
+  [K in PublicationRestriction]: string;
+} = {
+  no_restriction: "no_restriction",
+  draft: "draft",
+  legal_restriction: "legal_restriction",
 };
 
 export const UPDATE_FREQUENCY_LABELS: { [K in UpdateFrequency]: string } = {

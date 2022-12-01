@@ -6,10 +6,15 @@
     DataFormat,
     DatasetFormData,
     DatasetFormInitial,
+    PublicationRestriction,
     UpdateFrequency,
   } from "src/definitions/datasets";
   import type { Tag } from "src/definitions/tag";
-  import { DATA_FORMAT_LABELS, UPDATE_FREQUENCY_LABELS } from "src/constants";
+  import {
+    DATA_FORMAT_LABELS,
+    PUBLICATION_RESTRICTIONS_OPTIONS,
+    UPDATE_FREQUENCY_LABELS,
+  } from "src/constants";
   import { formatHTMLDate } from "$lib/util/format";
   import RequiredMarker from "../RequiredMarker/RequiredMarker.svelte";
   import { account } from "src/lib/stores/auth";
@@ -22,9 +27,11 @@
   import { handleSelectChange } from "src/lib/util/form";
   import { Maybe } from "$lib/util/maybe";
   import TagSelector from "../TagSelector/TagSelector.svelte";
+  import RadioGroupField from "../RadioGroupField/RadioGroupField.svelte";
   import LicenseField from "./_LicenseField.svelte";
   import type { Catalog, ExtraFieldValue } from "src/definitions/catalogs";
   import ExtraField from "./_ExtraField.svelte";
+  import Alert from "../Alert/Alert.svelte";
 
   export let submitLabel = "Publier la fiche de données";
   export let loadingLabel = "Publication en cours...";
@@ -55,6 +62,7 @@
     license: string;
     tags: Tag[];
     extraFieldValues: string[];
+    publicationRestriction: PublicationRestriction;
   };
 
   const dataFormatChoices = Object.entries(DATA_FORMAT_LABELS).map(
@@ -86,6 +94,7 @@
       );
       return fieldValue?.value || "";
     }),
+    publicationRestriction: initial?.publicationRestriction || "no_restriction",
   };
 
   // Handle this value manually.
@@ -96,6 +105,7 @@
       initialValues,
       validationSchema: yup.object().shape({
         organizationSiret: yup.string().required("Ce champs est requis"),
+        publicationRestriction: yup.string().required("Ce champs est requis"),
         title: yup.string().required("Ce champ est requis"),
         description: yup.string().required("Ce champs est requis"),
         service: yup.string().required("Ce champs est requis"),
@@ -172,7 +182,6 @@
           license,
           extraFieldValues,
         };
-
         dispatch("save", data);
       },
     });
@@ -455,6 +464,39 @@
           on:blur={(ev) => handleExtraFieldChange(ev, index)}
         />
       {/each}
+    </div>
+  {/if}
+
+  {#if !initial || (catalog.organization.siret === $account?.organizationSiret && initial)}
+    <h2 id="visibilité-fiche" class="fr-mt-6w fr-mb-5w">
+      Visibilité de cette fiche catalogue
+    </h2>
+
+    <Alert title="Qui peut voir cette fiche ?">
+      Par défaut, les fiches catalogues publiées sont accessibles au public (<a
+        href="https://catalogue.data.gouv.fr/api/docs#/catalogs/export_catalog_catalogs__siret__export_csv_get"
+        target="_blank"
+        rel="noopener"
+        >via API
+      </a>).
+      <br /> <br />
+      <strong>
+        Une fiche catalogue contient les informations concernant un jeu de
+        données. Il ne s’agit pas de son contenu.
+      </strong>
+    </Alert>
+
+    <div class="form--content fr-mb-8w fr-mt-5w">
+      <RadioGroupField
+        name="publicationRestriction"
+        label="L’accès aux informations contribuées sur ce formulaire doit-il être restreint ?"
+        hintText="Si le contenu que vous avez saisi contient des données sensibles ou à caractère personnel, il vous est possible de faire en sorte que seuls les membres de votre organisation aient accès à cette fiche."
+        options={toSelectOptions(PUBLICATION_RESTRICTIONS_OPTIONS)}
+        value={$form.publicationRestriction}
+        on:change={handleFieldChange}
+        on:blur={handleFieldChange}
+        displayOptionsInline={false}
+      />
     </div>
   {/if}
 

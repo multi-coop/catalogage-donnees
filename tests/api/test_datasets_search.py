@@ -39,7 +39,7 @@ async def add_test_datasets(
             description=description,
         )
         pk = await bus.execute(command)
-        query = GetDatasetByID(id=pk)
+        query = GetDatasetByID(id=pk, account=user.account)
         await bus.execute(query)
 
 

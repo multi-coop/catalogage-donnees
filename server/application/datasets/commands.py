@@ -6,7 +6,11 @@ from pydantic import EmailStr, Field
 from server.domain.auth.entities import Account
 from server.domain.catalogs.entities import ExtraFieldValue
 from server.domain.common.types import ID, Skip
-from server.domain.datasets.entities import DataFormat, UpdateFrequency
+from server.domain.datasets.entities import (
+    DataFormat,
+    PublicationRestriction,
+    UpdateFrequency,
+)
 from server.domain.organizations.types import Siret
 from server.seedwork.application.commands import Command
 
@@ -31,6 +35,9 @@ class CreateDataset(CreateDatasetValidationMixin, Command[ID]):
     license: Optional[str] = None
     tag_ids: List[ID] = Field(default_factory=list)
     extra_field_values: List[ExtraFieldValue] = Field(default_factory=list)
+    publication_restriction: Optional[
+        PublicationRestriction
+    ] = PublicationRestriction.NO_RESTRICTION
 
 
 class UpdateDataset(UpdateDatasetValidationMixin, Command[None]):
@@ -51,6 +58,7 @@ class UpdateDataset(UpdateDatasetValidationMixin, Command[None]):
     license: Optional[str] = Field(...)
     tag_ids: List[ID]
     extra_field_values: List[ExtraFieldValue]
+    publication_restriction: Optional[PublicationRestriction] = Field(...)
 
 
 class DeleteDataset(Command[None]):

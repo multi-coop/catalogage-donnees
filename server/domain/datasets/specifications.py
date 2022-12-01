@@ -11,6 +11,7 @@ from .entities import DataFormat
 class DatasetSpec:
     search_term: Optional[str] = None
     organization_siret: Optional[Siret] = None
+    include_dataset_with_publication_restriction: Optional[bool] = True
     geographical_coverage__in: Optional[Sequence[str]] = None
     service__in: Optional[Sequence[str]] = None
     format__in: Optional[Sequence[DataFormat]] = None

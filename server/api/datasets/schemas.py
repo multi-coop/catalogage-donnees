@@ -10,7 +10,11 @@ from server.application.datasets.validation import (
     UpdateDatasetValidationMixin,
 )
 from server.domain.common.types import ID
-from server.domain.datasets.entities import DataFormat, UpdateFrequency
+from server.domain.datasets.entities import (
+    DataFormat,
+    PublicationRestriction,
+    UpdateFrequency,
+)
 from server.domain.organizations.types import Siret
 
 
@@ -27,6 +31,7 @@ class DatasetListParams:
         technical_source: Optional[List[str]] = Query(None),
         tag_id: Optional[List[ID]] = Query(None),
         license: Optional[str] = Query(None),
+        publication_restriction: Optional[PublicationRestriction] = Query(None),
     ) -> None:
         self.q = q
         self.organization_siret = organization_siret
@@ -38,6 +43,7 @@ class DatasetListParams:
         self.technical_source = technical_source
         self.tag_id = tag_id
         self.license = license
+        self.publication_restriction = publication_restriction
 
 
 class DatasetCreate(CreateDatasetValidationMixin, BaseModel):
@@ -56,6 +62,9 @@ class DatasetCreate(CreateDatasetValidationMixin, BaseModel):
     license: Optional[str] = None
     tag_ids: List[ID] = Field(default_factory=list)
     extra_field_values: List[ExtraFieldValueCreate] = Field(default_factory=list)
+    publication_restriction: Optional[
+        PublicationRestriction
+    ] = PublicationRestriction.NO_RESTRICTION
 
 
 class DatasetUpdate(UpdateDatasetValidationMixin, BaseModel):
@@ -73,3 +82,4 @@ class DatasetUpdate(UpdateDatasetValidationMixin, BaseModel):
     license: Optional[str] = Field(...)
     tag_ids: List[ID]
     extra_field_values: List[ExtraFieldValueCreate] = Field(default_factory=list)
+    publication_restriction: Optional[PublicationRestriction] = Field(...)

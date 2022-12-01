@@ -31,7 +31,9 @@ async def test_dataset_cascades(
         )
     )
 
-    dataset = await bus.execute(GetDatasetByID(id=dataset_id))
+    dataset = await bus.execute(
+        GetDatasetByID(id=dataset_id, account=temp_user.account)
+    )
 
     await bus.execute(DeleteDataset(id=dataset_id))
 

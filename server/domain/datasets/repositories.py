@@ -1,11 +1,12 @@
-from typing import List, Optional, Set, Tuple
+from typing import List, Optional, Set, Tuple, Union
 
 from typing_extensions import TypedDict
 
+from server.domain.auth.entities import Account
 from server.seedwork.domain.repositories import Repository
 
 from ..common.pagination import Page
-from ..common.types import ID, id_factory
+from ..common.types import ID, Skip, id_factory
 from .entities import Dataset
 from .specifications import DatasetSpec
 
@@ -24,7 +25,11 @@ class DatasetRepository(Repository):
         return id_factory()
 
     async def get_all(
-        self, *, page: Optional[Page] = Page(), spec: DatasetSpec = DatasetSpec()
+        self,
+        *,
+        account: Union[Account, Skip] = Skip(),
+        page: Optional[Page] = Page(),
+        spec: DatasetSpec = DatasetSpec(),
     ) -> Tuple[List[Tuple[Dataset, DatasetGetAllExtras]], int]:
         raise NotImplementedError  # pragma: no cover
 
