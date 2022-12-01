@@ -12,7 +12,7 @@
   import type { Tag } from "src/definitions/tag";
   import {
     DATA_FORMAT_LABELS,
-    PUBLICATION_RESTRICTIONS,
+    PUBLICATION_RESTRICTIONS_OPTIONS,
     UPDATE_FREQUENCY_LABELS,
   } from "src/constants";
   import { formatHTMLDate } from "$lib/util/format";
@@ -467,34 +467,38 @@
     </div>
   {/if}
 
-  <h2 id="visibilité-fiche" class="fr-mt-6w fr-mb-5w">
-    Visibilité de cette fiche catalogue
-  </h2>
+  {#if !initial || (catalog.organization.siret === $account?.organizationSiret && initial)}
+    <h2 id="visibilité-fiche" class="fr-mt-6w fr-mb-5w">
+      Visibilité de cette fiche catalogue
+    </h2>
 
-  <Alert title="Qui peut voir cette fiche ?">
-    Par défaut, les fiches catalogues publiées sont accessibles au public
-    (fichier CSV).
-    <br /> <br />
-    <strong>
-      La visibilité de la fiche concerne les infomations qui la décrivent. Si
-      aucun accès n’est exposé publiquement aux jeux de données et que les
-      informations saisies ne contiennent pas de secrets légaux, il n’y a alors
-      pas de raison de masquer cette fiche aux autres organisations.
-    </strong>
-  </Alert>
+    <Alert title="Qui peut voir cette fiche ?">
+      Par défaut, les fiches catalogues publiées sont accessibles au public (<a
+        href="https://catalogue.data.gouv.fr/api/docs#/catalogs/export_catalog_catalogs__siret__export_csv_get"
+        target="_blank"
+        rel="noopener"
+        >via API
+      </a>).
+      <br /> <br />
+      <strong>
+        Une fiche catalogue contient les informations concernant un jeu de
+        données. Il ne s’agit pas de son contenu.
+      </strong>
+    </Alert>
 
-  <div class="form--content fr-mb-8w fr-mt-5w">
-    <RadioGroupField
-      name="publicationRestriction"
-      label="L’accès aux informations contribuées sur ce formulaire doit-il être restreint ?"
-      hintText="Si le contenu que vous avez saisi contient des données sensibles ou à caractère personnel, il vous est possible de faire en sorte que seuls les membres de votre organisation aient accès à cette fiche."
-      options={toSelectOptions(PUBLICATION_RESTRICTIONS)}
-      value={$form.publicationRestriction}
-      on:change={handleFieldChange}
-      on:blur={handleFieldChange}
-      displayOptionsInline={false}
-    />
-  </div>
+    <div class="form--content fr-mb-8w fr-mt-5w">
+      <RadioGroupField
+        name="publicationRestriction"
+        label="L’accès aux informations contribuées sur ce formulaire doit-il être restreint ?"
+        hintText="Si le contenu que vous avez saisi contient des données sensibles ou à caractère personnel, il vous est possible de faire en sorte que seuls les membres de votre organisation aient accès à cette fiche."
+        options={toSelectOptions(PUBLICATION_RESTRICTIONS_OPTIONS)}
+        value={$form.publicationRestriction}
+        on:change={handleFieldChange}
+        on:blur={handleFieldChange}
+        displayOptionsInline={false}
+      />
+    </div>
+  {/if}
 
   <div class="fr-input-group button--container fr-mb-6w">
     <button

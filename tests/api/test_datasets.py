@@ -325,6 +325,55 @@ class TestDatasetPermissions:
         response = await client.delete(f"/datasets/{pk}/", auth=temp_user.auth)
         assert response.status_code == 403
 
+    async def test_can_no_see_dataset_of_other_organizations_with_restricted_publication(  # noqa: E501
+        self,
+        client: httpx.AsyncClient,
+        temp_org: OrganizationView,
+    ) -> None:
+
+        bus = resolve(MessageBus)
+        command = CreateDatasetFactory.build(
+            organization_siret=temp_org.siret,
+            publication_restriction=PublicationRestriction.DRAFT,
+            account=Skip(),
+        )
+        dataset_id = await bus.execute(command)
+
+        siret = await bus.execute(CreateOrganizationFactory.build())
+
+        user = await create_test_password_user(
+            CreatePasswordUserFactory.build(organization_siret=siret)
+        )
+
+        response = await client.get(f"/datasets/{dataset_id}/", auth=user.auth)
+
+        assert response.status_code == 403
+
+    async def test_can_see_dataset_of_other_organizations_without_publication_restriction(  # noqa: E501
+        self,
+        client: httpx.AsyncClient,
+        temp_org: OrganizationView,
+        temp_user: TestPasswordUser,
+    ) -> None:
+
+        bus = resolve(MessageBus)
+        command = CreateDatasetFactory.build(
+            organization_siret=temp_org.siret,
+            publication_restriction=PublicationRestriction.NO_RESTRICTION,
+            account=Skip(),
+        )
+        dataset_id = await bus.execute(command)
+
+        siret = await bus.execute(CreateOrganizationFactory.build())
+
+        user = await create_test_password_user(
+            CreatePasswordUserFactory.build(organization_siret=siret)
+        )
+
+        response = await client.get(f"/datasets/{dataset_id}/", auth=user.auth)
+
+        assert response.status_code == 200
+
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
@@ -388,6 +437,7 @@ async def test_dataset_pagination(
                 organization_siret=temp_org.siret,
                 title=f"Dataset {k}",
                 tag_ids=tag_ids,
+                publication_restriction=PublicationRestriction.NO_RESTRICTION,
             )
         )
 
@@ -404,7 +454,7 @@ async def test_dataset_pagination(
 
 
 @pytest.mark.asyncio
-async def test_dataset_get_all_uses_reverse_chronological_order(
+async def test_dataset_get_all_uses_reverse_chronological_order(  # noqa: E501
     client: httpx.AsyncClient, temp_org: OrganizationView, temp_user: TestPasswordUser
 ) -> None:
     bus = resolve(MessageBus)
@@ -422,6 +472,82 @@ async def test_dataset_get_all_uses_reverse_chronological_order(
     assert response.status_code == 200
     titles = [dataset["title"] for dataset in response.json()["items"]]
     assert titles == ["Newest", "Intermediate", "Oldest"]
+
+
+@pytest.mark.asyncio
+async def test_get_datasets_without_publication_restriction(
+    client: httpx.AsyncClient, temp_org: OrganizationView, temp_user: TestPasswordUser
+) -> None:
+    bus = resolve(MessageBus)
+
+    siret = await bus.execute(CreateOrganizationFactory.build())
+
+    user = await create_test_password_user(
+        CreatePasswordUserFactory.build(organization_siret=siret)
+    )
+
+    for publication_restriction in (
+        PublicationRestriction.DRAFT,
+        PublicationRestriction.LEGAL_RESTRICTION,
+        PublicationRestriction.NO_RESTRICTION,
+    ):
+        await bus.execute(
+            CreateDatasetFactory.build(
+                account=temp_user.account,
+                organization_siret=temp_org.siret,
+                title=f"Title {publication_restriction}",
+                publication_restriction=publication_restriction,
+            )
+        )
+
+    response = await client.get("/datasets/", auth=user.auth)
+    assert response.status_code == 200
+    publication_restriction_data = [
+        dataset["publication_restriction"] for dataset in response.json()["items"]
+    ]
+
+    assert not set(
+        [
+            PublicationRestriction.LEGAL_RESTRICTION.value,
+            PublicationRestriction.DRAFT.value,
+        ]
+    ).issubset(set(publication_restriction_data))
+    assert PublicationRestriction.NO_RESTRICTION.value in publication_restriction_data
+
+
+@pytest.mark.asyncio
+async def test_get_datasets_with_publications_restrictions_of_my_organization_only_including_those_without_publication_restriction(  # noqa: E501
+    client: httpx.AsyncClient, temp_org: OrganizationView, temp_user: TestPasswordUser
+) -> None:
+    bus = resolve(MessageBus)
+
+    for publication_restriction in (
+        PublicationRestriction.DRAFT,
+        PublicationRestriction.LEGAL_RESTRICTION,
+        PublicationRestriction.NO_RESTRICTION,
+    ):
+        await bus.execute(
+            CreateDatasetFactory.build(
+                account=temp_user.account,
+                organization_siret=temp_org.siret,
+                title=f"Title {publication_restriction}",
+                publication_restriction=publication_restriction,
+            )
+        )
+
+    response = await client.get("/datasets/", auth=temp_user.auth)
+    assert response.status_code == 200
+    publication_restriction_data = [
+        dataset["publication_restriction"] for dataset in response.json()["items"]
+    ]
+
+    assert set(
+        [
+            PublicationRestriction.LEGAL_RESTRICTION.value,
+            PublicationRestriction.DRAFT.value,
+            PublicationRestriction.NO_RESTRICTION.value,
+        ]
+    ).issubset(set(publication_restriction_data))
 
 
 @pytest.mark.asyncio
@@ -662,7 +788,7 @@ class TestDatasetUpdate:
         }
 
         # Entity was indeed updated
-        query = GetDatasetByID(id=dataset_id)
+        query = GetDatasetByID(id=dataset_id, account=temp_user.account)
         dataset = await bus.execute(query)
         assert dataset.title == "Other title"
         assert dataset.description == "Other description"
@@ -676,6 +802,55 @@ class TestDatasetUpdate:
         assert dataset.last_updated_at == other_last_updated_at
         assert dataset.url == "https://data.gouv.fr/datasets/other"
         assert dataset.license == "ODC Open Database License"
+
+    async def test_can_not_update_publication_restriction_if_i_do_not_belong_to_the_organization(  # noqa: E501
+        self,
+        client: httpx.AsyncClient,
+        temp_org: OrganizationView,
+        temp_user: TestPasswordUser,
+    ) -> None:
+        bus = resolve(MessageBus)
+
+        siret = await bus.execute(CreateOrganizationFactory.build())
+
+        user = await create_test_password_user(
+            CreatePasswordUserFactory.build(organization_siret=siret)
+        )
+
+        dataset_id = await bus.execute(
+            CreateDatasetFactory.build(
+                account=temp_user.account,
+                organization_siret=temp_org.siret,
+                publication_restriction=PublicationRestriction.NO_RESTRICTION,
+            )
+        )
+
+        other_last_updated_at = fake.date_time_tz()
+
+        payload = to_payload(
+            UpdateDatasetPayloadFactory.build(
+                title="Other title",
+                description="Other description",
+                service="Other service",
+                geographical_coverage="Hauts-de-France",
+                formats=[DataFormat.DATABASE],
+                technical_source="Other information system",
+                producer_email="other.service@mydomain.org",
+                contact_emails=["other.person@mydomain.org"],
+                update_frequency=UpdateFrequency.WEEKLY,
+                last_updated_at=other_last_updated_at.isoformat(),
+                url="https://data.gouv.fr/datasets/other",
+                license="ODC Open Database License",
+                tag_ids=[],
+                extra_field_values=[],
+                publication_restriction=PublicationRestriction.LEGAL_RESTRICTION.value,
+            )
+        )
+
+        response = await client.put(
+            f"/datasets/{dataset_id}/", json=payload, auth=user.auth
+        )
+        assert response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -769,7 +944,9 @@ class TestTags:
             {"id": str(tag_architecture.id), "name": "Architecture"},
         ]
 
-        dataset = await bus.execute(GetDatasetByID(id=dataset_id))
+        dataset = await bus.execute(
+            GetDatasetByID(id=dataset_id, account=temp_user.account)
+        )
         assert dataset.tags == [tag_architecture]
 
     async def test_tags_remove(
@@ -801,7 +978,9 @@ class TestTags:
         assert response.status_code == 200
         assert response.json()["tags"] == []
 
-        dataset = await bus.execute(GetDatasetByID(id=dataset_id))
+        dataset = await bus.execute(
+            GetDatasetByID(id=dataset_id, account=temp_user.account)
+        )
         assert dataset.tags == []
 
 
@@ -867,7 +1046,7 @@ class TestExtraFieldValues:
             account=user.account, organization_siret=siret
         )
         dataset_id = await bus.execute(command)
-        dataset = await bus.execute(GetDatasetByID(id=dataset_id))
+        dataset = await bus.execute(GetDatasetByID(id=dataset_id, account=user.account))
         assert not dataset.extra_field_values
 
         payload = to_payload(
@@ -908,7 +1087,7 @@ class TestExtraFieldValues:
             ],
         )
         dataset_id = await bus.execute(command)
-        dataset = await bus.execute(GetDatasetByID(id=dataset_id))
+        dataset = await bus.execute(GetDatasetByID(id=dataset_id, account=user.account))
         assert len(dataset.extra_field_values) == 1
 
         payload = to_payload(
@@ -955,7 +1134,7 @@ class TestDeleteDataset:
         assert response.status_code == 204
 
         with pytest.raises(DatasetDoesNotExist):
-            await bus.execute(GetDatasetByID(id=dataset_id))
+            await bus.execute(GetDatasetByID(id=dataset_id, account=temp_user.account))
 
     async def test_idempotent(
         self, client: httpx.AsyncClient, admin_user: TestPasswordUser

@@ -1,7 +1,12 @@
-from sqlalchemy import desc, func, select, text
+from typing import Union
+
+from sqlalchemy import and_, desc, func, or_, select, text
 from sqlalchemy.engine import Row
 from sqlalchemy.orm import contains_eager, selectinload
 
+from server.domain.auth.entities import Account
+from server.domain.common.types import Skip
+from server.domain.datasets.entities import PublicationRestriction
 from server.domain.datasets.repositories import DatasetGetAllExtras
 from server.domain.datasets.specifications import DatasetSpec
 
@@ -15,7 +20,7 @@ _TS_HEADLINE_DESCRIPTION_COL = "ts_headline_description"
 
 
 class GetAllQuery:
-    def __init__(self, spec: DatasetSpec) -> None:
+    def __init__(self, spec: DatasetSpec, account: Union[Account, Skip]) -> None:
         columns = []
         joinclauses = []
         whereclauses = []
@@ -60,8 +65,47 @@ class GetAllQuery:
             # Sort rows by search rank, best match first.
             orderbyclauses.append(desc(text("rank")))
 
-        if (siret := spec.organization_siret) is not None:
-            whereclauses.append(CatalogRecordModel.organization_siret == siret)
+        if isinstance(account, Skip):
+            if organization_siret := spec.organization_siret:
+                whereclauses.append(
+                    and_(
+                        CatalogRecordModel.organization_siret == organization_siret,
+                        DatasetModel.publication_restriction
+                        == PublicationRestriction.NO_RESTRICTION,
+                    )
+                )
+            else:
+                whereclauses.append(
+                    DatasetModel.publication_restriction
+                    == PublicationRestriction.NO_RESTRICTION,
+                )
+
+        if isinstance(account, Account):
+            if spec.organization_siret is not None:
+                if spec.organization_siret == account.organization_siret:
+                    whereclauses.append(
+                        CatalogRecordModel.organization_siret
+                        == spec.organization_siret,
+                    )
+
+                else:
+                    whereclauses.append(
+                        and_(
+                            CatalogRecordModel.organization_siret
+                            == spec.organization_siret,
+                            DatasetModel.publication_restriction
+                            == PublicationRestriction.NO_RESTRICTION,
+                        )
+                    )
+            else:
+                whereclauses.append(
+                    or_(
+                        CatalogRecordModel.organization_siret
+                        == account.organization_siret,
+                        DatasetModel.publication_restriction
+                        == PublicationRestriction.NO_RESTRICTION,
+                    )
+                )
 
         if (geographical_coverages := spec.geographical_coverage__in) is not None:
             whereclauses.append(
@@ -70,11 +114,6 @@ class GetAllQuery:
 
         if (services := spec.service__in) is not None:
             whereclauses.append(DatasetModel.service.in_(services))
-
-        if (publication_restriction := spec.publication_restriction) is not None:
-            whereclauses.append(
-                DatasetModel.publication_restriction == publication_restriction
-            )
 
         if (formats := spec.format__in) is not None:
             joinclauses.append((DatasetModel.formats, {"isouter": True}))

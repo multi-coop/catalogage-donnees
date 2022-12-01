@@ -16,9 +16,14 @@ from server.domain.tags.repositories import TagRepository
 from server.seedwork.application.messages import MessageBus
 
 from .commands import CreateDataset, DeleteDataset, UpdateDataset
-from .exceptions import CannotCreateDataset, CannotUpdateDataset
+from .exceptions import CannotCreateDataset, CannotSeeDataset, CannotUpdateDataset
 from .queries import GetAllDatasets, GetDatasetByID, GetDatasetFilters
-from .specifications import can_create_dataset, can_update_dataset
+from .specifications import (
+    can_create_dataset,
+    can_not_change_publication_restriction_level,
+    can_see_dataset,
+    can_update_dataset,
+)
 from .views import DatasetFiltersView, DatasetView
 
 # This organization typically holds password users used by the development team.
@@ -82,6 +87,17 @@ async def update_dataset(command: UpdateDataset) -> None:
     ):
         raise CannotUpdateDataset(f"{command.account=}, {dataset=}")
 
+    if (
+        not isinstance(command.account, Skip)
+        and command.publication_restriction is not None
+        and can_not_change_publication_restriction_level(
+            dataset=dataset,
+            account=command.account,
+            new_publication_restriction_level=command.publication_restriction,
+        )
+    ):
+        raise CannotUpdateDataset(f"{command.account=}, {dataset=}")
+
     tags = await tag_repository.get_all(ids=command.tag_ids)
     dataset.update(
         **command.dict(exclude={"account", "id", "tag_ids", "extra_field_values"}),
@@ -124,9 +140,11 @@ async def get_dataset_filters(query: GetDatasetFilters) -> DatasetFiltersView:
 
 
 async def get_all_datasets(query: GetAllDatasets) -> Pagination[DatasetView]:
-    repository = resolve(DatasetRepository)
+    dataset_repository = resolve(DatasetRepository)
 
-    datasets, count = await repository.get_all(page=query.page, spec=query.spec)
+    datasets, count = await dataset_repository.get_all(
+        page=query.page, spec=query.spec, account=query.account
+    )
 
     views = [DatasetView(**dataset.dict(), **extras) for dataset, extras in datasets]
 
@@ -135,11 +153,15 @@ async def get_all_datasets(query: GetAllDatasets) -> Pagination[DatasetView]:
 
 async def get_dataset_by_id(query: GetDatasetByID) -> DatasetView:
     repository = resolve(DatasetRepository)
-
     id = query.id
     dataset = await repository.get_by_id(id)
 
     if dataset is None:
         raise DatasetDoesNotExist(id)
+
+    if not isinstance(query.account, Skip) and not can_see_dataset(
+        dataset, query.account
+    ):
+        raise CannotSeeDataset(f"{query.account.organization_siret=}, {id=}")
 
     return DatasetView(**dataset.dict())

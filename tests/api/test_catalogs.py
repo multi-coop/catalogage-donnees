@@ -59,7 +59,7 @@ async def test_catalog_create(client: httpx.AsyncClient) -> None:
     dataset_id = await bus.execute(
         CreateDatasetFactory.build(account=user.account, organization_siret=siret)
     )
-    dataset = await bus.execute(GetDatasetByID(id=dataset_id))
+    dataset = await bus.execute(GetDatasetByID(id=dataset_id, account=user.account))
     assert dataset.catalog_record.organization.siret == siret
 
 

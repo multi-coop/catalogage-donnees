@@ -11,6 +11,7 @@ from server.application.datasets.commands import (
 )
 from server.application.datasets.exceptions import (
     CannotCreateDataset,
+    CannotSeeDataset,
     CannotUpdateDataset,
 )
 from server.application.datasets.queries import GetAllDatasets, GetDatasetByID
@@ -42,6 +43,7 @@ router.include_router(filters.router)
     response_model=Pagination[DatasetView],
 )
 async def list_datasets(
+    request: "APIRequest",
     params: DatasetListParams = Depends(),
 ) -> Pagination[DatasetView]:
     bus = resolve(MessageBus)
@@ -59,8 +61,8 @@ async def list_datasets(
             technical_source__in=params.technical_source,
             tag__id__in=params.tag_id,
             license=params.license,
-            publication_restriction=params.publication_restriction,
         ),
+        account=request.user.account,
     )
 
     return await bus.execute(query)
@@ -72,14 +74,17 @@ async def list_datasets(
     response_model=DatasetView,
     responses={404: {}},
 )
-async def get_dataset_by_id(id: ID) -> DatasetView:
+async def get_dataset_by_id(id: ID, request: "APIRequest") -> DatasetView:
     bus = resolve(MessageBus)
 
-    query = GetDatasetByID(id=id)
+    query = GetDatasetByID(id=id, account=request.user.account)
     try:
         return await bus.execute(query)
     except DatasetDoesNotExist:
         raise HTTPException(404)
+    except CannotSeeDataset as exec:
+        logger.exception(exec)
+        raise HTTPException(403, detail="Permission denied")
 
 
 @router.post(
@@ -101,8 +106,12 @@ async def create_dataset(data: DatasetCreate, request: "APIRequest") -> DatasetV
         logger.exception(exc)
         raise HTTPException(403, detail="Permission denied")
 
-    query = GetDatasetByID(id=id)
-    return await bus.execute(query)
+    try:
+        query = GetDatasetByID(id=id, account=request.user.account)
+        return await bus.execute(query)
+    except CannotSeeDataset as exec:
+        logger.exception(exec)
+        raise HTTPException(403, detail="Permission denied")
 
 
 @router.put(
@@ -126,8 +135,12 @@ async def update_dataset(
         logger.exception(exc)
         raise HTTPException(403, detail="Permission denied")
 
-    query = GetDatasetByID(id=id)
-    return await bus.execute(query)
+    try:
+        query = GetDatasetByID(id=id, account=request.user.account)
+        return await bus.execute(query)
+    except CannotSeeDataset as exec:
+        logger.exception(exec)
+        raise HTTPException(403, detail="Permission denied")
 
 
 @router.delete(
