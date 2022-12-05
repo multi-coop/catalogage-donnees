@@ -41,9 +41,20 @@ def build_tag_table_of_truth(
 def link_dataset_with_tags_to_keep(
     dataset_results: List[Tuple[Dataset, DatasetGetAllExtras]],
     table_of_truth: Dict[str, ID],
-) -> Dict[ID, Tuple[Dataset, List[str]]]:
+) -> Dict[ID, List[str]]:
+    tags_to_keep: Dict[ID,  List[str]] = {}
+
     for dataset, _ in dataset_results:
-        pass
+        tags = dataset.tags
+        for tag in tags:
+            truth = table_of_truth[tag.name]
+            if truth == tag.id:
+                if dataset.id in tags_to_keep:
+                    tags_to_keep[dataset.id].append(tag.id)
+                else:
+                    tags_to_keep[dataset.id] = [tag.id]
+ 
+    return tags_to_keep
 
 
 async def main() -> None:
