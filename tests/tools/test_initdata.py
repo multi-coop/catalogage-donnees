@@ -136,7 +136,7 @@ async def test_repo_initdata(
     monkeypatch.setenv("TOOLS_PASSWORDS", m.group(1))
 
     num_users = 4
-    num_tags = 7
+    num_tags = 9
     num_datasets = 5
     num_organizations = 2
     num_catalogs = 1

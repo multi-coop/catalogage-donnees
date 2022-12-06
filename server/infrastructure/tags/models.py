@@ -15,7 +15,7 @@ dataset_tag = Table(
     "dataset_tag",
     mapper_registry.metadata,
     Column("dataset_id", ForeignKey("dataset.id"), primary_key=True),
-    Column("tag_id", ForeignKey("tag.id", ondelete="cascade"), primary_key=True),
+    Column("tag_id", ForeignKey("tag.id"), primary_key=True),
 )
 
 

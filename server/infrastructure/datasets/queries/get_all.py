@@ -70,11 +70,10 @@ class GetAllQuery:
                 whereclauses.append(
                     and_(
                         CatalogRecordModel.organization_siret == organization_siret,
-                        DatasetModel.publication_restriction
-                        == PublicationRestriction.NO_RESTRICTION,
                     )
                 )
-            else:
+
+            if not spec.include_all_datasets:
                 whereclauses.append(
                     DatasetModel.publication_restriction
                     == PublicationRestriction.NO_RESTRICTION,

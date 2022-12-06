@@ -56,6 +56,9 @@ currentmigration: #- Show current migraiton
 initdata: #- Initialize data
 	${bin}python -m tools.initdata tools/initdata.yml
 
+dedupe-tags: #- Dedupe tags
+	${bin}python -m tools.remove_duplicated_tags
+
 initdatareset: #- Initialize data, resetting any changed target entities
 	${bin}python -m tools.initdata --reset tools/initdata.yml
 
@@ -138,6 +141,9 @@ ops-deploy: #- Deploy environment
 
 ops-initdata: #- Run initdata in environment
 	cd ops && make initdata env=$(env)
+
+ops-dedupe-tags: #- Run initdata in environment
+	cd ops && make dedupe-tags env=$(env)
 
 ops-staging: #- Sync staging branch with changes from current branch 
 	git checkout staging 
