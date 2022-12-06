@@ -18,3 +18,9 @@ class TagRepository(Repository):
 
     async def insert(self, entity: Tag) -> ID:
         raise NotImplementedError  # pragma: no cover
+
+    async def delete_by_id(self, id_: ID) -> ID:
+        raise NotImplementedError  # pragma: no cover
+
+    async def delete_many_by_id(self, ids_: List[ID]) -> List[ID]:
+        raise NotImplementedError  # pragma: no cover

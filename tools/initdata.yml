@@ -102,7 +102,17 @@ tags:
   - id: "3fb62570-7398-431a-bd60-cce1fd7bd32b"
     params:
       name: chemin de fer
-
+  
+  - id: "5fb62590-7398-431a-bd60-cce1fd7bd45b"
+    params:
+      name: environnement
+    
+  - id: "ea474611-20e8-41e1-b7a6-c0aad69e062e"
+    params:
+      name: chemin de fer
+    
+   
+  
 datasets:
   - # Mimicks: https://www.data.gouv.fr/fr/datasets/donnees-brutes-de-l-inventaire-forestier/
     id: "16b398af-f8c7-48b9-898a-18ad3404f528"
@@ -125,6 +135,7 @@ datasets:
       license: Licence Ouverte
       tag_ids:
         - "9c1549a5-02ef-43a9-aa20-6babdce0b733"
+        - "5fb62590-7398-431a-bd60-cce1fd7bd45b" # This dataset has a duplicated tag : "environement"
       extra_field_values: []
       publication_restriction: "no_restriction"
 
