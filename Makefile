@@ -142,6 +142,9 @@ ops-deploy: #- Deploy environment
 ops-initdata: #- Run initdata in environment
 	cd ops && make initdata env=$(env)
 
+ops-dedupe-tags: #- Run initdata in environment
+	cd ops && make dedupe-tags env=$(env)
+
 ops-staging: #- Sync staging branch with changes from current branch 
 	git checkout staging 
 	git pull --rebase origin staging

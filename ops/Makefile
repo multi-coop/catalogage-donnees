@@ -25,3 +25,6 @@ deploy:
 
 initdata:
 	${bin}ansible-playbook ${vault-password} ${env-opts} -t initdata ansible/playbook.yml $(extra_opts)
+
+dedupe-tags:
+	${bin}ansible-playbook ${vault-password} ${env-opts} -t dedupe-tags ansible/playbook.yml $(extra_opts)

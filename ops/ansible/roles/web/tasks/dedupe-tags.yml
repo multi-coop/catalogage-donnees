@@ -1,0 +1,4 @@
+- name: Dedupe tags
+  shell:
+    cmd: venv/bin/python -m tools.remove_duplicated_tags
+    chdir: "{{ workdir }}"
