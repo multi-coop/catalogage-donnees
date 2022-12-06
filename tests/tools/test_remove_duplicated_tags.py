@@ -19,6 +19,14 @@ from ..factories import (
 )
 
 
+def get_tag_names(tags: List[TagView]) -> List[str]:
+    return list(map(lambda x: x.name, tags))
+
+
+def get_tag_id(tags: List[TagView]) -> List[ID]:
+    return list(map(lambda x: x.id, tags))
+
+
 @pytest.mark.asyncio
 async def test_link_dataset_with_tags_to_keep() -> None:
 
@@ -78,12 +86,7 @@ async def test_link_dataset_with_tags_to_keep() -> None:
 
 
 @pytest.mark.asyncio
-async def test_remove_duplicated_tags() -> None:
-    def get_tag_names(tags: List[TagView]) -> List[str]:
-        return list(map(lambda x: x.name, tags))
-
-    def get_tag_id(tags: List[TagView]) -> List[ID]:
-        return list(map(lambda x: x.id, tags))
+async def test_should_remove_links_between_duplicated_tags_and_dataset() -> None:
 
     bus = resolve(MessageBus)
 
@@ -142,3 +145,42 @@ async def test_remove_duplicated_tags() -> None:
 
     # check  dataset_2 tag list contains only ids included in tag list
     assert set(get_tag_id(dataset_2.tags)).issubset(set(get_tag_id(tags)))
+
+
+@pytest.mark.asyncio
+async def test_should_not_have_duplicated_tag_stored() -> None:
+
+    bus = resolve(MessageBus)
+
+    # Simulate an existing organization and catalog
+    siret = await bus.execute(
+        CreateOrganizationFactory.build(name="Ministère 1", siret="11004601800013")
+    )
+    await bus.execute(
+        CreateCatalog(
+            organization_siret=siret,
+        )
+    )
+
+    tag_name = "duplicated_tag"
+
+    tag_id_1 = await bus.execute(CreateTagFactory.build(name=tag_name))
+
+    await bus.execute(CreateTagFactory.build(name="not_used"))
+    await bus.execute(CreateTagFactory.build(name="not_used"))
+
+    await bus.execute(
+        CreateDatasetFactory.build(
+            account=Skip(),
+            tag_ids=[tag_id_1],
+            organization_siret=siret,
+        )
+    )
+
+    await main()
+
+    tags = await bus.execute(GetAllTags())
+
+    tag_names = get_tag_names(tags)
+
+    assert len(tag_names) == len(set(tag_names))

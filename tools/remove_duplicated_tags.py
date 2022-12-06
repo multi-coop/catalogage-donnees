@@ -1,7 +1,13 @@
 import asyncio
+import functools
 from typing import Dict, List, Tuple
 
+
+import click
+from dotenv import load_dotenv
+
 from server.application.datasets.commands import UpdateDataset
+from server.application.tags.views import TagView
 from server.config.di import bootstrap, resolve
 from server.domain.common.types import ID, Skip
 from server.domain.datasets.entities import Dataset
@@ -9,6 +15,21 @@ from server.domain.datasets.repositories import DatasetGetAllExtras, DatasetRepo
 from server.domain.tags.entities import Tag
 from server.domain.tags.repositories import TagRepository
 from server.seedwork.application.messages import MessageBus
+
+
+load_dotenv()
+success = functools.partial(click.style, fg="bright_green")
+
+
+def get_duplicated_tags_ids_to_delelte(tags: List[TagView]) -> List[ID]:
+    tags_to_delete = []
+    tag_names = []
+    for tag in tags:
+        if not tag.name in tag_names:
+            tag_names.append(tag.name)
+        else:
+            tags_to_delete.append(tag.id)
+    return tags_to_delete
 
 
 async def update_dataset_tags(
@@ -97,21 +118,29 @@ def get_tags_to_delete_list(
 async def main() -> None:
     bus = resolve(MessageBus)
     tag_repository = resolve(TagRepository)
-    datasets_repository = resolve(DatasetRepository)
+    # datasets_repository = resolve(DatasetRepository)
 
-    dataset_results, _ = await datasets_repository.get_all()
+    # dataset_results, _ = await datasets_repository.get_all()
 
-    tag_table_of_truth = build_tag_table_of_truth(dataset_results)
+    # tag_table_of_truth = build_tag_table_of_truth(dataset_results)
 
-    dataset_tags_map = link_dataset_with_tags_to_keep(
-        dataset_results, tag_table_of_truth
-    )
+    # dataset_tags_map = link_dataset_with_tags_to_keep(
+    #     dataset_results, tag_table_of_truth
+    # )
 
-    await update_dataset_tags(dataset_results, dataset_tags_map, bus)
+    # await update_dataset_tags(dataset_results, dataset_tags_map, bus)
 
-    tags_to_delete = get_tags_to_delete_list(dataset_results, tag_table_of_truth)
+    # tags_to_delete = get_tags_to_delete_list(dataset_results, tag_table_of_truth)
 
-    await tag_repository.delete_many_by_id(tags_to_delete)
+    # await tag_repository.delete_many_by_id(tags_to_delete)
+
+    # tags = await tag_repository.get_all()
+
+    # ids = get_duplicated_tags_ids_to_delelte(tags)
+
+    await tag_repository.delete_many_by_id([])
+
+    # print(f"{success('ok')}: {len(ids)} tags deleted")
 
 
 if __name__ == "__main__":

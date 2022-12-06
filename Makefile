@@ -56,6 +56,9 @@ currentmigration: #- Show current migraiton
 initdata: #- Initialize data
 	${bin}python -m tools.initdata tools/initdata.yml
 
+dedupe-tags: #- Dedupe tags
+	${bin}python -m tools.remove_duplicated_tags
+
 initdatareset: #- Initialize data, resetting any changed target entities
 	${bin}python -m tools.initdata --reset tools/initdata.yml
 
