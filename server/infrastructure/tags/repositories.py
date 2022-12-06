@@ -46,13 +46,11 @@ class SqlTagRepository(TagRepository):
 
     async def delete_many_by_id(self, ids_: List[ID]) -> List[ID]:
         async with self._db.session() as session:
-            stmt = delete(TagModel).where(
-                TagModel.name.in_(["chemin de fer", "services"])
-            )
+            stmt = delete(TagModel).where(TagModel.id.in_(ids_))
 
             await session.execute(stmt)
 
-            # print(result.scalar_one_or_none())
+            await session.commit()
 
             return ids_
 

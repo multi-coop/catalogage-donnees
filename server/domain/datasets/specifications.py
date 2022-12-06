@@ -18,3 +18,4 @@ class DatasetSpec:
     technical_source__in: Optional[Sequence[str]] = None
     tag__id__in: Optional[Sequence[ID]] = None
     license: Optional[str] = None
+    include_all_datasets: bool = False
