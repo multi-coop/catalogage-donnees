@@ -1,7 +1,7 @@
 import asyncio
 import functools
+import logging.config
 from typing import Dict, List, Tuple
-
 
 import click
 from dotenv import load_dotenv
@@ -9,13 +9,14 @@ from dotenv import load_dotenv
 from server.application.datasets.commands import UpdateDataset
 from server.application.tags.views import TagView
 from server.config.di import bootstrap, resolve
+from server.config.settings import Settings
 from server.domain.common.types import ID, Skip
 from server.domain.datasets.entities import Dataset
-from server.domain.datasets.repositories import DatasetGetAllExtras, DatasetRepository
+from server.domain.datasets.repositories import DatasetGetAllExtras
 from server.domain.tags.entities import Tag
 from server.domain.tags.repositories import TagRepository
+from server.infrastructure.logging.config import get_log_config
 from server.seedwork.application.messages import MessageBus
-
 
 load_dotenv()
 success = functools.partial(click.style, fg="bright_green")
@@ -145,4 +146,8 @@ async def main() -> None:
 
 if __name__ == "__main__":
     bootstrap()
+
+    settings = resolve(Settings)
+    logging.config.dictConfig(get_log_config(settings))
+
     asyncio.run(main())
