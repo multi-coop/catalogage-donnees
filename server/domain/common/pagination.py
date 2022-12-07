@@ -11,7 +11,7 @@ T = TypeVar("T")
 
 class Page(BaseModel):
     number: Annotated[int, Field(ge=1, le=10_000)] = 1
-    size: Annotated[int, Field(ge=1, le=100)] = 10
+    size: Annotated[int, Field(ge=1)] = 10
 
     class Config:
         allow_mutation = False

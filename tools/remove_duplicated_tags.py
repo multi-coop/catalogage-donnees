@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from server.application.datasets.commands import UpdateDataset
 from server.config.di import bootstrap, resolve
 from server.config.settings import Settings
+from server.domain.common.pagination import Page
 from server.domain.common.types import ID, Skip
 from server.domain.datasets.entities import Dataset
 from server.domain.datasets.repositories import DatasetGetAllExtras, DatasetRepository
@@ -23,62 +24,31 @@ success = functools.partial(click.style, fg="bright_green")
 info = functools.partial(click.style, fg="blue")
 
 
-def get_duplicated_tags_ids_to_delelte(tags: List[Tag]) -> List[ID]:
-    tags_to_delete = []
-    tag_names = []
-    for tag in tags:
-        if tag.name not in tag_names:
-            tag_names.append(tag.name)
-        else:
-            tags_to_delete.append(tag.id)
-    return tags_to_delete
-
-
 async def update_dataset_tags(
     dataset_results: List[Tuple[Dataset, DatasetGetAllExtras]],
     dataset_ids_map: Dict[ID, List[ID]],
     bus: MessageBus,
 ) -> None:
-    tasks = []
-    for dataset, _ in dataset_results:
-        tags = dataset_ids_map[dataset.id]
-        print(f"{info('ok')}: Update dataset {dataset.id} with tags {tags}")
 
-        tasks.append(
-            bus.execute(
+    for dataset, _ in dataset_results:
+
+        if dataset is not None and dataset.id in dataset_ids_map:
+            tags = dataset_ids_map[dataset.id]
+            await bus.execute(
                 UpdateDataset(
-                    account=Skip(), tag_ids=tags, **dataset.dict(exclude={"tag_ids"})
+                    account=Skip(),
+                    tag_ids=tags,
+                    **dataset.dict(exclude={"tag_ids"}),
                 )
             )
-        )
-
-    await asyncio.wait(tasks)
-
-
-def group_tag_by_name(tags: List[Tag]) -> Dict[str, List[ID]]:
-
-    groupped_by_tag_by_name: Dict[str, List[ID]] = {}
-
-    for tag in tags:
-        if tag.name in groupped_by_tag_by_name:
-            groupped_by_tag_by_name[tag.name].append(tag.id)
-        else:
-            groupped_by_tag_by_name[tag.name] = [tag.id]
-
-    return groupped_by_tag_by_name
 
 
 def build_tag_table_of_truth(
-    dataset_results: List[Tuple[Dataset, DatasetGetAllExtras]]
+    tags: List[Tag], tag_table_of_truth: Dict[str, ID] = {}
 ) -> Dict[str, ID]:
-
-    tag_table_of_truth: Dict[str, ID] = {}
-
-    for dataset, _ in dataset_results:
-        tags = dataset.tags
-        for tag in tags:
-            if tag.name not in tag_table_of_truth:
-                tag_table_of_truth[tag.name] = tag.id
+    for tag in tags:
+        if tag.name not in tag_table_of_truth:
+            tag_table_of_truth[tag.name] = tag.id
 
     return tag_table_of_truth
 
@@ -93,29 +63,51 @@ def link_dataset_with_tags_to_keep(
         tags = dataset.tags
         for tag in tags:
             truth = table_of_truth[tag.name]
-            if truth == tag.id:
-                if dataset.id in tags_to_keep:
-                    tags_to_keep[dataset.id].append(tag.id)
-                else:
-                    tags_to_keep[dataset.id] = [tag.id]
+
+            if dataset.id not in tags_to_keep.keys():
+                tags_to_keep[dataset.id] = [truth]
+            else:
+                tags_to_keep[dataset.id].append(truth)
 
     return tags_to_keep
 
 
 def get_tags_to_delete_list(
-    dataset_results: List[Tuple[Dataset, DatasetGetAllExtras]],
+    tags: List[Tag],
     table_of_truth: Dict[str, ID],
 ) -> List[ID]:
-    tags_to_remove: List[ID] = []
+    tags_to_delete: List[ID] = []
+
+    def match_with_the_truth(tag: Tag) -> bool:
+        return table_of_truth[tag.name] == tag.id
+
+    for tag in tags:
+        if not match_with_the_truth(tag):
+            tags_to_delete.append(tag.id)
+
+    return tags_to_delete
+
+
+def build_table_of_truth_from_stored_datasets(
+    dataset_results: List[Tuple[Dataset, DatasetGetAllExtras]]
+) -> Dict[str, ID]:
+    table_of_truth: Dict[str, ID] = {}
 
     for dataset, _ in dataset_results:
-        tags = dataset.tags
-        for tag in tags:
-            truth = table_of_truth[tag.name]
-            if not truth == tag.id:
-                tags_to_remove.append(tag.id)
+        partial_table_of_truth = build_tag_table_of_truth(
+            dataset.tags, tag_table_of_truth=table_of_truth
+        )
 
-    return tags_to_remove
+        table_of_truth = partial_table_of_truth
+
+    return table_of_truth
+
+
+def build_table_of_truth_from_tags(
+    tags: List[Tag], partial_table_of_truth: Dict[str, ID]
+) -> Dict[str, ID]:
+
+    return build_tag_table_of_truth(tags, partial_table_of_truth)
 
 
 async def main() -> None:
@@ -124,28 +116,33 @@ async def main() -> None:
     datasets_repository = resolve(DatasetRepository)
 
     dataset_results, _ = await datasets_repository.get_all(
-        spec=DatasetSpec(include_all_datasets=True)
+        spec=DatasetSpec(include_all_datasets=True),
+        page=Page(
+            number=1,
+            size=1000,  # we want to get all datasets from the database
+        ),
+        account=Skip(),
     )
 
-    tag_table_of_truth = build_tag_table_of_truth(dataset_results)
+    tags = await tag_repository.get_all()
+
+    partial_table_of_truth = build_table_of_truth_from_stored_datasets(dataset_results)
+
+    table_of_truth = build_table_of_truth_from_tags(tags, partial_table_of_truth)
 
     dataset_tags_map = link_dataset_with_tags_to_keep(
-        dataset_results, tag_table_of_truth
+        dataset_results, table_of_truth=table_of_truth
     )
 
     await update_dataset_tags(dataset_results, dataset_tags_map, bus)
 
-    tags_to_delete = get_tags_to_delete_list(dataset_results, tag_table_of_truth)
+    tags_to_delete = get_tags_to_delete_list(tags, table_of_truth)
 
     await tag_repository.delete_many_by_id(tags_to_delete)
 
-    tags = await tag_repository.get_all()
-
-    ids = get_duplicated_tags_ids_to_delelte(tags)
-
-    await tag_repository.delete_many_by_id(ids)
-
-    print(f"{success('ok')}: {len(ids) + len(tags_to_delete)} tags deleted")
+    print(
+        f"{success('ok')}: {len(tags_to_delete)} duplicated tags deleted - Previoulsy {len(tags)} were stored, {len(tags) - len(tags_to_delete)} remains"  # noqa E501
+    )
 
 
 if __name__ == "__main__":
