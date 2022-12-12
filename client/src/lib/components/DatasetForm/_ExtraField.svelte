@@ -65,3 +65,9 @@
     on:blur
   />
 {/if}
+
+<style>
+  label > p {
+    font-size: inherit;
+  }
+</style>

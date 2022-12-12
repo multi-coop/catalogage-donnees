@@ -68,3 +68,10 @@
     </p>
   {/if}
 </div>
+
+<style>
+  /* Fix a parsing issue. Sometimes when a markdown string is parsed into html the result string is wrapped by a <p> tag */
+  span > p {
+    font-size: inherit;
+  }
+</style>
