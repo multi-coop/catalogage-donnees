@@ -12,7 +12,7 @@ catalogs:
       extra_fields:
         - name: referentiel
           title: Référentiel ou norme
-          hint_text: Ce jeu de données contient-il un référentiel ou une norme ? Si oui, lequel ?
+          hint_text: Ce jeu de données contient-il un [référentiel](https://fr.wikipedia.org/wiki/R%C3%A9f%C3%A9rentiel) ou une norme ? Si oui, lequel ?
           type: TEXT
 
 users:
