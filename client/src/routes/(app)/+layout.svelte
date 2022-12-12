@@ -18,7 +18,7 @@
 </script>
 
 <LayoutProviders>
-  <Header account={$account} />
+  <Header />
 
   <main id="contenu" class="fr-mb-8w">
     <slot />

@@ -4,7 +4,6 @@
   import { logout, account } from "$lib/stores/auth";
   import { navigationItems } from "$lib/stores/layout/navigation";
   import { SITE_TITLE } from "src/constants";
-  import paths from "$lib/paths";
   import { Maybe } from "$lib/util/maybe";
 
   $: path = $page.url.pathname;
@@ -15,6 +14,7 @@
   };
 </script>
 
+<!-- svelte-ignore a11y-no-redundant-roles -- this is the main header so the role is not redudant -->
 <header role="banner" class="fr-header">
   <div class="fr-header__body">
     <div class="fr-container">
