@@ -58,7 +58,7 @@
   </div>
 </section>
 
-<section role="region" class="fr-container fr-py-8w">
+<section class="fr-container fr-py-8w">
   <div class="fr-grid-row">
     <div class="fr-col-12">
       <h2 class="fr-h3">Comment accéder aux catalogues ?</h2>

@@ -9,7 +9,6 @@ test.describe('homepage', () => { // 2
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore this is a hot fix untild this isssue will be resolved https://github.com/dequelabs/axe-core-npm/issues/601
     const accessibilityScanResults = await new AxeBuilder.default({ page }).analyze(); // 4
-
     expect(accessibilityScanResults.violations).toEqual([]); // 5
   });
 });
