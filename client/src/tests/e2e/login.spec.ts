@@ -15,7 +15,7 @@ test.describe("Login", () => {
         "text='Bienvenue sur le service de catalogage de données de l’État'"
       )
       .waitFor();
-    await expect(page).toHaveURL("/login");
+    await expect(page).toHaveURL("/");
   });
 
   test("Logs in", async ({ page }) => {
