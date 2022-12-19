@@ -63,6 +63,7 @@ async def test_create_organization(client: httpx.AsyncClient) -> None:
     assert response.json() == {
         "siret": "60487647500499",
         "name": "Example organization",
+        "logo_url": None,
     }
 
 
@@ -73,7 +74,11 @@ async def test_create_organization_many(client: httpx.AsyncClient) -> None:
         payload = to_payload(command)
         response = await client.post("/organizations/", json=payload, auth=api_key_auth)
         assert response.status_code == 201
-        assert response.json() == {"siret": command.siret, "name": command.name}
+        assert response.json() == {
+            "siret": command.siret,
+            "name": command.name,
+            "logo_url": command.logo_url,
+        }
 
 
 @pytest.mark.asyncio
