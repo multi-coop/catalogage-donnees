@@ -47,10 +47,7 @@ async def test_catalog_create(client: httpx.AsyncClient) -> None:
     )
     assert response.status_code == 201
     assert response.json() == {
-        "organization": {
-            "siret": str(siret),
-            "name": "Org 1",
-        },
+        "organization": {"siret": str(siret), "name": "Org 1", "logo_url": None},
         "extra_fields": [],
     }
     catalog = await bus.execute(GetCatalogBySiret(siret=siret))
@@ -254,10 +251,7 @@ async def test_create_catalog_with_extra_fields(client: httpx.AsyncClient) -> No
     data = response.json()
 
     assert data == {
-        "organization": {
-            "siret": str(siret),
-            "name": "Org 1",
-        },
+        "organization": {"siret": str(siret), "name": "Org 1", "logo_url": None},
         "extra_fields": [
             {
                 "id": data["extra_fields"][0]["id"],
@@ -342,10 +336,7 @@ async def test_get_catalog(
     assert response.status_code == 200
     data = response.json()
     assert data == {
-        "organization": {
-            "siret": siret,
-            "name": "Org 1",
-        },
+        "organization": {"siret": siret, "name": "Org 1", "logo_url": None},
         "extra_fields": [
             {
                 "id": data["extra_fields"][0]["id"],

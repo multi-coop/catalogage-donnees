@@ -17,6 +17,7 @@ class OrganizationModel(Base):
 
     siret: Siret = Column(CHAR(14), primary_key=True)
     name: str = Column(String(), nullable=False)
+    logo_url: str = Column(String(), nullable=True)
 
     catalog: "CatalogModel" = relationship(
         "CatalogModel",

@@ -30,8 +30,7 @@ async def create_organization_if_not_exists(
     bus = resolve(MessageBus)
 
     command = CreateOrganization(
-        name=data.name,
-        siret=data.siret,
+        name=data.name, siret=data.siret, logo_url=data.logo_url
     )
 
     try:
