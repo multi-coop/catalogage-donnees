@@ -13,7 +13,7 @@ import type {
 import { login, logout } from "$lib/stores/auth";
 import { buildFakeTag } from "src/tests/factories/tags";
 import type { Catalog, ExtraField } from "src/definitions/catalogs";
-import type { Organization } from "src/definitions/organizations";
+import type { Organization } from "src/definitions/organization";
 
 describe("Test the dataset form", () => {
   beforeAll(() =>

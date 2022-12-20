@@ -1,4 +1,5 @@
 import type { Catalog, ExtraField } from "src/definitions/catalogs";
+import { toOrganization } from "./organization";
 
 const toExtraField = (data: any): ExtraField => {
   const { hint_text, ...rest } = data;
@@ -22,7 +23,7 @@ const toExtraField = (data: any): ExtraField => {
 export const toCatalog = (data: any): Catalog => {
   const { organization, extra_fields } = data;
   return {
-    organization,
+    organization: toOrganization(organization),
     extraFields: extra_fields.map((v: any) => toExtraField(v)),
   };
 };

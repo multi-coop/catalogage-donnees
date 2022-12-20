@@ -1,4 +1,4 @@
-import type { Organization } from "src/definitions/organizations";
+import type { Organization } from "src/definitions/organization";
 import { range } from "$lib/util/array";
 import { randint } from "src/lib/util/random";
 
