@@ -61,7 +61,7 @@
 <section class="fr-container fr-py-8w">
   <div class="fr-grid-row">
     <div class="fr-col-12">
-      <h3>Comment accéder aux catalogues ?</h3>
+      <h2 class="fr-h3">Comment accéder aux catalogues ?</h2>
 
       <p>
         L’accès aux catalogues s’effectue via le compte MonComptePro. Il est
@@ -85,7 +85,7 @@
   </div>
 </section>
 <section class="fr-container fr-py-8w">
-  <h3>Ils utilisent notre service</h3>
+  <h2 class="fr-h3">Ils utilisent notre service</h2>
   <div class="fr-grid-row fr-grid-row--gutters">
     <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-3">
       <OrganizationCard

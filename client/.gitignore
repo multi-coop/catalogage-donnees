@@ -12,3 +12,6 @@ node_modules
 
 # End-to-end tests with Playwright
 /test-results
+/test-results/
+/playwright-report/
+/playwright/.cache/
