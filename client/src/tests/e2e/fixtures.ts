@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { test as base, expect, type APIRequestContext } from "@playwright/test";
 import type { Dataset } from "../../definitions/datasets.js";
 import { toDataset } from "../../lib/transformers/dataset.js";
@@ -20,6 +21,7 @@ type AppFixtures = {
   adminApiToken: string;
   apiToken: string;
   dataset: Dataset;
+  makeAxeBuilder: () => AxeBuilder;
 };
 
 export type AppTestArgs = AppFixtures;
@@ -91,5 +93,11 @@ export const test = base.extend<AppTestArgs>({
       headers,
     });
     expect(response.ok()).toBeTruthy();
+  },
+  makeAxeBuilder: async ({ page }, use) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore this is a hot fix untild this isssue will be resolved https://github.com/dequelabs/axe-core-npm/issues/601
+    const makeAxeBuilder = () => new AxeBuilder.default({ page });
+    await use(makeAxeBuilder);
   },
 });

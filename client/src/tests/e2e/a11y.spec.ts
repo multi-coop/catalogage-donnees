@@ -1,17 +1,35 @@
-import AxeBuilder from "@axe-core/playwright";
-import { test, expect } from "@playwright/test";
+import { test } from "./fixtures.js";
+import { expect } from "@playwright/test";
 
-test.describe("homepage", () => {
-  // 2
-  test("should not have any automatically detectable accessibility issues", async ({
+test.describe("acesssibility", () => {
+  test("home page should not have any automatically detectable accessibility issues", async ({
     page,
+    makeAxeBuilder,
   }) => {
-    await page.goto("/"); // 3
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore this is a hot fix untild this isssue will be resolved https://github.com/dequelabs/axe-core-npm/issues/601
-    const accessibilityScanResults = await new AxeBuilder.default({
-      page,
-    }).analyze(); // 4
-    expect(accessibilityScanResults.violations).toEqual([]); // 5
+    await page.goto("/");
+
+    const accessibilityScanResults = await makeAxeBuilder().analyze();
+    expect(accessibilityScanResults.violations).toEqual([]);
+  });
+
+  test("accessibility declaration page should not have any automatically detectable accessibility issues", async ({
+    page,
+    makeAxeBuilder,
+  }) => {
+    await page.goto("/declaration-daccessibilite");
+
+    const accessibilityScanResults = await makeAxeBuilder().analyze();
+    expect(accessibilityScanResults.violations).toEqual([]);
+  });
+
+  test("'mentions légales' page should not have any automatically detectable accessibility issues", async ({
+    page,
+    makeAxeBuilder,
+  }) => {
+    await page.goto("/mentions-legales");
+
+    const accessibilityScanResults = await makeAxeBuilder().analyze();
+
+    expect(accessibilityScanResults.violations).toEqual([]);
   });
 });
