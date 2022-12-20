@@ -5,8 +5,7 @@ from .models import OrganizationModel
 
 def make_entity(instance: OrganizationModel) -> Organization:
     return Organization(
-        siret=instance.siret,
-        name=instance.name,
+        siret=instance.siret, name=instance.name, logo_url=instance.logo_url
     )
 
 

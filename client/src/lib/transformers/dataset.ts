@@ -4,6 +4,7 @@ import type {
   DatasetUpdateData,
 } from "src/definitions/datasets";
 import { omit } from "../util/object.js";
+import { toOrganization } from "./organization.js";
 
 export const camelToUnderscore = (key: string): string => {
   return key.replace(/([A-Z])/g, "_$1").toLowerCase();
@@ -55,7 +56,7 @@ export const toDataset = (item: any): Dataset => {
     ...rest,
     catalogRecord: {
       createdAt: new Date(created_at),
-      organization,
+      organization: toOrganization(organization),
     },
     producerEmail: producer_email,
     contactEmails: contact_emails,

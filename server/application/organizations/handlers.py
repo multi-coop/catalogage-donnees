@@ -33,8 +33,7 @@ async def create_organization(command: CreateOrganization) -> Siret:
         raise OrganizationAlreadyExists(organization)
 
     organization = Organization(
-        siret=command.siret,
-        name=command.name,
+        siret=command.siret, name=command.name, logo_url=command.logo_url
     )
 
     return await repository.insert(organization)

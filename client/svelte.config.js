@@ -25,7 +25,8 @@ const config = {
         ],
         "img-src": [
           "self",
-          "data:", // E.g. DSFR inline images
+          "data:", // E.g. DSFR inline images,
+          "https://raw.githubusercontent.com/etalab/catalogage-donnees-config/", // the organizations logos are stored on github
         ],
       },
     },

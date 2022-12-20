@@ -121,3 +121,4 @@ class CreateOrganizationFactory(Factory[CreateOrganization]):
 
     name = Use(fake.company)
     siret = Use(fake.siret)
+    logo_url = None

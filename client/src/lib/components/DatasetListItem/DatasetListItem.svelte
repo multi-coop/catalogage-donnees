@@ -6,6 +6,8 @@
   import { capitalize, formatDaysMonthsOrYearsToNow } from "$lib/util/format";
   import DatasetPropertyList from "../DatasetPropertyList/DatasetPropertyList.svelte";
 
+  import logoRepubliqueFrancaise from "$lib/assets/organizations/logoRepubliqueFrancaise.svg";
+
   export let dataset: Dataset;
 
   $: properties = [
@@ -37,9 +39,14 @@
     title="Consulter cette fiche de données"
   >
     <div class="item__logo">
-      <p class="fr-logo fr-logo--sm">
-        {@html "Ministère<br />de la culture"}
-      </p>
+      {#if dataset.catalogRecord.organization.logoUrl}
+        <img
+          src={dataset.catalogRecord.organization.logoUrl}
+          alt={`logo ${dataset.catalogRecord.organization.name}`}
+        />
+      {:else}
+        <img src={logoRepubliqueFrancaise} alt={`logo république française`} />
+      {/if}
     </div>
 
     <div>
@@ -107,6 +114,9 @@
     display: flex;
     padding-right: var(--sp-1w);
     align-items: center;
+  }
+  .item__logo > img {
+    object-fit: cover;
   }
 
   .item__actions {

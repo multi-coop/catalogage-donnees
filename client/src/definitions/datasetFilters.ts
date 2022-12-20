@@ -1,5 +1,5 @@
 import type { SelectOption } from "./form";
-import type { Organization } from "./organizations";
+import type { Organization } from "./organization";
 import type { Tag } from "./tag";
 
 export type DatasetFiltersInfo = {

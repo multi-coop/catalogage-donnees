@@ -27,20 +27,30 @@ async def test_dataset_filters_info(
 ) -> None:
     bus = resolve(MessageBus)
 
+    organization_logo_url = (
+        "https://upload.wikimedia.org/wikipedia/commons/6/60/Edward_Snowden-2.jpg"
+    )
+
     siret_non_empty = await bus.execute(
         CreateOrganizationFactory.build(
-            name="A - Organization with a non-empty catalog"
+            name="A - Organization with a non-empty catalog",
+            logo_url=organization_logo_url,
         )
     )
     await bus.execute(CreateCatalog(organization_siret=siret_non_empty))
 
     siret_empty = await bus.execute(
-        CreateOrganizationFactory.build(name="B - Organization with an empty catalog")
+        CreateOrganizationFactory.build(
+            name="B - Organization with an empty catalog",
+            logo_url=organization_logo_url,
+        )
     )
     await bus.execute(CreateCatalog(organization_siret=siret_empty))
 
     await bus.execute(
-        CreateOrganizationFactory.build(name="C - Organization without a catalog")
+        CreateOrganizationFactory.build(
+            name="C - Organization without a catalog", logo_url=organization_logo_url
+        )
     )
 
     user = await create_test_password_user(
@@ -91,10 +101,12 @@ async def test_dataset_filters_info(
         {
             "siret": str(siret_non_empty),
             "name": "A - Organization with a non-empty catalog",
+            "logo_url": organization_logo_url,
         },
         {
             "siret": str(siret_empty),
             "name": "B - Organization with an empty catalog",
+            "logo_url": organization_logo_url,
         },
     ]
 

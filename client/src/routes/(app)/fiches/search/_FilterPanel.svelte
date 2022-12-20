@@ -4,7 +4,7 @@
     DatasetFiltersValue,
   } from "src/definitions/datasetFilters";
   import type { SelectOption } from "src/definitions/form";
-  import type { Organization } from "src/definitions/organizations";
+  import type { Organization } from "src/definitions/organization";
   import type { Tag } from "src/definitions/tag";
   import SearchableSelect from "src/lib/components/SearchableSelect/SearchableSelect.svelte";
   import {

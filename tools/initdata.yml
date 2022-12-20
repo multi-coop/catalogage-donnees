@@ -2,9 +2,11 @@ organizations:
   - params:
       name: "Ministère de la Culture"
       siret: "11004601800013"
+      logo_url: "https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/culture/logo.svg"
   - params:
-      name: "Ministère de la Santé"
+      name: "DINUM"
       siret: "13001653800014"
+      logo_url: "https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/dinum/logo.svg"
 
 catalogs:
   - params:
