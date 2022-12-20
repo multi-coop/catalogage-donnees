@@ -35,3 +35,7 @@ __pycache__
 # Svelte kit
 
 vite.config.js*
+
+#Playwright
+
+*/playwright-report/*
