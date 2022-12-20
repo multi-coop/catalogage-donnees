@@ -17,6 +17,7 @@
   import { buildMailToString } from "src/lib/util/mail";
   import InfoBanner from "src/lib/components/InfoBanner/InfoBanner.svelte";
   import Tooltip from "src/lib/components/Tooltip/Tooltip.svelte";
+  import logoRepubliqueFrancaise from "$lib/assets/organizations/logoRepubliqueFrancaise.svg";
 
   export let data: PageData;
 
@@ -34,9 +35,17 @@
     <header class="fr-mt-5w">
       <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle">
         <div class="fr-col-sm-4 fr-col-md-3 fr-col-lg-2">
-          <p class="fr-logo" title="république française">
-            {@html "Ministère<br />de la culture"}
-          </p>
+          {#if catalog.organization.logoUrl}
+            <img
+              src={catalog.organization.logoUrl}
+              alt={`logo ${catalog.organization.name}`}
+            />
+          {:else}
+            <img
+              src={logoRepubliqueFrancaise}
+              alt={`logo république française`}
+            />
+          {/if}
         </div>
         <div class="fr-col-sm-8 fr-col-md-9 fr-col-lg-10">
           <p class="fr-m-0 fr-text-mention--grey">{dataset.service}</p>
@@ -200,11 +209,6 @@
 </section>
 
 <style>
-  .fr-logo {
-    width: 100%;
-    word-break: break-all;
-  }
-
   .header__tags {
     display: flex;
     gap: 10px;
