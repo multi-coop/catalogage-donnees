@@ -10,6 +10,7 @@
   import DatasetFormLayout from "src/lib/components/DatasetFormLayout/DatasetFormLayout.svelte";
   import ModalExitFormConfirmation from "src/lib/components/ModalExitFormConfirmation/ModalExitFormConfirmation.svelte";
   import { hasHistory } from "src/lib/util/history";
+  import SkipLink from "src/lib/components/SkipLink/SkipLink.svelte";
 
   let modalControlId = "confirm-stop-contributing-modal";
 
@@ -48,11 +49,14 @@
   };
 </script>
 
-<header class="fr-p-4w">
+<SkipLink linksMap={{ formulaire: "main" }} />
+
+<!-- svelte-ignore a11y-no-redundant-roles -- this is the page's main header so this role is not rudundant -->
+<header role="banner" class="fr-p-4w">
   <div class="fr-col">
-    <h5 class="fr-grid-row fr-text--regular">
+    <h1 class="fr-grid-row  fr-h5 fr-text--regular">
       Contribuer une fiche de jeu de données
-    </h5>
+    </h1>
     {#if Maybe.Some(catalog)}
       <p class="fr-grid-row fr-text--sm fr-text-mention--grey">
         Catalogue : {catalog.organization.name}
@@ -87,15 +91,18 @@
   />
 
   <DatasetFormLayout>
-    <DatasetForm
-      {catalog}
-      {tags}
-      {licenses}
-      geographicalCoverages={filtersInfo.geographicalCoverage}
-      {loading}
-      on:save={onSave}
-      on:touched={() => (formHasBeenTouched = true)}
-    />
+    <!-- We go back to page top if the main container gets focus -->
+    <main on:focus={() => window.scroll(0, 0)} tabindex="-1" id="main">
+      <DatasetForm
+        {catalog}
+        {tags}
+        {licenses}
+        geographicalCoverages={filtersInfo.geographicalCoverage}
+        {loading}
+        on:save={onSave}
+        on:touched={() => (formHasBeenTouched = true)}
+      />
+    </main>
   </DatasetFormLayout>
 {/if}
 
