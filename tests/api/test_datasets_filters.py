@@ -8,7 +8,6 @@ from server.application.catalogs.commands import CreateCatalog
 from server.application.organizations.views import OrganizationView
 from server.config.di import resolve
 from server.domain.common.types import ID, id_factory
-from server.domain.datasets.entities import DataFormat
 from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 
@@ -178,9 +177,9 @@ class _Env:
         ),
         pytest.param(
             "format",
-            lambda _: {"formats": [DataFormat.FILE_GIS.value]},
-            lambda _: [DataFormat.DATABASE.value],
-            lambda _: [DataFormat.FILE_GIS.value],
+            lambda _: {"formats": ["DATABASE"]},
+            lambda _: ["DATABASE"],
+            lambda _: ["DATABASE"],
             id="format",
         ),
         pytest.param(

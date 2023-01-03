@@ -14,11 +14,7 @@ from server.application.tags.queries import GetTagByID
 from server.config.di import resolve
 from server.domain.catalogs.entities import ExtraFieldValue, TextExtraField
 from server.domain.common.types import ID, Skip, id_factory
-from server.domain.datasets.entities import (
-    DataFormat,
-    PublicationRestriction,
-    UpdateFrequency,
-)
+from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.organizations.types import Siret
 from server.infrastructure.catalogs.models import ExtraFieldValueModel
@@ -144,7 +140,7 @@ async def test_dataset_crud(
             description="Example description",
             service="Example service",
             geographical_coverage="France métropolitaine",
-            formats=[DataFormat.WEBSITE],
+            formats=["Website"],
             technical_source="Example database",
             producer_email="example.service@mydomain.org",
             contact_emails=["example.person@mydomain.org"],
@@ -742,7 +738,7 @@ class TestDatasetUpdate:
                 description="Other description",
                 service="Other service",
                 geographical_coverage="Hauts-de-France",
-                formats=[DataFormat.DATABASE],
+                formats=["DATABASE"],
                 technical_source="Other information system",
                 producer_email="other.service@mydomain.org",
                 contact_emails=["other.person@mydomain.org"],
@@ -794,7 +790,7 @@ class TestDatasetUpdate:
         assert dataset.description == "Other description"
         assert dataset.service == "Other service"
         assert dataset.geographical_coverage == "Hauts-de-France"
-        assert dataset.formats == [DataFormat.DATABASE]
+        assert dataset.formats == ["DATABASE"]
         assert dataset.technical_source == "Other information system"
         assert dataset.producer_email == "other.service@mydomain.org"
         assert dataset.contact_emails == ["other.person@mydomain.org"]
@@ -833,7 +829,7 @@ class TestDatasetUpdate:
                 description="Other description",
                 service="Other service",
                 geographical_coverage="Hauts-de-France",
-                formats=[DataFormat.DATABASE],
+                formats=["DATABASE"],
                 technical_source="Other information system",
                 producer_email="other.service@mydomain.org",
                 contact_emails=["other.person@mydomain.org"],
@@ -865,7 +861,7 @@ class TestFormats:
         command = CreateDatasetFactory.build(
             account=temp_user.account,
             organization_siret=temp_org.siret,
-            formats=[DataFormat.WEBSITE, DataFormat.API],
+            formats=["WEBSITE", "API"],
         )
         dataset_id = await bus.execute(command)
 
@@ -874,14 +870,14 @@ class TestFormats:
             json=to_payload(
                 UpdateDatasetPayloadFactory.build_from_create_command(
                     command.copy(exclude={"formats"}),
-                    formats=[DataFormat.WEBSITE, DataFormat.API, DataFormat.FILE_GIS],
+                    formats=["WEBSITE", "API", "FICHIER GS"],
                 )
             ),
             auth=temp_user.auth,
         )
 
         assert response.status_code == 200
-        assert sorted(response.json()["formats"]) == ["api", "file_gis", "website"]
+        assert sorted(response.json()["formats"]) == ["API", "FICHIER GS", "WEBSITE"]
 
     async def test_formats_remove(
         self,
@@ -893,7 +889,7 @@ class TestFormats:
         command = CreateDatasetFactory.build(
             account=temp_user.account,
             organization_siret=temp_org.siret,
-            formats=[DataFormat.WEBSITE, DataFormat.API],
+            formats=["WEBSITE", "API"],
         )
         dataset_id = await bus.execute(command)
 
@@ -902,7 +898,7 @@ class TestFormats:
             json=to_payload(
                 UpdateDatasetPayloadFactory.build_from_create_command(
                     command.copy(exclude={"formats"}),
-                    formats=[DataFormat.WEBSITE],
+                    formats=["WEBSITE"],
                 )
             ),
             auth=temp_user.auth,

@@ -8,7 +8,7 @@ from server.domain.catalogs.exceptions import CatalogDoesNotExist
 from server.domain.catalogs.repositories import CatalogRepository
 from server.domain.common.pagination import Pagination
 from server.domain.common.types import ID, Skip
-from server.domain.datasets.entities import DataFormat, Dataset
+from server.domain.datasets.entities import Dataset
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.datasets.repositories import DatasetRepository
 from server.domain.organizations.types import Siret
@@ -132,7 +132,7 @@ async def get_dataset_filters(query: GetDatasetFilters) -> DatasetFiltersView:
         ],
         geographical_coverage=sorted(geographical_coverages),
         service=list(services),
-        format=list(DataFormat),
+        format=list([]),
         technical_source=list(technical_sources),
         tag_id=tags,
         license=["*", *licenses],

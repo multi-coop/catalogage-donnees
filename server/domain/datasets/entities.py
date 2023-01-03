@@ -12,15 +12,6 @@ from ..catalog_records.entities import CatalogRecord
 from ..common.types import ID
 
 
-class DataFormat(enum.Enum):
-    FILE_TABULAR = "file_tabular"
-    FILE_GIS = "file_gis"
-    API = "api"
-    DATABASE = "database"
-    WEBSITE = "website"
-    OTHER = "other"
-
-
 class UpdateFrequency(enum.Enum):
     NEVER = "never"
     REALTIME = "realtime"
@@ -45,7 +36,7 @@ class Dataset(Entity):
     description: str
     service: str
     geographical_coverage: str
-    formats: List[DataFormat]
+    formats: List[str]
     technical_source: Optional[str]
     producer_email: Optional[str]
     contact_emails: List[str]
@@ -68,7 +59,7 @@ class Dataset(Entity):
         description: str,
         service: str,
         geographical_coverage: str,
-        formats: List[DataFormat],
+        formats: List[str],
         technical_source: Optional[str],
         producer_email: Optional[str],
         contact_emails: List[str],

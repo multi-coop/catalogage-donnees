@@ -16,7 +16,7 @@ from server.application.organizations.queries import GetOrganizationBySiret
 from server.application.tags.queries import GetAllTags
 from server.config.di import bootstrap, resolve
 from server.domain.common.types import ID, id_factory
-from server.domain.datasets.entities import DataFormat, UpdateFrequency
+from server.domain.datasets.entities import UpdateFrequency
 from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 from tools.initdata import InitData
@@ -63,29 +63,25 @@ def _map_geographical_coverage(value: Optional[str], config: Config) -> str:
 def _map_formats(
     value: Optional[str], import_notes: TextIO, config: Config
 ) -> List[str]:
-    if value is None or value in config.input_csv.na_values:
-        import_notes.write("Format : (Information manquante)\n")
-        return [DataFormat.OTHER.value]  # At least one value is required.
 
-    value = value.lower().strip()
+    if not value:
+        return []
 
     unknown_formats = []
 
-    def _map_format(value: str) -> List[DataFormat]:
+    def _map_format(value: str) -> List[str]:
         if value in config.formats.list_map:
-            return [DataFormat(f) for f in config.formats.list_map[value]]
+            return [f for f in config.formats.list_map[value]]
 
         dataformat = config.formats.map.get(value, value)
 
         try:
-            return [DataFormat(dataformat)]
+            return [dataformat]
         except ValueError:
             unknown_formats.append(value)
-            return [DataFormat.OTHER]
+            return ["Autres"]
 
-    result = list(
-        set(f.value for val in value.split(",") for f in _map_format(val.strip()))
-    )
+    result = list(set(f for val in value.split(",") for f in _map_format(val.strip())))
 
     if unknown_formats:
         line = f"Format (valeurs non-reconnues) : {', '.join(unknown_formats)}"

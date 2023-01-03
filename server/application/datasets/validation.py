@@ -2,12 +2,10 @@ from typing import List, Optional
 
 from pydantic import BaseModel, validator
 
-from server.domain.datasets.entities import DataFormat
-
 
 class CreateDatasetValidationMixin(BaseModel):
     @validator("formats", check_fields=False)
-    def check_formats_at_least_one(cls, value: List[DataFormat]) -> List[DataFormat]:
+    def check_formats_at_least_one(cls, value: List[str]) -> List[str]:
         if not value:
             raise ValueError("formats must contain at least one item")
         return value
@@ -39,7 +37,7 @@ class UpdateDatasetValidationMixin(BaseModel):
         return value
 
     @validator("formats", check_fields=False)
-    def check_formats_at_least_one(cls, value: List[DataFormat]) -> List[DataFormat]:
+    def check_formats_at_least_one(cls, value: List[str]) -> List[str]:
         if not value:
             raise ValueError("formats must contain at least one item")
         return value

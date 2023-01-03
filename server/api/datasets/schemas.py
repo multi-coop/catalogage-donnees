@@ -10,11 +10,7 @@ from server.application.datasets.validation import (
     UpdateDatasetValidationMixin,
 )
 from server.domain.common.types import ID
-from server.domain.datasets.entities import (
-    DataFormat,
-    PublicationRestriction,
-    UpdateFrequency,
-)
+from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
 from server.domain.organizations.types import Siret
 
 
@@ -27,7 +23,7 @@ class DatasetListParams:
         organization_siret: Optional[Siret] = Query(None),
         geographical_coverage: Optional[List[str]] = Query(None),
         service: Optional[List[str]] = Query(None),
-        format_: Optional[List[DataFormat]] = Query(None, alias="format"),
+        format_: Optional[List[str]] = Query(None, alias="format"),
         technical_source: Optional[List[str]] = Query(None),
         tag_id: Optional[List[ID]] = Query(None),
         license: Optional[str] = Query(None),
@@ -52,7 +48,7 @@ class DatasetCreate(CreateDatasetValidationMixin, BaseModel):
     description: str
     service: str
     geographical_coverage: str
-    formats: List[DataFormat]
+    formats: List[str]
     technical_source: Optional[str] = None
     producer_email: Optional[EmailStr] = None
     contact_emails: List[EmailStr]
@@ -72,7 +68,7 @@ class DatasetUpdate(UpdateDatasetValidationMixin, BaseModel):
     description: str
     service: str
     geographical_coverage: str
-    formats: List[DataFormat]
+    formats: List[str]
     technical_source: Optional[str] = Field(...)
     producer_email: Optional[EmailStr] = Field(...)
     contact_emails: List[EmailStr]

@@ -13,7 +13,7 @@ from server.application.datasets.commands import CreateDataset, UpdateDataset
 from server.application.organizations.commands import CreateOrganization
 from server.application.tags.commands import CreateTag
 from server.domain.common import datetime as dtutil
-from server.domain.datasets.entities import DataFormat, PublicationRestriction
+from server.domain.datasets.entities import PublicationRestriction
 from server.domain.licenses.entities import BUILTIN_LICENSE_SUGGESTIONS
 
 T = TypeVar("T", bound=BaseModel)
@@ -61,6 +61,8 @@ _FAKE_GEOGRAPHICAL_COVERAGES = [
     "Monde",
 ]
 
+_FAKE_FORMATS = ["API" "Autres", "Fichier tabulaires"]
+
 
 class _BaseCreateDatasetFactory:
     organization_siret = Require()
@@ -68,7 +70,7 @@ class _BaseCreateDatasetFactory:
     description = Use(fake.text)
     service = Use(fake.company)
     geographical_coverage = Use(lambda: random.choice(_FAKE_GEOGRAPHICAL_COVERAGES))
-    formats = Use(lambda: random.choices(list(DataFormat), k=random.randint(1, 3)))
+    formats = Use(lambda: random.choices(list(_FAKE_FORMATS), k=random.randint(1, 3)))
     technical_source = Use(
         lambda: fake.sentence(nb_words=3) if random.random() < 0.5 else None
     )

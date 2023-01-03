@@ -15,11 +15,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import ARRAY, TSVECTOR, UUID
 from sqlalchemy.orm import Mapped, relationship
 
-from server.domain.datasets.entities import (
-    DataFormat,
-    PublicationRestriction,
-    UpdateFrequency,
-)
+from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
 
 from ..database import Base, mapper_registry
 from ..tags.models import TagModel, dataset_tag
@@ -42,7 +38,7 @@ class DataFormatModel(Base):
     __tablename__ = "dataformat"
 
     id = Column(Integer, primary_key=True)
-    name = Column(Enum(DataFormat, name="dataformat_enum"), nullable=False, unique=True)
+    name = Column(String, nullable=False, unique=True)
 
     datasets: List["DatasetModel"] = relationship(
         "DatasetModel",

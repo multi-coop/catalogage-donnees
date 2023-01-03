@@ -1,4 +1,4 @@
-"""change_dataformat_enum_to_string_value
+"""fix_nullable_publication_restriction.
 
 Revision ID: a6fd9d9cdb24
 Revises: 1809801ce675
