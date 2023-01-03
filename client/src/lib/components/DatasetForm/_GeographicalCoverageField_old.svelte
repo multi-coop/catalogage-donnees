@@ -9,11 +9,7 @@
   export let error = "";
   export let suggestions: string[] = [];
 
-  $: showSuggestions = false;
-
-  let elementList: HTMLElement;
-
-  let currentItemIndex = 0;
+  let showSuggestions = false;
 
   const dispatch = createEventDispatcher<{ input: string }>();
 
@@ -29,42 +25,15 @@
   };
 
   const onSelectItem = (item: string) => {
+    showSuggestions = false;
     dispatch("input", item);
-  };
-
-  const handleListBoxKeyDown = (
-    ev: KeyboardEvent & { currentTarget: HTMLInputElement }
-  ) => {
-    const key = ev.key;
-
-    if (!elementList) {
-      return;
-    }
-
-    switch (key) {
-      case "Enter":
-        showSuggestions = true;
-
-        console.log(filteredSuggestions[currentItemIndex]);
-        // onSelectItem(filteredSuggestions[currentItemIndex]);
-        break;
-
-      case "Down":
-      case "ArrowDown":
-        currentItemIndex = currentItemIndex + 1;
-        if (currentItemIndex === filteredSuggestions.length) {
-          currentItemIndex = 0;
-        }
-
-      default:
-        break;
-    }
   };
 </script>
 
 <div
   class="fr-input-group dropdown fr-my-4w"
   class:fr-input-group--error={error}
+  use:clickOutside={{ callback: () => (showSuggestions = false) }}
 >
   <label class="fr-label" for="geographicalCoverage">
     Couverture géographique
@@ -84,32 +53,32 @@
     required
     role="combobox"
     autocomplete="off"
-    aria-activedescendant={showSuggestions
-      ? `geographicalCoverage-item-${currentItemIndex}`
-      : null}
     aria-controls="geographicalCoverage-results"
+    aria-autocomplete="list"
     aria-expanded={showSuggestions}
     aria-describedby={error ? "geographicalCoverage-desc-error" : null}
     on:input={onInput}
-    on:keydown={handleListBoxKeyDown}
-    aria-autocomplete="both"
+    on:focus={() => (showSuggestions = true)}
   />
 
   <ul
     id="geographicalCoverage-results"
     class="fr-raw-list dropdown--list"
-    class:hide={!showSuggestions}
     role="listbox"
     aria-label="Suggestions"
-    bind:this={elementList}
   >
-    {#each filteredSuggestions as item, index}
+    {#each filteredSuggestions as item}
       <li
-        id="geographicalCoverage-item-{index}"
+        id="geographicalCoverage-{item}"
         class="dropdown--list-item"
-        class:focused={currentItemIndex === index}
         role="option"
+        tabindex="0"
         on:click={() => onSelectItem(item)}
+        on:keydown={(ev) => {
+          if (ev.key === "Enter") {
+            onSelectItem(item);
+          }
+        }}
       >
         {item}
       </li>
@@ -124,13 +93,6 @@
 </div>
 
 <style>
-  li:focus {
-    background: blue;
-  }
-
-  .hide {
-    display: none;
-  }
   .dropdown {
     position: relative;
   }
@@ -155,9 +117,5 @@
 
   .dropdown--list-item:hover {
     background-color: var(--background-contrast-grey);
-  }
-
-  .focused {
-    background-color: blue;
   }
 </style>

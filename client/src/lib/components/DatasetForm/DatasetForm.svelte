@@ -191,7 +191,7 @@
   $: emailErrors = $errors.contactEmails as unknown as string[];
 
   export const submitForm = (event: Event) => {
-    handleSubmit(event);
+    event.preventDefault();
   };
 
   const handleFieldChange = async (event: Event) => {
@@ -243,7 +243,7 @@
 
 <form
   on:submit={submitForm}
-  data-bitwarden-watching="1"
+  novalidate
   aria-label="Informations sur le jeu de données"
 >
   <h2 id="information-generales" class="fr-mb-5w">Informations générales</h2>
