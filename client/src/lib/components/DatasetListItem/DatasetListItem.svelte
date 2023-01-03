@@ -109,14 +109,10 @@
   .item:hover {
     background-color: var(--background-elevated-grey-hover);
   }
-
-  .item__logo {
-    display: flex;
-    padding-right: var(--sp-1w);
-    align-items: center;
-  }
   .item__logo > img {
-    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
 
   .item__actions {
