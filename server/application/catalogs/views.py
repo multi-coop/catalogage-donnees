@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
+from server.application.dataformats.views import DataFormatView
 from server.application.datasets.views import ExtraFieldValueView
 from server.application.tags.views import TagView
 from server.domain.catalogs.entities import ExtraFieldType
@@ -31,7 +32,7 @@ class DatasetExportView(BaseModel):
     description: str
     service: str
     geographical_coverage: str
-    formats: List[str]
+    formats: List[DataFormatView]
     technical_source: Optional[str]
     producer_email: Optional[str]
     contact_emails: List[str]

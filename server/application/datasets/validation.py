@@ -4,9 +4,9 @@ from pydantic import BaseModel, validator
 
 
 class CreateDatasetValidationMixin(BaseModel):
-    @validator("formats", check_fields=False)
-    def check_formats_at_least_one(cls, value: List[str]) -> List[str]:
-        if not value:
+    @validator("format_ids", check_fields=False)
+    def check_formats_at_least_one(cls, value: List[int]) -> List[int]:
+        if not value or len(value) == 0:
             raise ValueError("formats must contain at least one item")
         return value
 
@@ -36,9 +36,9 @@ class UpdateDatasetValidationMixin(BaseModel):
             raise ValueError("service must not be empty")
         return value
 
-    @validator("formats", check_fields=False)
-    def check_formats_at_least_one(cls, value: List[str]) -> List[str]:
-        if not value:
+    @validator("format_ids", check_fields=False)
+    def check_formats_at_least_one(cls, value: List[int]) -> List[int]:
+        if not value or len(value) == 0:
             raise ValueError("formats must contain at least one item")
         return value
 

@@ -8,7 +8,6 @@ from ..catalogs.transformers import (
     make_extra_field_value_entity,
     make_extra_field_value_instance,
 )
-
 from ..dataformats.transformers import make_entity as make_data_format_entity
 from ..tags.models import TagModel
 from ..tags.transformers import make_entity as make_tag_entity
@@ -16,8 +15,6 @@ from .models import DataFormatModel, DatasetModel
 
 
 def make_entity(instance: DatasetModel) -> Dataset:
-
-    print(instance.formats)
     kwargs: dict = {
         "catalog_record": make_catalog_record_entity(instance.catalog_record),
         "formats": [make_data_format_entity(format) for format in instance.formats],

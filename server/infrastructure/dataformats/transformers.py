@@ -4,7 +4,9 @@ from .models import DataFormatModel
 
 
 def make_entity(instance: DataFormatModel) -> DataFormat:
-    return DataFormat(name=instance.name, id=instance.id)
+    return DataFormat(
+        **{field: getattr(instance, field) for field in DataFormat.__fields__}
+    )
 
 
 def make_instance(entity: DataFormat) -> DataFormatModel:

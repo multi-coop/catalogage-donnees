@@ -49,7 +49,7 @@ from ..helpers import TestPasswordUser, create_test_password_user, to_payload
                     "loc": ["body", "geographical_coverage"],
                     "type": "value_error.missing",
                 },
-                {"loc": ["body", "formats"], "type": "value_error.missing"},
+                {"loc": ["body", "format_ids"], "type": "value_error.missing"},
                 {"loc": ["body", "contact_emails"], "type": "value_error.missing"},
             ],
             id="missing-fields",
@@ -60,12 +60,12 @@ from ..helpers import TestPasswordUser, create_test_password_user, to_payload
                 "description": "Description",
                 "service": "Service",
                 "geographical_coverage": "national",
-                "formats": [],
+                "format_ids": [],
                 "contact_emails": ["person@mydomain.org"],
             },
             [
                 {
-                    "loc": ["body", "formats"],
+                    "loc": ["body", "format_ids"],
                     "msg": "formats must contain at least one item",
                 }
             ],
@@ -98,6 +98,7 @@ async def test_create_dataset_invalid(
     expected_errors_attrs: list,
 ) -> None:
     payload = {"organization_siret": str(temp_org.siret), **payload}
+
     response = await client.post("/datasets/", json=payload, auth=temp_user.auth)
     assert response.status_code == 422
 
@@ -657,7 +658,7 @@ class TestDatasetUpdate:
             "description",
             "service",
             "geographical_coverage",
-            "formats",
+            "format_ids",
             "technical_source",
             "producer_email",
             "contact_emails",
@@ -748,7 +749,7 @@ class TestDatasetUpdate:
                 description="Other description",
                 service="Other service",
                 geographical_coverage="Hauts-de-France",
-                formats=["DATABASE"],
+                format_ids=[1],
                 technical_source="Other information system",
                 producer_email="other.service@mydomain.org",
                 contact_emails=["other.person@mydomain.org"],
@@ -779,7 +780,7 @@ class TestDatasetUpdate:
             "description": "Other description",
             "service": "Other service",
             "geographical_coverage": "Hauts-de-France",
-            "formats": ["database"],
+            "formats": [DataFormatView(id=1, name="FILE_TABULAR")],
             "technical_source": "Other information system",
             "producer_email": "other.service@mydomain.org",
             "contact_emails": ["other.person@mydomain.org"],
@@ -800,7 +801,7 @@ class TestDatasetUpdate:
         assert dataset.description == "Other description"
         assert dataset.service == "Other service"
         assert dataset.geographical_coverage == "Hauts-de-France"
-        assert dataset.formats == ["DATABASE"]
+        assert dataset.formats == [DataFormatView(id=1, name="FILE_TABULAR")]
         assert dataset.technical_source == "Other information system"
         assert dataset.producer_email == "other.service@mydomain.org"
         assert dataset.contact_emails == ["other.person@mydomain.org"]
@@ -871,7 +872,7 @@ class TestFormats:
         command = CreateDatasetFactory.build(
             account=temp_user.account,
             organization_siret=temp_org.siret,
-            formats=["WEBSITE", "API"],
+            format_ids=[1],
         )
         dataset_id = await bus.execute(command)
 
@@ -879,15 +880,18 @@ class TestFormats:
             f"/datasets/{dataset_id}/",
             json=to_payload(
                 UpdateDatasetPayloadFactory.build_from_create_command(
-                    command.copy(exclude={"formats"}),
-                    formats=["WEBSITE", "API", "FICHIER GS"],
+                    command.copy(exclude={"format_ids"}),
+                    format_ids=[1, 2],
                 )
             ),
             auth=temp_user.auth,
         )
 
         assert response.status_code == 200
-        assert sorted(response.json()["formats"]) == ["API", "FICHIER GS", "WEBSITE"]
+        assert response.json()["formats"] == [
+            DataFormatView(id=1, name="FILE_TABULAR"),
+            DataFormatView(id=2, name="FILE_GIS"),
+        ]
 
     async def test_formats_remove(
         self,

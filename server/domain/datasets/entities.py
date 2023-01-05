@@ -60,7 +60,7 @@ class Dataset(Entity):
         description: str,
         service: str,
         geographical_coverage: str,
-        formats: List[str],
+        formats: List[DataFormat],
         technical_source: Optional[str],
         producer_email: Optional[str],
         contact_emails: List[str],

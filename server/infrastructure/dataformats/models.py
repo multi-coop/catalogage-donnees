@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, List
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Table, Sequence
+from sqlalchemy import Column, ForeignKey, Integer, Sequence, String, Table
 from sqlalchemy.orm import relationship
 
 from ..database import Base, mapper_registry
@@ -17,7 +17,7 @@ dataset_dataformat = Table(
     Column("dataformat_id", ForeignKey("dataformat.id"), primary_key=True),
 )
 
-TABLE_ID = Sequence("table_name_id_seq", start=10)
+TABLE_ID: Sequence = Sequence("table_name_id_seq", start=10)
 
 
 class DataFormatModel(Base):

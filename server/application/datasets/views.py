@@ -2,8 +2,8 @@ import datetime as dt
 from typing import List, Optional
 
 from pydantic import BaseModel
-from server.application.dataformats.views import DataFormatView
 
+from server.application.dataformats.views import DataFormatView
 from server.domain.common.types import ID
 from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
 from server.domain.datasets.repositories import DatasetHeadlines
