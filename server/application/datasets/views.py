@@ -2,6 +2,7 @@ import datetime as dt
 from typing import List, Optional
 
 from pydantic import BaseModel
+from server.application.dataformats.views import DataFormatView
 
 from server.domain.common.types import ID
 from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
@@ -24,7 +25,7 @@ class DatasetView(BaseModel):
     description: str
     service: str
     geographical_coverage: str
-    formats: List[str]
+    formats: List[DataFormatView]
     technical_source: Optional[str]
     producer_email: Optional[str]
     contact_emails: List[str]

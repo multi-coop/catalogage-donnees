@@ -1,50 +1,19 @@
 import uuid
 from typing import TYPE_CHECKING, List
 
-from sqlalchemy import (
-    Column,
-    Computed,
-    DateTime,
-    Enum,
-    ForeignKey,
-    Index,
-    Integer,
-    String,
-    Table,
-)
+from sqlalchemy import Column, Computed, DateTime, Enum, ForeignKey, Index, String
 from sqlalchemy.dialects.postgresql import ARRAY, TSVECTOR, UUID
 from sqlalchemy.orm import Mapped, relationship
 
 from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
 
-from ..database import Base, mapper_registry
+from ..database import Base
+from ..dataformats.models import DataFormatModel, dataset_dataformat
 from ..tags.models import TagModel, dataset_tag
 
 if TYPE_CHECKING:  # pragma: no cover
     from ..catalog_records.models import CatalogRecordModel
     from ..catalogs.models import ExtraFieldValueModel
-
-# Association table
-# See: https://docs.sqlalchemy.org/en/14/orm/basic_relationships.html#many-to-many
-dataset_dataformat = Table(
-    "dataset_dataformat",
-    mapper_registry.metadata,
-    Column("dataset_id", ForeignKey("dataset.id"), primary_key=True),
-    Column("dataformat_id", ForeignKey("dataformat.id"), primary_key=True),
-)
-
-
-class DataFormatModel(Base):
-    __tablename__ = "dataformat"
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False, unique=True)
-
-    datasets: List["DatasetModel"] = relationship(
-        "DatasetModel",
-        back_populates="formats",
-        secondary=dataset_dataformat,
-    )
 
 
 class DatasetModel(Base):

@@ -69,6 +69,7 @@ from server.domain.auth.repositories import (
 )
 from server.domain.catalog_records.repositories import CatalogRecordRepository
 from server.domain.catalogs.repositories import CatalogRepository
+from server.domain.dataformats.repositories import DataFormatRepository
 from server.domain.datasets.repositories import DatasetRepository
 from server.domain.organizations.repositories import OrganizationRepository
 from server.domain.tags.repositories import TagRepository
@@ -92,6 +93,7 @@ from server.infrastructure.catalog_records.repositories import (
 from server.infrastructure.catalogs.caching import ExportCache
 from server.infrastructure.catalogs.repositories import SqlCatalogRepository
 from server.infrastructure.database import Database
+from server.infrastructure.dataformats.repositories import SqlDataFormatRepository
 from server.infrastructure.datasets.repositories import SqlDatasetRepository
 from server.infrastructure.organizations.repositories import SqlOrganizationRepository
 from server.infrastructure.tags.repositories import SqlTagRepository
@@ -166,6 +168,7 @@ def configure(container: "Container") -> None:
     container.register_instance(TagRepository, SqlTagRepository(db))
     container.register_instance(OrganizationRepository, SqlOrganizationRepository(db))
     container.register_instance(CatalogRepository, SqlCatalogRepository(db))
+    container.register_instance(DataFormatRepository, SqlDataFormatRepository(db))
 
     # Caching
     container.register_instance(ExportCache, ExportCache(max_age=dt.timedelta(days=1)))

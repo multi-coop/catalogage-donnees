@@ -7,6 +7,7 @@ from sqlalchemy import select
 
 from server.application.catalogs.commands import CreateCatalog
 from server.application.catalogs.queries import GetCatalogBySiret
+from server.application.dataformats.views import DataFormatView
 from server.application.datasets.queries import GetDatasetByID
 from server.application.organizations.views import OrganizationView
 from server.application.tags.commands import CreateTag
@@ -14,6 +15,8 @@ from server.application.tags.queries import GetTagByID
 from server.config.di import resolve
 from server.domain.catalogs.entities import ExtraFieldValue, TextExtraField
 from server.domain.common.types import ID, Skip, id_factory
+from server.domain.dataformats.entities import DataFormat
+from server.domain.dataformats.repositories import DataFormatRepository
 from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.organizations.types import Siret
@@ -133,6 +136,10 @@ async def test_dataset_crud(
 ) -> None:
     last_updated_at = fake.date_time_tz()
 
+    dataformat_repository = resolve(DataFormatRepository)
+
+    await dataformat_repository.insert(DataFormat(name="feuille de pappier"))
+
     payload = to_payload(
         CreateDatasetPayloadFactory.build(
             organization_siret=temp_org.siret,
@@ -140,7 +147,7 @@ async def test_dataset_crud(
             description="Example description",
             service="Example service",
             geographical_coverage="France métropolitaine",
-            formats=["Website"],
+            format_ids=[1, 2],
             technical_source="Example database",
             producer_email="example.service@mydomain.org",
             contact_emails=["example.person@mydomain.org"],
@@ -169,7 +176,10 @@ async def test_dataset_crud(
         "description": "Example description",
         "service": "Example service",
         "geographical_coverage": "France métropolitaine",
-        "formats": ["website"],
+        "formats": [
+            DataFormatView(id=1, name="FILE_TABULAR"),
+            DataFormatView(id=2, name="FILE_GIS"),
+        ],
         "technical_source": "Example database",
         "producer_email": "example.service@mydomain.org",
         "contact_emails": ["example.person@mydomain.org"],

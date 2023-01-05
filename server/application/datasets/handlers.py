@@ -8,6 +8,7 @@ from server.domain.catalogs.exceptions import CatalogDoesNotExist
 from server.domain.catalogs.repositories import CatalogRepository
 from server.domain.common.pagination import Pagination
 from server.domain.common.types import ID, Skip
+from server.domain.dataformats.repositories import DataFormatRepository
 from server.domain.datasets.entities import Dataset
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.datasets.repositories import DatasetRepository
@@ -36,6 +37,7 @@ async def create_dataset(command: CreateDataset, *, id_: ID = None) -> ID:
     catalog_repository = resolve(CatalogRepository)
     catalog_record_repository = resolve(CatalogRecordRepository)
     tag_repository = resolve(TagRepository)
+    format_repository = resolve(DataFormatRepository)
 
     if id_ is None:
         id_ = repository.make_id()
@@ -63,11 +65,14 @@ async def create_dataset(command: CreateDataset, *, id_: ID = None) -> ID:
 
     tags = await tag_repository.get_all(ids=command.tag_ids)
 
+    formats = await format_repository.get_all(ids=command.format_ids)
+
     dataset = Dataset(
         id=id_,
         catalog_record=catalog_record,
         tags=tags,
-        **command.dict(exclude={"tag_ids"}),
+        formats=formats,
+        **command.dict(exclude={"tag_ids", "format_ids"}),
     )
 
     return await repository.insert(dataset)

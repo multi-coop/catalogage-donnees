@@ -48,7 +48,7 @@ class DatasetCreate(CreateDatasetValidationMixin, BaseModel):
     description: str
     service: str
     geographical_coverage: str
-    formats: List[str]
+    format_ids: List[int]
     technical_source: Optional[str] = None
     producer_email: Optional[EmailStr] = None
     contact_emails: List[EmailStr]

@@ -5,6 +5,7 @@ from typing import List, Optional
 from pydantic import Field
 
 from server.domain.catalogs.entities import ExtraFieldValue
+from server.domain.dataformats.entities import DataFormat
 from server.domain.tags.entities import Tag
 from server.seedwork.domain.entities import Entity
 
@@ -36,7 +37,7 @@ class Dataset(Entity):
     description: str
     service: str
     geographical_coverage: str
-    formats: List[str]
+    formats: List[DataFormat]
     technical_source: Optional[str]
     producer_email: Optional[str]
     contact_emails: List[str]
