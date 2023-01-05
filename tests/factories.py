@@ -61,8 +61,6 @@ _FAKE_GEOGRAPHICAL_COVERAGES = [
     "Monde",
 ]
 
-_FAKE_FORMATS = ["API" "Autres", "Fichier tabulaires"]
-
 
 class _BaseCreateDatasetFactory:
     organization_siret = Require()
@@ -70,7 +68,7 @@ class _BaseCreateDatasetFactory:
     description = Use(fake.text)
     service = Use(fake.company)
     geographical_coverage = Use(lambda: random.choice(_FAKE_GEOGRAPHICAL_COVERAGES))
-    formats = Use(lambda: random.choices(list(_FAKE_FORMATS), k=random.randint(1, 3)))
+    format_ids = Use(lambda: [random.randint(1, 6)])
     technical_source = Use(
         lambda: fake.sentence(nb_words=3) if random.random() < 0.5 else None
     )
@@ -97,6 +95,7 @@ class CreateDatasetPayloadFactory(_BaseCreateDatasetFactory, Factory[DatasetCrea
 
 class _BaseUpdateDatasetFactory:
     tag_ids = Use(lambda: [])
+    format_ids = Use(lambda: [1, 2])
     extra_field_values = Use(lambda: [])
 
 

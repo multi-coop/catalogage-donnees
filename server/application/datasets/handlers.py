@@ -105,7 +105,8 @@ async def update_dataset(command: UpdateDataset) -> None:
         raise CannotUpdateDataset(f"{command.account=}, {dataset=}")
 
     tags = await tag_repository.get_all(ids=command.tag_ids)
-    formats = await format_repository.get_all(ids=command.tag_ids)
+    formats = await format_repository.get_all(ids=command.format_ids)
+
     dataset.update(
         **command.dict(
             exclude={"account", "id", "tag_ids", "format_ids", "extra_field_values"}

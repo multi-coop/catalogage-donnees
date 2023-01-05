@@ -899,7 +899,7 @@ class TestFormats:
         command = CreateDatasetFactory.build(
             account=temp_user.account,
             organization_siret=temp_org.siret,
-            formats=["WEBSITE", "API"],
+            format_ids=[1, 2],
         )
         dataset_id = await bus.execute(command)
 
@@ -907,15 +907,15 @@ class TestFormats:
             f"/datasets/{dataset_id}/",
             json=to_payload(
                 UpdateDatasetPayloadFactory.build_from_create_command(
-                    command.copy(exclude={"formats"}),
-                    formats=["WEBSITE"],
+                    command.copy(exclude={"format_ids"}),
+                    format_ids=[2],
                 )
             ),
             auth=temp_user.auth,
         )
 
         assert response.status_code == 200
-        assert response.json()["formats"] == ["website"]
+        assert response.json()["formats"] == [DataFormatView(id=2, name="FILE_GIS")]
 
 
 @pytest.mark.asyncio
@@ -929,7 +929,8 @@ class TestTags:
         bus = resolve(MessageBus)
 
         command = CreateDatasetFactory.build(
-            account=temp_user.account, organization_siret=temp_org.siret
+            account=temp_user.account,
+            organization_siret=temp_org.siret,
         )
         dataset_id = await bus.execute(command)
         tag_architecture_id = await bus.execute(CreateTag(name="Architecture"))
