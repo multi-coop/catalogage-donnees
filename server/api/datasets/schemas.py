@@ -68,7 +68,7 @@ class DatasetUpdate(UpdateDatasetValidationMixin, BaseModel):
     description: str
     service: str
     geographical_coverage: str
-    formats: List[str]
+    format_ids: List[int]
     technical_source: Optional[str] = Field(...)
     producer_email: Optional[EmailStr] = Field(...)
     contact_emails: List[EmailStr]

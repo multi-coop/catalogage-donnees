@@ -77,7 +77,7 @@ from ..helpers import TestPasswordUser, create_test_password_user, to_payload
                 "description": "Description",
                 "service": "Service",
                 "geographical_coverage": "national",
-                "formats": ["api"],
+                "format_ids": [1, 2],
                 "contact_emails": [],
             },
             [
@@ -1085,6 +1085,7 @@ class TestExtraFieldValues:
         command = CreateDatasetFactory.build(
             account=user.account,
             organization_siret=siret,
+            format_ids=[1, 2],
             extra_field_values=[
                 ExtraFieldValue(
                     extra_field_id=extra_field_id,

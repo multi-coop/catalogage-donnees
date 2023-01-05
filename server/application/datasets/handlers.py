@@ -81,6 +81,7 @@ async def create_dataset(command: CreateDataset, *, id_: ID = None) -> ID:
 async def update_dataset(command: UpdateDataset) -> None:
     repository = resolve(DatasetRepository)
     tag_repository = resolve(TagRepository)
+    format_repository = resolve(DataFormatRepository)
 
     pk = command.id
     dataset = await repository.get_by_id(pk)
@@ -104,9 +105,13 @@ async def update_dataset(command: UpdateDataset) -> None:
         raise CannotUpdateDataset(f"{command.account=}, {dataset=}")
 
     tags = await tag_repository.get_all(ids=command.tag_ids)
+    formats = await format_repository.get_all(ids=command.tag_ids)
     dataset.update(
-        **command.dict(exclude={"account", "id", "tag_ids", "extra_field_values"}),
+        **command.dict(
+            exclude={"account", "id", "tag_ids", "format_ids", "extra_field_values"}
+        ),
         tags=tags,
+        formats=formats,
         extra_field_values=command.extra_field_values,
     )
 

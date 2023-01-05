@@ -142,7 +142,7 @@ class SqlDatasetRepository(DatasetRepository):
                     return
 
                 formats = await get_all_dataformat_instances_by_ids(
-                    session, entity.formats
+                    session, [format.id for format in entity.formats]
                 )
                 tags = await get_all_tag_instances_by_ids(
                     session, [tag.id for tag in entity.tags]
