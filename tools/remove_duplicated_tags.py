@@ -38,7 +38,8 @@ async def update_dataset_tags(
                 UpdateDataset(
                     account=Skip(),
                     tag_ids=tags,
-                    **dataset.dict(exclude={"tag_ids"}),
+                    format_ids=[format.id for format in dataset.formats],
+                    **dataset.dict(exclude={"tag_ids", "formats"}),
                 )
             )
 

@@ -78,16 +78,19 @@ async def test_import_catalog_example(tmp_path: Path) -> None:
     assert all(d["params"]["organization_siret"] == siret for d in initdata["datasets"])
 
     d0 = initdata["datasets"][0]["params"]
-    assert sorted(d0["formats"]) == ["database", "file_gis", "file_tabular"]
+    assert sorted(d0["formats"]) == [
+        "fichier SIG (Shapefile, ...)",
+        "fichier tabulaire (Excell, CSV,...)",
+        "oracle et shp",
+    ]
     assert d0["geographical_coverage"] == "aquitaine"
     assert d0["update_frequency"] == "yearly"
     assert "[[ Notes d'import automatique ]]" not in d0["description"]
 
     d1 = initdata["datasets"][1]["params"]
     assert d1["geographical_coverage"] == "(Information manquante)"
-    assert d1["formats"] == ["other"]
+    assert d1["formats"] == ["Information manquante"]
     assert d1["update_frequency"] is None
     assert d1["url"] is None
     assert "[[ Notes d'import automatique ]]" in d1["description"]
-    assert "Format : (Information manquante)" in d1["description"]
     assert "Fréquence de mise à jour (valeur originale) : Invalid" in d1["description"]

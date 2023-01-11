@@ -64,28 +64,21 @@ def _map_formats(
     value: Optional[str], import_notes: TextIO, config: Config
 ) -> List[str]:
 
+    print(value)
+
     if not value:
         return []
 
-    unknown_formats = []
-
     def _map_format(value: str) -> List[str]:
-        if value in config.formats.list_map:
-            return [f for f in config.formats.list_map[value]]
 
         dataformat = config.formats.map.get(value, value)
 
         try:
             return [dataformat]
         except ValueError:
-            unknown_formats.append(value)
-            return ["Autres"]
+            return [value]
 
     result = list(set(f for val in value.split(",") for f in _map_format(val.strip())))
-
-    if unknown_formats:
-        line = f"Format (valeurs non-reconnues) : {', '.join(unknown_formats)}"
-        import_notes.writelines([line, "\n"])
 
     return result
 
