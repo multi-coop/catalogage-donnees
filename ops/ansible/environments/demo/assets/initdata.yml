@@ -59,6 +59,11 @@ tags:
     params:
       name: chemin de fer
 
+formats:
+  - website
+  - file_tabular
+  - other
+
 datasets:
   - # Mimicks: https://www.data.gouv.fr/fr/datasets/donnees-brutes-de-l-inventaire-forestier/
     id: "16b398af-f8c7-48b9-898a-18ad3404f528"

@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 from server.application.dataformats.views import DataFormatView
 from server.domain.common.types import ID
+from server.domain.dataformats.entities import DataFormat
 from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
 from server.domain.datasets.repositories import DatasetHeadlines
 
@@ -45,7 +46,7 @@ class DatasetFiltersView(BaseModel):
     organization_siret: List[OrganizationView]
     geographical_coverage: List[str]
     service: List[str]
-    format: List[str]
+    format_id: List[DataFormat]
     technical_source: List[str]
     tag_id: List[TagView]
     license: List[str]

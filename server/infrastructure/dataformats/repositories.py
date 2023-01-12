@@ -26,7 +26,7 @@ class SqlDataFormatRepository(DataFormatRepository):
 
             return instance.id
 
-    async def get_all(self, ids: List[int] = None) -> List[DataFormat]:
+    async def get_all(self, ids: List[Optional[int]] = None) -> List[DataFormat]:
         async with self._db.session() as session:
             stmt = select(DataFormatModel)
             if ids is not None:
@@ -34,3 +34,12 @@ class SqlDataFormatRepository(DataFormatRepository):
             result = await session.execute(stmt)
             items = result.unique().scalars()
             return [make_entity(item) for item in items]
+
+    async def get_by_name(self, name: str) -> Optional[DataFormat]:
+        async with self._db.session() as session:
+            stmt = select(DataFormatModel).where(DataFormatModel.name == name)
+            result = await session.execute(stmt)
+            instance = result.unique().scalar_one_or_none()
+            if instance is None:
+                return None
+            return make_entity(instance)

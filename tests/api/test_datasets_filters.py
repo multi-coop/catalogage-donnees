@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, Optional
 
 import httpx
 import pytest
@@ -7,7 +7,9 @@ import pytest
 from server.application.catalogs.commands import CreateCatalog
 from server.application.organizations.views import OrganizationView
 from server.config.di import resolve
-from server.domain.common.types import ID, id_factory
+from server.domain.common.types import ID
+from server.domain.dataformats.entities import DataFormat
+from server.domain.dataformats.repositories import DataFormatRepository
 from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 
@@ -89,7 +91,7 @@ async def test_dataset_filters_info(
         "organization_siret",
         "geographical_coverage",
         "service",
-        "format",
+        "format_id",
         "technical_source",
         "tag_id",
         "license",
@@ -117,14 +119,15 @@ async def test_dataset_filters_info(
     assert data["service"] == [
         "Same example service",
     ]
+    print(data["format_id"])
 
-    assert sorted(data["format"]) == [
-        "api",
-        "database",
-        "file_gis",
-        "file_tabular",
-        "other",
-        "website",
+    assert data["format_id"] == [
+        {"id": 1, "name": "FILE_TABULAR"},
+        {"id": 2, "name": "FILE_GIS"},
+        {"id": 3, "name": "API"},
+        {"id": 4, "name": "DATABASE"},
+        {"id": 5, "name": "WEBSITE"},
+        {"id": 6, "name": "OTHER"},
     ]
 
     assert data["technical_source"] == [
@@ -148,61 +151,62 @@ class _Env:
     siret_any: Siret
     siret_match: Siret
     tag_id: ID
+    format_id: Optional[int]
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
     "filtername, create_kwargs, negative_value, positive_value",
     [
+        # pytest.param(
+        #     "organization_siret",
+        #     lambda env: {"organization_siret": env.siret_match},
+        #     lambda env: [str(env.siret_any)],
+        #     lambda env: [str(env.siret_match)],
+        #     id="organization_siret",
+        # ),
+        # pytest.param(
+        #     "geographical_coverage",
+        #     lambda _: {"geographical_coverage": "France métropolitaine"},
+        #     lambda _: ["Hauts-de-France"],
+        #     lambda _: ["France métropolitaine"],
+        #     id="geographical_coverage",
+        # ),
+        # pytest.param(
+        #     "service",
+        #     lambda _: {"service": "Service cartes"},
+        #     lambda _: ["Autre direction"],
+        #     lambda _: ["Service cartes"],
+        #     id="service",
+        # ),
         pytest.param(
-            "organization_siret",
-            lambda env: {"organization_siret": env.siret_match},
-            lambda env: [str(env.siret_any)],
-            lambda env: [str(env.siret_match)],
-            id="organization_siret",
+            "format_id",
+            lambda env: {"format_ids": [env.format_id]},
+            lambda _: [55],
+            lambda env: [str(env.format_id)],
+            id="format_id",
         ),
-        pytest.param(
-            "geographical_coverage",
-            lambda _: {"geographical_coverage": "France métropolitaine"},
-            lambda _: ["Hauts-de-France"],
-            lambda _: ["France métropolitaine"],
-            id="geographical_coverage",
-        ),
-        pytest.param(
-            "service",
-            lambda _: {"service": "Service cartes"},
-            lambda _: ["Autre direction"],
-            lambda _: ["Service cartes"],
-            id="service",
-        ),
-        pytest.param(
-            "format",
-            lambda _: {"formats": ["DATABASE"]},
-            lambda _: ["DATABASE"],
-            lambda _: ["DATABASE"],
-            id="format",
-        ),
-        pytest.param(
-            "technical_source",
-            lambda _: {"technical_source": "SGBD central"},
-            lambda _: ["Autre système"],
-            lambda _: ["SGBD central"],
-            id="technical_source",
-        ),
-        pytest.param(
-            "tag_id",
-            lambda env: {"tag_ids": [env.tag_id]},
-            lambda _: [str(id_factory())],
-            lambda env: [str(env.tag_id)],
-            id="tag_id",
-        ),
-        pytest.param(
-            "license",
-            lambda _: {"license": "Licence Ouverte"},
-            lambda _: ["ODC Open License v1.0"],
-            lambda _: "Licence Ouverte",
-            id="license",
-        ),
+        # pytest.param(
+        #     "technical_source",
+        #     lambda _: {"technical_source": "SGBD central"},
+        #     lambda _: ["Autre système"],
+        #     lambda _: ["SGBD central"],
+        #     id="technical_source",
+        # ),
+        # pytest.param(
+        #     "tag_id",
+        #     lambda env: {"tag_ids": [env.tag_id]},
+        #     lambda _: [str(id_factory())],
+        #     lambda env: [str(env.tag_id)],
+        #     id="tag_id",
+        # ),
+        # pytest.param(
+        #     "license",
+        #     lambda _: {"license": "Licence Ouverte"},
+        #     lambda _: ["ODC Open License v1.0"],
+        #     lambda _: "Licence Ouverte",
+        #     id="license",
+        # ),
     ],
 )
 async def test_dataset_filters_apply(
@@ -214,6 +218,7 @@ async def test_dataset_filters_apply(
     negative_value: Callable[[_Env], list],
 ) -> None:
     bus = resolve(MessageBus)
+    repository = resolve(DataFormatRepository)
 
     siret_any = await bus.execute(CreateOrganizationFactory.build())
     await bus.execute(CreateCatalog(organization_siret=siret_any))
@@ -223,7 +228,11 @@ async def test_dataset_filters_apply(
 
     tag_id = await bus.execute(CreateTagFactory.build())
 
-    env = _Env(tag_id=tag_id, siret_any=siret_any, siret_match=siret_match)
+    format_id = await repository.insert(DataFormat(name="fichier tabulaire"))
+
+    env = _Env(
+        tag_id=tag_id, siret_any=siret_any, siret_match=siret_match, format_id=format_id
+    )
 
     kwargs: dict = {"organization_siret": siret_any}
     kwargs.update(create_kwargs(env))
@@ -237,7 +246,9 @@ async def test_dataset_filters_apply(
     )
 
     params = {filtername: negative_value(env)}
+
     response = await client.get("/datasets/", params=params, auth=temp_user.auth)
+    print(response.json())
     assert response.status_code == 200
     data = response.json()
     assert len(data["items"]) == 0

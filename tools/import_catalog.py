@@ -64,8 +64,6 @@ def _map_formats(
     value: Optional[str], import_notes: TextIO, config: Config
 ) -> List[str]:
 
-    print(value)
-
     if not value:
         return []
 
@@ -192,7 +190,7 @@ async def main(config_path: Path, out_path: Path) -> int:
         "nom_orga",
         "service",
         "couv_geo",
-        "format",
+        "formats",
         "si",
         "contact_service",
         "contact_personne",
@@ -236,7 +234,7 @@ async def main(config_path: Path, out_path: Path) -> int:
         params["geographical_coverage"] = _map_geographical_coverage(
             row["couv_geo"] or None, config
         )
-        params["formats"] = _map_formats(row["format"] or None, import_notes, config)
+        params["formats"] = _map_formats(row["formats"] or None, import_notes, config)
         params["technical_source"] = row["si"] or None
         params["producer_email"] = row["contact_service"] or None
         params["contact_emails"] = _map_contact_emails(row["contact_personne"] or None)
@@ -269,6 +267,7 @@ async def main(config_path: Path, out_path: Path) -> int:
         users=[],
         tags=tags_to_create,
         datasets=datasets,
+        formats=[],
     ).dict()
 
     out_path.write_text(yaml.safe_dump(initdata))

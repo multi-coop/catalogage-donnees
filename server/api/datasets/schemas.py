@@ -23,7 +23,7 @@ class DatasetListParams:
         organization_siret: Optional[Siret] = Query(None),
         geographical_coverage: Optional[List[str]] = Query(None),
         service: Optional[List[str]] = Query(None),
-        format_: Optional[List[str]] = Query(None, alias="format"),
+        format_id: Optional[List[int]] = Query(None),
         technical_source: Optional[List[str]] = Query(None),
         tag_id: Optional[List[ID]] = Query(None),
         license: Optional[str] = Query(None),
@@ -35,7 +35,7 @@ class DatasetListParams:
         self.page_size = page_size
         self.geographical_coverage = geographical_coverage
         self.service = service
-        self.format = format_
+        self.format_id = format_id
         self.technical_source = technical_source
         self.tag_id = tag_id
         self.license = license

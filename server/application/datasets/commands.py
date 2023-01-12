@@ -21,7 +21,7 @@ class CreateDataset(CreateDatasetValidationMixin, Command[ID]):
     description: str
     service: str
     geographical_coverage: str
-    format_ids: List[int]
+    format_ids: List[Optional[int]]
     technical_source: Optional[str] = None
     producer_email: Optional[EmailStr] = None
     contact_emails: List[EmailStr]
@@ -44,7 +44,7 @@ class UpdateDataset(UpdateDatasetValidationMixin, Command[None]):
     description: str
     service: str
     geographical_coverage: str
-    format_ids: List[int]
+    format_ids: List[Optional[int]]
     technical_source: Optional[str] = Field(...)
     producer_email: Optional[EmailStr] = Field(...)
     contact_emails: List[EmailStr]

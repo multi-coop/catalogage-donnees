@@ -127,12 +127,14 @@ async def delete_dataset(command: DeleteDataset) -> None:
 async def get_dataset_filters(query: GetDatasetFilters) -> DatasetFiltersView:
     bus = resolve(MessageBus)
     repository = resolve(DatasetRepository)
+    data_format_repository = resolve(DataFormatRepository)
 
     catalogs = await bus.execute(GetAllCatalogs())
     geographical_coverages = await repository.get_geographical_coverage_set()
     services = await repository.get_service_set()
     technical_sources = await repository.get_technical_source_set()
     tags = await bus.execute(GetAllTags())
+    formats = await data_format_repository.get_all()
     licenses = await bus.execute(GetLicenseSet())
 
     return DatasetFiltersView(
@@ -143,7 +145,7 @@ async def get_dataset_filters(query: GetDatasetFilters) -> DatasetFiltersView:
         ],
         geographical_coverage=sorted(geographical_coverages),
         service=list(services),
-        format=list([]),
+        format_id=formats,
         technical_source=list(technical_sources),
         tag_id=tags,
         license=["*", *licenses],

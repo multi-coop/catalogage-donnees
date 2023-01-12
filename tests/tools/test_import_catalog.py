@@ -46,7 +46,7 @@ async def test_import_catalog_example(tmp_path: Path) -> None:
     csv_path.write_text(
         dedent(
             """\
-            titre;description;mots_cles;nom_orga;siret_orga;id_alt_orga;service;si;contact_service;contact_personne;date_pub;date_maj;freq_maj;couv_geo;url;format;licence;donnees_geoloc
+            titre;description;mots_cles;nom_orga;siret_orga;id_alt_orga;service;si;contact_service;contact_personne;date_pub;date_maj;freq_maj;couv_geo;url;formats;licence;donnees_geoloc
             Titre1;Description1;"Tag 1,Tag 2";Ministère 1;11004601800013;;Direction1;SI1;service@mydomain.org;contact@mydomain.org;;2022-10-06;annuelle;aquitaine;;geojson, xls, oracle et shp;etalab-2.0;oui
             Titre2;Description2;"Tag 1,Tag 3";Ministère 1;11004601800013;;Direction1;SI2;service@mydomain.org;contact@mydomain.org;;;Invalid;NSP;;Information manquante;etalab-2.0;oui
             """  # noqa

@@ -76,6 +76,11 @@ users:
     extras:
       role: ADMIN
 
+formats:
+  - website
+  - file_tabular
+  - other
+
 tags:
   - id: "9c1549a5-02ef-43a9-aa20-6babdce0b733"
     params:

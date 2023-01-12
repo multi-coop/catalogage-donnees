@@ -29,6 +29,7 @@ async def test_initdata_empty(tmp_path: Path) -> None:
         datasets: []
         organizations: []
         catalogs: []
+        formats: []
 
         """
     )
@@ -66,6 +67,7 @@ async def test_initdata_env_password_invalid(
               password: __env__
         tags: []
         datasets: []
+        formats: []
         """.format(
             siret=temp_org.siret
         )
@@ -96,6 +98,7 @@ async def test_initdata_env_password(
               password: __env__
         tags: []
         datasets: []
+        formats: []
 
         """.format(
             siret=temp_org.siret
@@ -140,13 +143,21 @@ async def test_repo_initdata(
     num_datasets = 5
     num_organizations = 2
     num_catalogs = 1
+    num_formats = 3
     num_entities = (
-        num_users + num_tags + num_datasets + num_catalogs + num_organizations
+        num_users
+        + num_tags
+        + num_datasets
+        + num_catalogs
+        + num_organizations
+        + num_formats
     )
 
     code = await initdata.main(path, no_input=True)
     assert code == 0
     captured = capsys.readouterr()
+
+    print(captured.out)
     assert captured.out.count("created") == num_entities
 
     pk = ID(uuid.UUID("16b398af-f8c7-48b9-898a-18ad3404f528"))
@@ -163,6 +174,7 @@ async def test_repo_initdata(
     command = UpdateDataset(
         account=Skip(),
         **dataset.dict(exclude={"title"}),
+        format_ids=[format.id for format in dataset.formats],
         tag_ids=[tag.id for tag in dataset.tags],
         title="Changed",
     )

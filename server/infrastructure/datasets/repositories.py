@@ -39,6 +39,8 @@ class SqlDatasetRepository(DatasetRepository):
             query = GetAllQuery(spec, account=account)
             stmt = query.statement
 
+            print(spec.format__id__in)
+
             count = await get_count_from(stmt, session)
 
             if page is not None:
