@@ -19,9 +19,7 @@
     {
       label: "Formats",
       icon: "fr-icon-file-line",
-      value: dataset.formats
-        .map((format) => DATA_FORMAT_SHORT_NAMES[format])
-        .join(", "),
+      value: dataset.formats.map((format) => format.name).join(", "),
     },
     {
       label: "Licence",

@@ -119,7 +119,6 @@ async def test_dataset_filters_info(
     assert data["service"] == [
         "Same example service",
     ]
-    print(data["format_id"])
 
     assert sorted(data["format_id"], key=lambda x: x["id"], reverse=False) == [
         {"id": 1, "name": "Fichier tabulaire (XLS, XLSX, CSV, ...)"},
@@ -248,7 +247,7 @@ async def test_dataset_filters_apply(
     params = {filtername: negative_value(env)}
 
     response = await client.get("/datasets/", params=params, auth=temp_user.auth)
-    print(response.json())
+
     assert response.status_code == 200
     data = response.json()
     assert len(data["items"]) == 0
