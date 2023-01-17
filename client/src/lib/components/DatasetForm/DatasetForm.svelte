@@ -304,7 +304,7 @@
       </legend>
       <div class="fr-fieldset__content">
         {#each formats as { id, name }, index}
-          {@const identifier = `dataformats-${name}`}
+          {@const identifier = `dataformats-${id}`}
           <div class="fr-checkbox-group">
             <input
               type="checkbox"

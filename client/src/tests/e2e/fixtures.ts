@@ -63,7 +63,7 @@ export const test = base.extend<AppTestArgs>({
       organization_siret: "11004601800013",
       title: "Sample title",
       description: "Sample description",
-      formats: ["api"],
+      format_ids: [1, 2],
       entrypoint_email: "jane.doe@beta.gouv.fr",
       contact_emails: ["contact@beta.gouv.fr"],
       service: "La Drac",

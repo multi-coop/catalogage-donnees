@@ -54,9 +54,8 @@ test.describe("Basic form submission", () => {
 
     // "Sources et formats" section
 
-    const apiFormat = page.locator("label[for=dataformats-api]");
+    const apiFormat = page.locator("label[for=dataformats-1]");
     await apiFormat.check();
-    expect(await page.isChecked("input[value=api]")).toBeTruthy();
 
     const technicalSource = page.locator("form [name=technicalSource]");
     await technicalSource.fill(technicalSourceText);
@@ -145,7 +144,12 @@ test.describe("Basic form submission", () => {
     expect(json.title).toBe(titleText);
     expect(json.description).toBe(descriptionText);
     expect(json.geographical_coverage).toBe("Europe continentale");
-    expect(json.formats).toStrictEqual(["api"]);
+    expect(json.formats).toStrictEqual([
+      {
+        id: 1,
+        name: "Fichier tabulaire (XLS, XLSX, CSV, ...)",
+      },
+    ]);
     expect(json.producer_email).toBe(producerEmailText);
     expect(json.contact_emails).toEqual([contactEmail1Text, contactEmail2Text]);
     expect(json).toHaveProperty("id");
