@@ -407,7 +407,7 @@ async def test_export_catalog(client: httpx.AsyncClient) -> None:
             description="Example description",
             service="Example service",
             geographical_coverage="France métropolitaine",
-            formats=["WEBSITE", "AUTRES"],
+            formats=["Site web", "AUTRES"],
             technical_source="Example database",
             producer_email="example.service@mydomain.org",
             contact_emails=["example.person@mydomain.org"],
@@ -480,7 +480,7 @@ async def test_export_catalog(client: httpx.AsyncClient) -> None:
         "description": "Example description",
         "service": "Example service",
         "couv_geo": "France métropolitaine",
-        "format": "FILE_TABULAR, FILE_GIS",
+        "format": "Fichier tabulaire (XLS, XLSX, CSV, ...), Fichier SIG (Shapefile, ...)",  # noqa: E501
         "si": "Example database",
         "contact_service": "example.service@mydomain.org",
         "contact_personne": "example.person@mydomain.org",

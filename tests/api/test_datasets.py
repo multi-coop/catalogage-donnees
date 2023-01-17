@@ -178,8 +178,8 @@ async def test_dataset_crud(
         "service": "Example service",
         "geographical_coverage": "France métropolitaine",
         "formats": [
-            DataFormatView(id=1, name="FILE_TABULAR"),
-            DataFormatView(id=2, name="FILE_GIS"),
+            DataFormatView(id=1, name="Fichier tabulaire (XLS, XLSX, CSV, ...)"),
+            DataFormatView(id=2, name="Fichier SIG (Shapefile, ...)"),
         ],
         "technical_source": "Example database",
         "producer_email": "example.service@mydomain.org",
@@ -768,7 +768,7 @@ class TestDatasetUpdate:
         )
         assert response.status_code == 200
 
-        # API returns updated representation
+        # API (REST, GraphQL, ...) returns updated representation
         data = response.json()
         assert data == {
             "id": str(dataset_id),
@@ -780,7 +780,9 @@ class TestDatasetUpdate:
             "description": "Other description",
             "service": "Other service",
             "geographical_coverage": "Hauts-de-France",
-            "formats": [DataFormatView(id=1, name="FILE_TABULAR")],
+            "formats": [
+                DataFormatView(id=1, name="Fichier tabulaire (XLS, XLSX, CSV, ...)")
+            ],
             "technical_source": "Other information system",
             "producer_email": "other.service@mydomain.org",
             "contact_emails": ["other.person@mydomain.org"],
@@ -801,7 +803,9 @@ class TestDatasetUpdate:
         assert dataset.description == "Other description"
         assert dataset.service == "Other service"
         assert dataset.geographical_coverage == "Hauts-de-France"
-        assert dataset.formats == [DataFormatView(id=1, name="FILE_TABULAR")]
+        assert dataset.formats == [
+            DataFormatView(id=1, name="Fichier tabulaire (XLS, XLSX, CSV, ...)")
+        ]
         assert dataset.technical_source == "Other information system"
         assert dataset.producer_email == "other.service@mydomain.org"
         assert dataset.contact_emails == ["other.person@mydomain.org"]
@@ -840,7 +844,7 @@ class TestDatasetUpdate:
                 description="Other description",
                 service="Other service",
                 geographical_coverage="Hauts-de-France",
-                formats=["DATABASE"],
+                formats=["Base de données"],
                 technical_source="Other information system",
                 producer_email="other.service@mydomain.org",
                 contact_emails=["other.person@mydomain.org"],
@@ -889,8 +893,8 @@ class TestFormats:
 
         assert response.status_code == 200
         assert response.json()["formats"] == [
-            DataFormatView(id=1, name="FILE_TABULAR"),
-            DataFormatView(id=2, name="FILE_GIS"),
+            DataFormatView(id=1, name="Fichier tabulaire (XLS, XLSX, CSV, ...)"),
+            DataFormatView(id=2, name="Fichier SIG (Shapefile, ...)"),
         ]
 
     async def test_formats_remove(
@@ -919,7 +923,9 @@ class TestFormats:
         )
 
         assert response.status_code == 200
-        assert response.json()["formats"] == [DataFormatView(id=2, name="FILE_GIS")]
+        assert response.json()["formats"] == [
+            DataFormatView(id=2, name="Fichier SIG (Shapefile, ...)")
+        ]
 
 
 @pytest.mark.asyncio

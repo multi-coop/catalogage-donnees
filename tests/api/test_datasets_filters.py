@@ -121,13 +121,13 @@ async def test_dataset_filters_info(
     ]
     print(data["format_id"])
 
-    assert data["format_id"] == [
-        {"id": 1, "name": "FILE_TABULAR"},
-        {"id": 2, "name": "FILE_GIS"},
-        {"id": 3, "name": "API"},
-        {"id": 4, "name": "DATABASE"},
-        {"id": 5, "name": "WEBSITE"},
-        {"id": 6, "name": "OTHER"},
+    assert sorted(data["format_id"], key=lambda x: x["id"], reverse=False) == [
+        {"id": 1, "name": "Fichier tabulaire (XLS, XLSX, CSV, ...)"},
+        {"id": 2, "name": "Fichier SIG (Shapefile, ...)"},
+        {"id": 3, "name": "API (REST, GraphQL, ...)"},
+        {"id": 4, "name": "Base de données"},
+        {"id": 5, "name": "Site web"},
+        {"id": 6, "name": "Autre"},
     ]
 
     assert data["technical_source"] == [
