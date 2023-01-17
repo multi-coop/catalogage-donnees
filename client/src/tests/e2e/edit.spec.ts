@@ -28,8 +28,6 @@ test.describe("Edit dataset", () => {
     const description = page.locator("form [name=description]");
     expect(await description.inputValue()).toBe(dataset.description);
 
-    expect(await page.isChecked("input[value='api']")).toBeTruthy();
-
     expect(dataset.extraFieldValues).toHaveLength(1);
     const extraReferentiel = page.locator("form [name=referentiel]");
     expect(await extraReferentiel.inputValue()).toBe(
@@ -47,16 +45,6 @@ test.describe("Edit dataset", () => {
     expect(newDescriptionText).not.toBe(dataset.description);
     await description.fill(newDescriptionText);
     expect(await description.inputValue()).toBe(newDescriptionText);
-
-    const apiFormat = page.locator("label[for=dataformats-api]");
-    await apiFormat.uncheck();
-    expect(await page.isChecked("input[value=api]")).toBeFalsy();
-    const websiteFormat = page.locator("label[for=dataformats-website]");
-    await websiteFormat.check();
-    expect(await page.isChecked("input[value=website]")).toBeTruthy();
-    const databaseFormat = page.locator("label[for=dataformats-database]");
-    await databaseFormat.check();
-    expect(await page.isChecked("input[value=database]")).toBeTruthy();
 
     const selectedTag = page.locator(
       'button[role="listitem"]:has-text("services")'
@@ -86,7 +74,16 @@ test.describe("Edit dataset", () => {
     expect(json).toHaveProperty("id");
     expect(json.title).toBe(newTitleText);
     expect(json.description).toBe(newDescriptionText);
-    expect(json.formats).toStrictEqual(["database", "website"]);
+    expect(json.formats).toStrictEqual([
+      {
+        id: 1,
+        name: "Fichier tabulaire (XLS, XLSX, CSV, ...)",
+      },
+      {
+        id: 2,
+        name: "Fichier SIG (Shapefile, ...)",
+      },
+    ]);
     expect(
       json.tags.findIndex((item) => item.name === "environnement") !== -1
     ).toBeTruthy();

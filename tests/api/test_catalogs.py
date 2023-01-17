@@ -16,11 +16,7 @@ from server.domain.catalogs.entities import (
     TextExtraField,
 )
 from server.domain.common.types import Skip, id_factory
-from server.domain.datasets.entities import (
-    DataFormat,
-    PublicationRestriction,
-    UpdateFrequency,
-)
+from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
 from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 
@@ -411,7 +407,7 @@ async def test_export_catalog(client: httpx.AsyncClient) -> None:
             description="Example description",
             service="Example service",
             geographical_coverage="France métropolitaine",
-            formats=[DataFormat.WEBSITE, DataFormat.OTHER],
+            formats=["Site web", "AUTRES"],
             technical_source="Example database",
             producer_email="example.service@mydomain.org",
             contact_emails=["example.person@mydomain.org"],
@@ -435,7 +431,7 @@ async def test_export_catalog(client: httpx.AsyncClient) -> None:
             description="Example description",
             service="Example service",
             geographical_coverage="France métropolitaine",
-            formats=[DataFormat.WEBSITE, DataFormat.OTHER],
+            format_ids=[1, 2],
             technical_source="Example database",
             producer_email="example.service@mydomain.org",
             contact_emails=["example.person@mydomain.org"],
@@ -484,7 +480,7 @@ async def test_export_catalog(client: httpx.AsyncClient) -> None:
         "description": "Example description",
         "service": "Example service",
         "couv_geo": "France métropolitaine",
-        "format": "website, other",
+        "format": "Fichier tabulaire (XLS, XLSX, CSV, ...), Fichier SIG (Shapefile, ...)",  # noqa: E501
         "si": "Example database",
         "contact_service": "example.service@mydomain.org",
         "contact_personne": "example.person@mydomain.org",

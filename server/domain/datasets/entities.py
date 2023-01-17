@@ -5,20 +5,12 @@ from typing import List, Optional
 from pydantic import Field
 
 from server.domain.catalogs.entities import ExtraFieldValue
+from server.domain.dataformats.entities import DataFormat
 from server.domain.tags.entities import Tag
 from server.seedwork.domain.entities import Entity
 
 from ..catalog_records.entities import CatalogRecord
 from ..common.types import ID
-
-
-class DataFormat(enum.Enum):
-    FILE_TABULAR = "file_tabular"
-    FILE_GIS = "file_gis"
-    API = "api"
-    DATABASE = "database"
-    WEBSITE = "website"
-    OTHER = "other"
 
 
 class UpdateFrequency(enum.Enum):

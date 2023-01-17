@@ -1,4 +1,3 @@
-import { DATA_FORMAT_LABELS } from "src/constants";
 import type {
   DatasetFiltersInfo,
   DatasetFiltersOptions,
@@ -13,6 +12,7 @@ export const toFiltersInfo = (data: any): DatasetFiltersInfo => {
     geographical_coverage,
     technical_source,
     tag_id,
+    format_id,
     ...rest
   } = data;
   return {
@@ -20,6 +20,7 @@ export const toFiltersInfo = (data: any): DatasetFiltersInfo => {
     geographicalCoverage: geographical_coverage,
     technicalSource: technical_source,
     tagId: tag_id,
+    formatId: format_id,
     ...rest,
   };
 };
@@ -27,11 +28,12 @@ export const toFiltersInfo = (data: any): DatasetFiltersInfo => {
 export const toFiltersValue = (
   searchParams: URLSearchParams
 ): DatasetFiltersValue => {
+  const formatId = searchParams.get("format_id");
   return {
     organizationSiret: searchParams.get("organization_siret"),
     geographicalCoverage: searchParams.get("geographical_coverage"),
     service: searchParams.get("service"),
-    format: searchParams.get("format"),
+    formatId: formatId ? parseInt(formatId) : null,
     technicalSource: searchParams.get("technical_source"),
     tagId: searchParams.get("tag_id"),
     license: searchParams.get("license"),
@@ -45,7 +47,7 @@ export const toFiltersParams = (
     organizationSiret,
     geographicalCoverage,
     service,
-    format,
+    formatId,
     technicalSource,
     tagId,
     license,
@@ -55,7 +57,7 @@ export const toFiltersParams = (
     ["organization_siret", organizationSiret],
     ["geographical_coverage", geographicalCoverage],
     ["service", service],
-    ["format", format],
+    ["format_id", formatId],
     ["technical_source", technicalSource],
     ["tag_id", tagId],
     ["license", license],
@@ -75,9 +77,9 @@ export const toFiltersOptions = (
       value,
     })),
     service: info.service.map((value) => ({ label: value, value })),
-    format: info.format.map((value) => ({
-      label: DATA_FORMAT_LABELS[value],
-      value,
+    formatId: info.formatId.map((dataformat) => ({
+      label: dataformat.name,
+      value: dataformat.id,
     })),
     technicalSource: info.technicalSource.map((value) => ({
       label: value,
@@ -94,7 +96,8 @@ export const toFiltersOptions = (
 export const toFiltersButtonTexts = (
   value: DatasetFiltersValue,
   organizationSiretToName: Record<string, string>,
-  tagIdToName: Record<string, string>
+  tagIdToName: Record<string, string>,
+  formatIdToName: Record<string, string>
 ): { [K in keyof DatasetFiltersValue]: Maybe<string> } => {
   return {
     organizationSiret: Maybe.map(
@@ -103,7 +106,7 @@ export const toFiltersButtonTexts = (
     ),
     geographicalCoverage: value.geographicalCoverage,
     service: value.service,
-    format: Maybe.map(value.format, (v) => DATA_FORMAT_LABELS[v]),
+    formatId: Maybe.map(value.tagId, (v) => formatIdToName[v]),
     technicalSource: value.technicalSource,
     tagId: Maybe.map(value.tagId, (v) => tagIdToName[v]),
     license: Maybe.map(value.license, (v) =>

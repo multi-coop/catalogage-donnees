@@ -76,6 +76,8 @@ users:
     extras:
       role: ADMIN
 
+formats:
+  - "Fichier Zip"
 tags:
   - id: "9c1549a5-02ef-43a9-aa20-6babdce0b733"
     params:
@@ -127,7 +129,7 @@ datasets:
       service: Service cartographie
       geographical_coverage: France
       formats:
-        - website
+        - Fichier tabulaire (XLS, XLSX, CSV, ...)
       technical_source: SIG national de l'IGN
       producer_email: ign.service@mydomain.org
       contact_emails: [ign.person@mydomain.org]
@@ -151,7 +153,7 @@ datasets:
       service: Direction des données du CROUS
       geographical_coverage: France
       formats:
-        - file_tabular
+        - Fichier tabulaire (XLS, XLSX, CSV, ...)
       technical_source: Système d'information central du CROUS
       producer_email: null
       contact_emails: [crous.person@mydomain.org]
@@ -174,7 +176,7 @@ datasets:
       service: Direction des données du CROUS
       geographical_coverage: Monde # Fake, for E2E testing purposes
       formats:
-        - file_tabular
+        - Fichier Zip
       technical_source: Système d'information central du CROUS
       producer_email: null
       contact_emails: [crous.person@mydomain.org]
@@ -197,7 +199,7 @@ datasets:
       service: Service enquêtes
       geographical_coverage: France
       formats:
-        - other
+        - Fichier Zip
       technical_source: Catalogue des fiches de la DARES
       producer_email: null
       contact_emails: [dares.person@mydomain.org]
@@ -219,7 +221,7 @@ datasets:
       service: Service enquêtes
       geographical_coverage: France
       formats:
-        - other
+        - Fichier Zip
       technical_source: Catalogue des fiches de la DARES
       producer_email: null
       contact_emails: [dares.person@mydomain.org]
@@ -241,7 +243,7 @@ datasets:
       service: Service enquêtes
       geographical_coverage: France
       formats:
-        - other
+        - Fichier Zip
       technical_source: Catalogue des fiches de la DARES
       producer_email: null
       contact_emails: [dares.person@mydomain.org]

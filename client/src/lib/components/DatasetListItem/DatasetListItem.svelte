@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { Dataset } from "src/definitions/datasets";
-  import { DATA_FORMAT_SHORT_NAMES } from "src/constants";
   import paths from "$lib/paths";
   import { Maybe } from "$lib/util/maybe";
   import { capitalize, formatDaysMonthsOrYearsToNow } from "$lib/util/format";
@@ -19,9 +18,7 @@
     {
       label: "Formats",
       icon: "fr-icon-file-line",
-      value: dataset.formats
-        .map((format) => DATA_FORMAT_SHORT_NAMES[format])
-        .join(", "),
+      value: dataset.formats.map((format) => format.name).join(", "),
     },
     {
       label: "Licence",

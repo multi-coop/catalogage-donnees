@@ -84,7 +84,9 @@ async def get_catalog_export(query: GetCatalogExport) -> CatalogExportView:
         account=Skip(),
     )
 
-    return CatalogExportView(
+    view = CatalogExportView(
         catalog=CatalogView(**catalog.dict()),
         datasets=[DatasetExportView(**dataset.dict()) for (dataset, _) in datasets],
     )
+
+    return view

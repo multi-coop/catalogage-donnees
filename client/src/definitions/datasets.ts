@@ -1,16 +1,8 @@
 import type { Maybe } from "$lib/util/maybe";
 import type { ExtraFieldValue } from "./catalogs";
 import type { CatalogRecord } from "./catalog_records";
+import type { DataFormat } from "./dataformat";
 import type { Tag } from "./tag";
-
-// Matches enum on the backend.
-export type DataFormat =
-  | "file_tabular"
-  | "file_gis"
-  | "api"
-  | "database"
-  | "website"
-  | "other";
 
 export type UpdateFrequency =
   | "never"
@@ -58,7 +50,8 @@ export type DatasetFormData = Omit<
   "id" | "catalogRecord" | "headlines"
 > & { organizationSiret: string };
 
-export type DatasetCreateData = Omit<DatasetFormData, "tags"> & {
+export type DatasetCreateData = Omit<DatasetFormData, "tags" | "formats"> & {
   tagIds: string[];
+  formatIds: number[];
 };
 export type DatasetUpdateData = DatasetCreateData;

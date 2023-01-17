@@ -3,15 +3,12 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
+from server.application.dataformats.views import DataFormatView
 from server.application.datasets.views import ExtraFieldValueView
 from server.application.tags.views import TagView
 from server.domain.catalogs.entities import ExtraFieldType
 from server.domain.common.types import ID
-from server.domain.datasets.entities import (
-    DataFormat,
-    PublicationRestriction,
-    UpdateFrequency,
-)
+from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
 
 from ..organizations.views import OrganizationView
 
@@ -35,7 +32,7 @@ class DatasetExportView(BaseModel):
     description: str
     service: str
     geographical_coverage: str
-    formats: List[DataFormat]
+    formats: List[DataFormatView]
     technical_source: Optional[str]
     producer_email: Optional[str]
     contact_emails: List[str]

@@ -17,8 +17,8 @@ formats:
     "oracle et shp": [database, file_gis]
 
   map:
-    "xls": file_tabular
-    "geojson": file_gis
+    "xls": "fichier tabulaire (Excell, CSV,...)"
+    "geojson": "fichier SIG (Shapefile, ...)"
 
 update_frequency:
   map:

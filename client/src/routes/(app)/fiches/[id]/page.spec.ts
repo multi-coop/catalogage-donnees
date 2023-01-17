@@ -27,7 +27,7 @@ const dataset = getFakeDataset({
   id: "d4765f06-ccdf-4bae-b237-2bced67e6dc2",
   title: "foo",
   description: "bar baz crux",
-  formats: ["other"],
+  formats: [{ id: 55, name: "other" }],
   producerEmail: "service@mydomain.org",
   contactEmails: ["service@mydomain.org"],
   catalogRecord: getFakeCatalogRecord({

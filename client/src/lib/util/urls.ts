@@ -15,7 +15,7 @@ export const patchQueryString = (
   const newParams = new URLSearchParams(params);
   items.forEach(([name, value]) => {
     if (Maybe.Some(value)) {
-      newParams.set(name, value);
+      newParams.set(name, value.toString());
     } else {
       newParams.delete(name);
     }

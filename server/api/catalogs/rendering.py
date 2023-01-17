@@ -33,7 +33,7 @@ def to_csv(export: CatalogExportView) -> str:
             "description": dataset.description,
             "service": dataset.service,
             "couv_geo": dataset.geographical_coverage,
-            "format": ", ".join(fmt.value for fmt in dataset.formats),
+            "format": ", ".join(fmt.name for fmt in dataset.formats),
             "si": dataset.technical_source or "",
             "contact_service": dataset.producer_email or "",
             "contact_personne": ", ".join(dataset.contact_emails),

@@ -57,7 +57,7 @@ async def list_datasets(
             organization_siret=params.organization_siret,
             geographical_coverage__in=params.geographical_coverage,
             service__in=params.service,
-            format__in=params.format,
+            format__id__in=params.format_id,
             technical_source__in=params.technical_source,
             tag__id__in=params.tag_id,
             license=params.license,

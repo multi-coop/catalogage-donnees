@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { DataFormat } from "src/definitions/dataformat";
   import type {
     DatasetFiltersInfo,
     DatasetFiltersValue,
@@ -24,21 +25,25 @@
     return map;
   };
 
-  const createTagIdToNameMap = (tags: Tag[]): Record<string, string> => {
+  const createTagIdOrFormatIdToNameMap = (
+    items: Tag[] | DataFormat[]
+  ): Record<string, string> => {
     const map = {};
-    tags.forEach(({ id, name }) => (map[id] = name));
+    items.forEach(({ id, name }) => (map[id] = name));
     return map;
   };
 
   $: organizationSiretToName = createOrganizationSiretToNameMap(
     info.organizationSiret
   );
-  $: tagIdToName = createTagIdToNameMap(info.tagId);
+  $: tagIdToName = createTagIdOrFormatIdToNameMap(info.tagId);
+  $: formatIdToName = createTagIdOrFormatIdToNameMap(info.tagId);
   $: filtersOptions = toFiltersOptions(info);
   $: buttonTexts = toFiltersButtonTexts(
     value,
     organizationSiretToName,
-    tagIdToName
+    tagIdToName,
+    formatIdToName
   );
 
   const dispatch = createEventDispatcher<{ change: DatasetFiltersValue }>();
@@ -110,9 +115,9 @@
       label="Format de mise à disposition"
       buttonPlaceholder="Rechercher..."
       inputPlaceholder="Rechercher..."
-      buttonText={buttonTexts.format || "Rechercher..."}
-      on:clickItem={(e) => handleSelectFilter("format", e)}
-      options={filtersOptions.format}
+      buttonText={buttonTexts.formatId || "Rechercher..."}
+      on:clickItem={(e) => handleSelectFilter("formatId", e)}
+      options={filtersOptions.formatId}
     />
   </div>
 

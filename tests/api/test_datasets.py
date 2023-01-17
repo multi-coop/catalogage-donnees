@@ -7,6 +7,7 @@ from sqlalchemy import select
 
 from server.application.catalogs.commands import CreateCatalog
 from server.application.catalogs.queries import GetCatalogBySiret
+from server.application.dataformats.views import DataFormatView
 from server.application.datasets.queries import GetDatasetByID
 from server.application.organizations.views import OrganizationView
 from server.application.tags.commands import CreateTag
@@ -14,11 +15,9 @@ from server.application.tags.queries import GetTagByID
 from server.config.di import resolve
 from server.domain.catalogs.entities import ExtraFieldValue, TextExtraField
 from server.domain.common.types import ID, Skip, id_factory
-from server.domain.datasets.entities import (
-    DataFormat,
-    PublicationRestriction,
-    UpdateFrequency,
-)
+from server.domain.dataformats.entities import DataFormat
+from server.domain.dataformats.repositories import DataFormatRepository
+from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.organizations.types import Siret
 from server.infrastructure.catalogs.models import ExtraFieldValueModel
@@ -50,7 +49,7 @@ from ..helpers import TestPasswordUser, create_test_password_user, to_payload
                     "loc": ["body", "geographical_coverage"],
                     "type": "value_error.missing",
                 },
-                {"loc": ["body", "formats"], "type": "value_error.missing"},
+                {"loc": ["body", "format_ids"], "type": "value_error.missing"},
                 {"loc": ["body", "contact_emails"], "type": "value_error.missing"},
             ],
             id="missing-fields",
@@ -61,12 +60,12 @@ from ..helpers import TestPasswordUser, create_test_password_user, to_payload
                 "description": "Description",
                 "service": "Service",
                 "geographical_coverage": "national",
-                "formats": [],
+                "format_ids": [],
                 "contact_emails": ["person@mydomain.org"],
             },
             [
                 {
-                    "loc": ["body", "formats"],
+                    "loc": ["body", "format_ids"],
                     "msg": "formats must contain at least one item",
                 }
             ],
@@ -78,7 +77,7 @@ from ..helpers import TestPasswordUser, create_test_password_user, to_payload
                 "description": "Description",
                 "service": "Service",
                 "geographical_coverage": "national",
-                "formats": ["api"],
+                "format_ids": [1, 2],
                 "contact_emails": [],
             },
             [
@@ -99,6 +98,7 @@ async def test_create_dataset_invalid(
     expected_errors_attrs: list,
 ) -> None:
     payload = {"organization_siret": str(temp_org.siret), **payload}
+
     response = await client.post("/datasets/", json=payload, auth=temp_user.auth)
     assert response.status_code == 422
 
@@ -137,6 +137,10 @@ async def test_dataset_crud(
 ) -> None:
     last_updated_at = fake.date_time_tz()
 
+    dataformat_repository = resolve(DataFormatRepository)
+
+    await dataformat_repository.insert(DataFormat(name="feuille de pappier"))
+
     payload = to_payload(
         CreateDatasetPayloadFactory.build(
             organization_siret=temp_org.siret,
@@ -144,7 +148,7 @@ async def test_dataset_crud(
             description="Example description",
             service="Example service",
             geographical_coverage="France métropolitaine",
-            formats=[DataFormat.WEBSITE],
+            format_ids=[1, 2],
             technical_source="Example database",
             producer_email="example.service@mydomain.org",
             contact_emails=["example.person@mydomain.org"],
@@ -173,7 +177,10 @@ async def test_dataset_crud(
         "description": "Example description",
         "service": "Example service",
         "geographical_coverage": "France métropolitaine",
-        "formats": ["website"],
+        "formats": [
+            DataFormatView(id=1, name="Fichier tabulaire (XLS, XLSX, CSV, ...)"),
+            DataFormatView(id=2, name="Fichier SIG (Shapefile, ...)"),
+        ],
         "technical_source": "Example database",
         "producer_email": "example.service@mydomain.org",
         "contact_emails": ["example.person@mydomain.org"],
@@ -651,7 +658,7 @@ class TestDatasetUpdate:
             "description",
             "service",
             "geographical_coverage",
-            "formats",
+            "format_ids",
             "technical_source",
             "producer_email",
             "contact_emails",
@@ -742,7 +749,7 @@ class TestDatasetUpdate:
                 description="Other description",
                 service="Other service",
                 geographical_coverage="Hauts-de-France",
-                formats=[DataFormat.DATABASE],
+                format_ids=[1],
                 technical_source="Other information system",
                 producer_email="other.service@mydomain.org",
                 contact_emails=["other.person@mydomain.org"],
@@ -761,7 +768,7 @@ class TestDatasetUpdate:
         )
         assert response.status_code == 200
 
-        # API returns updated representation
+        # API (REST, GraphQL, ...) returns updated representation
         data = response.json()
         assert data == {
             "id": str(dataset_id),
@@ -773,7 +780,9 @@ class TestDatasetUpdate:
             "description": "Other description",
             "service": "Other service",
             "geographical_coverage": "Hauts-de-France",
-            "formats": ["database"],
+            "formats": [
+                DataFormatView(id=1, name="Fichier tabulaire (XLS, XLSX, CSV, ...)")
+            ],
             "technical_source": "Other information system",
             "producer_email": "other.service@mydomain.org",
             "contact_emails": ["other.person@mydomain.org"],
@@ -794,7 +803,9 @@ class TestDatasetUpdate:
         assert dataset.description == "Other description"
         assert dataset.service == "Other service"
         assert dataset.geographical_coverage == "Hauts-de-France"
-        assert dataset.formats == [DataFormat.DATABASE]
+        assert dataset.formats == [
+            DataFormatView(id=1, name="Fichier tabulaire (XLS, XLSX, CSV, ...)")
+        ]
         assert dataset.technical_source == "Other information system"
         assert dataset.producer_email == "other.service@mydomain.org"
         assert dataset.contact_emails == ["other.person@mydomain.org"]
@@ -833,7 +844,7 @@ class TestDatasetUpdate:
                 description="Other description",
                 service="Other service",
                 geographical_coverage="Hauts-de-France",
-                formats=[DataFormat.DATABASE],
+                formats=["Base de données"],
                 technical_source="Other information system",
                 producer_email="other.service@mydomain.org",
                 contact_emails=["other.person@mydomain.org"],
@@ -865,7 +876,7 @@ class TestFormats:
         command = CreateDatasetFactory.build(
             account=temp_user.account,
             organization_siret=temp_org.siret,
-            formats=[DataFormat.WEBSITE, DataFormat.API],
+            format_ids=[1],
         )
         dataset_id = await bus.execute(command)
 
@@ -873,15 +884,18 @@ class TestFormats:
             f"/datasets/{dataset_id}/",
             json=to_payload(
                 UpdateDatasetPayloadFactory.build_from_create_command(
-                    command.copy(exclude={"formats"}),
-                    formats=[DataFormat.WEBSITE, DataFormat.API, DataFormat.FILE_GIS],
+                    command.copy(exclude={"format_ids"}),
+                    format_ids=[1, 2],
                 )
             ),
             auth=temp_user.auth,
         )
 
         assert response.status_code == 200
-        assert sorted(response.json()["formats"]) == ["api", "file_gis", "website"]
+        assert response.json()["formats"] == [
+            DataFormatView(id=1, name="Fichier tabulaire (XLS, XLSX, CSV, ...)"),
+            DataFormatView(id=2, name="Fichier SIG (Shapefile, ...)"),
+        ]
 
     async def test_formats_remove(
         self,
@@ -893,7 +907,7 @@ class TestFormats:
         command = CreateDatasetFactory.build(
             account=temp_user.account,
             organization_siret=temp_org.siret,
-            formats=[DataFormat.WEBSITE, DataFormat.API],
+            format_ids=[1, 2],
         )
         dataset_id = await bus.execute(command)
 
@@ -901,15 +915,17 @@ class TestFormats:
             f"/datasets/{dataset_id}/",
             json=to_payload(
                 UpdateDatasetPayloadFactory.build_from_create_command(
-                    command.copy(exclude={"formats"}),
-                    formats=[DataFormat.WEBSITE],
+                    command.copy(exclude={"format_ids"}),
+                    format_ids=[2],
                 )
             ),
             auth=temp_user.auth,
         )
 
         assert response.status_code == 200
-        assert response.json()["formats"] == ["website"]
+        assert response.json()["formats"] == [
+            DataFormatView(id=2, name="Fichier SIG (Shapefile, ...)")
+        ]
 
 
 @pytest.mark.asyncio
@@ -923,7 +939,8 @@ class TestTags:
         bus = resolve(MessageBus)
 
         command = CreateDatasetFactory.build(
-            account=temp_user.account, organization_siret=temp_org.siret
+            account=temp_user.account,
+            organization_siret=temp_org.siret,
         )
         dataset_id = await bus.execute(command)
         tag_architecture_id = await bus.execute(CreateTag(name="Architecture"))
@@ -1079,6 +1096,7 @@ class TestExtraFieldValues:
         command = CreateDatasetFactory.build(
             account=user.account,
             organization_siret=siret,
+            format_ids=[1, 2],
             extra_field_values=[
                 ExtraFieldValue(
                     extra_field_id=extra_field_id,

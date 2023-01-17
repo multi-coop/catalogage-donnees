@@ -8,7 +8,8 @@ from server.domain.catalogs.exceptions import CatalogDoesNotExist
 from server.domain.catalogs.repositories import CatalogRepository
 from server.domain.common.pagination import Pagination
 from server.domain.common.types import ID, Skip
-from server.domain.datasets.entities import DataFormat, Dataset
+from server.domain.dataformats.repositories import DataFormatRepository
+from server.domain.datasets.entities import Dataset
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.datasets.repositories import DatasetRepository
 from server.domain.organizations.types import Siret
@@ -36,6 +37,7 @@ async def create_dataset(command: CreateDataset, *, id_: ID = None) -> ID:
     catalog_repository = resolve(CatalogRepository)
     catalog_record_repository = resolve(CatalogRecordRepository)
     tag_repository = resolve(TagRepository)
+    format_repository = resolve(DataFormatRepository)
 
     if id_ is None:
         id_ = repository.make_id()
@@ -63,11 +65,14 @@ async def create_dataset(command: CreateDataset, *, id_: ID = None) -> ID:
 
     tags = await tag_repository.get_all(ids=command.tag_ids)
 
+    formats = await format_repository.get_all(ids=command.format_ids)
+
     dataset = Dataset(
         id=id_,
         catalog_record=catalog_record,
         tags=tags,
-        **command.dict(exclude={"tag_ids"}),
+        formats=formats,
+        **command.dict(exclude={"tag_ids", "format_ids"}),
     )
 
     return await repository.insert(dataset)
@@ -76,6 +81,7 @@ async def create_dataset(command: CreateDataset, *, id_: ID = None) -> ID:
 async def update_dataset(command: UpdateDataset) -> None:
     repository = resolve(DatasetRepository)
     tag_repository = resolve(TagRepository)
+    format_repository = resolve(DataFormatRepository)
 
     pk = command.id
     dataset = await repository.get_by_id(pk)
@@ -99,9 +105,14 @@ async def update_dataset(command: UpdateDataset) -> None:
         raise CannotUpdateDataset(f"{command.account=}, {dataset=}")
 
     tags = await tag_repository.get_all(ids=command.tag_ids)
+    formats = await format_repository.get_all(ids=command.format_ids)
+
     dataset.update(
-        **command.dict(exclude={"account", "id", "tag_ids", "extra_field_values"}),
+        **command.dict(
+            exclude={"account", "id", "tag_ids", "format_ids", "extra_field_values"}
+        ),
         tags=tags,
+        formats=formats,
         extra_field_values=command.extra_field_values,
     )
 
@@ -116,12 +127,14 @@ async def delete_dataset(command: DeleteDataset) -> None:
 async def get_dataset_filters(query: GetDatasetFilters) -> DatasetFiltersView:
     bus = resolve(MessageBus)
     repository = resolve(DatasetRepository)
+    data_format_repository = resolve(DataFormatRepository)
 
     catalogs = await bus.execute(GetAllCatalogs())
     geographical_coverages = await repository.get_geographical_coverage_set()
     services = await repository.get_service_set()
     technical_sources = await repository.get_technical_source_set()
     tags = await bus.execute(GetAllTags())
+    formats = await data_format_repository.get_all()
     licenses = await bus.execute(GetLicenseSet())
 
     return DatasetFiltersView(
@@ -132,7 +145,7 @@ async def get_dataset_filters(query: GetDatasetFilters) -> DatasetFiltersView:
         ],
         geographical_coverage=sorted(geographical_coverages),
         service=list(services),
-        format=list(DataFormat),
+        format_id=formats,
         technical_source=list(technical_sources),
         tag_id=tags,
         license=["*", *licenses],

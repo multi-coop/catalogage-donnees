@@ -18,7 +18,12 @@ describe("transformers -- Dataset filters", () => {
       "France métropolitaine",
     ],
     service: ["DINUM"],
-    format: ["file_tabular", "file_gis"],
+    formatId: [
+      {
+        name: "fichier Tabulaire",
+        id: 55,
+      },
+    ],
     technicalSource: ["Base centrale", "Serveur GIS"],
     tagId: [
       {
@@ -36,7 +41,7 @@ describe("transformers -- Dataset filters", () => {
   const value: DatasetFiltersValue = {
     organizationSiret: "ign_siret",
     geographicalCoverage: "France métropolitaine",
-    format: "file_gis",
+    formatId: 55,
     service: null,
     technicalSource: "Serveur GIS",
     tagId: null,
@@ -48,7 +53,7 @@ describe("transformers -- Dataset filters", () => {
       ["organization_siret", "ign_siret"],
       ["geographical_coverage", "France métropolitaine"],
       ["service", null],
-      ["format", "file_gis"],
+      ["format_id", 55],
       ["technical_source", "Serveur GIS"],
       ["tag_id", null],
       ["license", "Licence Ouverte"],
@@ -60,7 +65,7 @@ describe("transformers -- Dataset filters", () => {
   test("getFiltersValueFromParams", () => {
     const queryString = toQueryString(toFiltersParams(value));
     expect(queryString).toBe(
-      "?organization_siret=ign_siret&geographical_coverage=France+m%C3%A9tropolitaine&format=file_gis&technical_source=Serveur+GIS&license=Licence+Ouverte"
+      "?organization_siret=ign_siret&geographical_coverage=France+m%C3%A9tropolitaine&format_id=55&technical_source=Serveur+GIS&license=Licence+Ouverte"
     );
     expect(toFiltersValue(new URLSearchParams(queryString))).toEqual(value);
   });
@@ -76,13 +81,7 @@ describe("transformers -- Dataset filters", () => {
         { label: "France métropolitaine", value: "France métropolitaine" },
       ],
       service: [{ label: "DINUM", value: "DINUM" }],
-      format: [
-        {
-          label: "Fichier tabulaire (XLS, XLSX, CSV, ...)",
-          value: "file_tabular",
-        },
-        { label: "Fichier SIG (Shapefile, ...)", value: "file_gis" },
-      ],
+      formatId: [{ label: "fichier Tabulaire", value: 55 }],
       technicalSource: [
         { label: "Base centrale", value: "Base centrale" },
         { label: "Serveur GIS", value: "Serveur GIS" },

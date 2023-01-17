@@ -19,16 +19,17 @@
 
   export let data: PageData;
 
-  $: ({ catalog, tags, licenses, filtersInfo } = data);
+  $: ({ catalog, tags, licenses, filtersInfo, dataformats } = data);
 
   const onSave = async (event: CustomEvent<DatasetFormData>) => {
     try {
       loading = true;
       const tagIds = event.detail.tags.map((item) => item.id);
+      const formatIds = event.detail.formats.map((item) => item.id);
       const dataset = await createDataset({
         fetch,
         apiToken: $apiTokenStore,
-        data: { tagIds, ...event.detail },
+        data: { ...event.detail, tagIds, formatIds },
       });
 
       if (Maybe.Some(dataset)) {
@@ -88,6 +89,7 @@
 
   <DatasetFormLayout>
     <DatasetForm
+      formats={dataformats}
       {catalog}
       {tags}
       {licenses}

@@ -8,17 +8,21 @@ import { get } from "svelte/store";
 import { account } from "src/lib/stores/auth";
 import { apiToken as apiTokenStore } from "$lib/stores/auth";
 import { Maybe } from "$lib/util/maybe";
+import { getDataFormats } from "src/lib/repositories/dataformat";
 
 export const load: PageLoad = async ({ fetch }) => {
   const apiToken = get(apiTokenStore);
   const siret = Maybe.expect(get(account), "$account").organizationSiret;
 
-  const [catalog, tags, licenses, filtersInfo] = await Promise.all([
-    getCatalogBySiret({ fetch, apiToken, siret }),
-    getTags({ fetch, apiToken }),
-    getLicenses({ fetch, apiToken }),
-    getDatasetFiltersInfo({ fetch, apiToken }),
-  ]);
+  const [catalog, tags, licenses, filtersInfo, dataformats] = await Promise.all(
+    [
+      getCatalogBySiret({ fetch, apiToken, siret }),
+      getTags({ fetch, apiToken }),
+      getLicenses({ fetch, apiToken }),
+      getDatasetFiltersInfo({ fetch, apiToken }),
+      getDataFormats({ fetch, apiToken }),
+    ]
+  );
 
   return {
     title: `Contribuer une fiche de jeu de données - ${SITE_TITLE}`,
@@ -26,5 +30,6 @@ export const load: PageLoad = async ({ fetch }) => {
     tags,
     licenses,
     filtersInfo,
+    dataformats,
   };
 };

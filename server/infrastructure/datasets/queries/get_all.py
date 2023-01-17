@@ -114,9 +114,9 @@ class GetAllQuery:
         if (services := spec.service__in) is not None:
             whereclauses.append(DatasetModel.service.in_(services))
 
-        if (formats := spec.format__in) is not None:
+        if (format_ids := spec.format__id__in) is not None:
             joinclauses.append((DatasetModel.formats, {"isouter": True}))
-            whereclauses.append(DataFormatModel.name.in_(formats))
+            whereclauses.append(DataFormatModel.id.in_(format_ids))
 
         if (technical_sources := spec.technical_source__in) is not None:
             whereclauses.append(DatasetModel.technical_source.in_(technical_sources))

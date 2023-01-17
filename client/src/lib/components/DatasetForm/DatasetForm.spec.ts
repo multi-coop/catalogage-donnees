@@ -6,7 +6,6 @@ import "@testing-library/jest-dom";
 import DatasetForm from "./DatasetForm.svelte";
 import { render, fireEvent } from "@testing-library/svelte";
 import type {
-  DataFormat,
   DatasetFormData,
   DatasetFormInitial,
 } from "src/definitions/datasets";
@@ -51,27 +50,35 @@ describe("Test the dataset form", () => {
   };
 
   test('The "title" field is present', () => {
-    const { getByLabelText } = render(DatasetForm, { catalog });
+    const { getByLabelText } = render(DatasetForm, { catalog, formats: [] });
     const title = getByLabelText("Nom du jeu de données", { exact: false });
     expect(title).toBeInTheDocument();
     expect(title).toBeRequired();
   });
 
   test('The "description" field is present', () => {
-    const { getByLabelText } = render(DatasetForm, { catalog });
+    const { getByLabelText } = render(DatasetForm, { catalog, formats: [] });
     const description = getByLabelText("Description", { exact: false });
     expect(description).toBeInTheDocument();
     expect(description).toBeRequired();
   });
 
   test('The "formats" field is present', async () => {
-    const { getAllByRole } = render(DatasetForm, { catalog });
+    const { getAllByRole } = render(DatasetForm, {
+      catalog,
+      formats: [
+        {
+          id: 55,
+          name: "fichier tabulaire",
+        },
+      ],
+    });
     const checkboxes = getAllByRole("checkbox");
     expect(checkboxes.length).toBeGreaterThan(0);
   });
 
   test('The "geographicalCoverage" field is present', async () => {
-    const { getByLabelText } = render(DatasetForm, { catalog });
+    const { getByLabelText } = render(DatasetForm, { catalog, formats: [] });
     const geographicalCoverage = getByLabelText("Couverture géographique", {
       exact: false,
     });
@@ -80,7 +87,7 @@ describe("Test the dataset form", () => {
   });
 
   test('The "technicalSource" field is present', async () => {
-    const { getByLabelText } = render(DatasetForm, { catalog });
+    const { getByLabelText } = render(DatasetForm, { catalog, formats: [] });
     const technicalSource = getByLabelText("Système d'information source", {
       exact: false,
     });
@@ -89,7 +96,7 @@ describe("Test the dataset form", () => {
   });
 
   test('The "tags" field is present', async () => {
-    const { getByLabelText } = render(DatasetForm, { catalog });
+    const { getByLabelText } = render(DatasetForm, { catalog, formats: [] });
     const tags = getByLabelText("Mot-clés", {
       exact: false,
     });
@@ -97,7 +104,15 @@ describe("Test the dataset form", () => {
   });
 
   test("At least one format is required", async () => {
-    const { getAllByRole } = render(DatasetForm, { catalog });
+    const { getAllByRole } = render(DatasetForm, {
+      catalog,
+      formats: [
+        {
+          id: 55,
+          name: "fichier tabulaire",
+        },
+      ],
+    });
     const checkboxes = getAllByRole("checkbox", { checked: false });
     checkboxes.forEach((checkbox) => expect(checkbox).toBeRequired());
     await fireEvent.click(checkboxes[0]);
@@ -109,7 +124,7 @@ describe("Test the dataset form", () => {
   });
 
   test('The "producerEmail" field is present', () => {
-    const { getByLabelText } = render(DatasetForm, { catalog });
+    const { getByLabelText } = render(DatasetForm, { catalog, formats: [] });
     const producerEmail = getByLabelText(
       "Adresse e-mail du service producteur",
       {
@@ -122,7 +137,7 @@ describe("Test the dataset form", () => {
   });
 
   test('The "contact emails" field is present', () => {
-    const { getAllByLabelText } = render(DatasetForm, { catalog });
+    const { getAllByLabelText } = render(DatasetForm, { catalog, formats: [] });
     const inputs = getAllByLabelText(/Contact \d/) as HTMLInputElement[];
     expect(inputs.length).toBe(1);
     expect(inputs[0]).toHaveAttribute("type", "email");
@@ -131,7 +146,7 @@ describe("Test the dataset form", () => {
   });
 
   test('The "contact emails" field requires at least one value', async () => {
-    const { getAllByLabelText } = render(DatasetForm, { catalog });
+    const { getAllByLabelText } = render(DatasetForm, { catalog, formats: [] });
     const inputs = getAllByLabelText(/Contact \d/) as HTMLInputElement[];
     expect(inputs.length).toBe(1);
     await fireEvent.input(inputs[0], { target: { value: "" } });
@@ -139,7 +154,7 @@ describe("Test the dataset form", () => {
   });
 
   test('The "url" field is present', async () => {
-    const { getByLabelText } = render(DatasetForm, { catalog });
+    const { getByLabelText } = render(DatasetForm, { catalog, formats: [] });
     const url = getByLabelText("Lien vers les données", {
       exact: false,
     });
@@ -148,7 +163,7 @@ describe("Test the dataset form", () => {
   });
 
   test('The "license" field is present', async () => {
-    const { getByLabelText } = render(DatasetForm, { catalog });
+    const { getByLabelText } = render(DatasetForm, { catalog, formats: [] });
     const license = getByLabelText("Licence de réutilisation", {
       exact: false,
     });
@@ -159,6 +174,7 @@ describe("Test the dataset form", () => {
   test("Extra fields are present", () => {
     const { getByLabelText } = render(DatasetForm, {
       catalog: catalogWithExtraFields,
+      formats: [],
     });
     const extraReferentiel = getByLabelText("Référentiel", { exact: false });
     expect(extraReferentiel).toBeInTheDocument();
@@ -166,7 +182,7 @@ describe("Test the dataset form", () => {
   });
 
   test("The submit button is present", () => {
-    const { getByRole } = render(DatasetForm, { catalog });
+    const { getByRole } = render(DatasetForm, { catalog, formats: [] });
     expect(getByRole("button", { name: /Publier/i })).toBeInTheDocument();
   });
 
@@ -175,6 +191,12 @@ describe("Test the dataset form", () => {
       catalog,
       submitLabel: "Envoyer",
       loadingLabel: "Ça charge...",
+      formats: [
+        {
+          id: 33,
+          name: "Fichier Tabulaire",
+        },
+      ],
     };
 
     const { getByRole, rerender } = render(DatasetForm, { props });
@@ -193,7 +215,12 @@ describe("Test the dataset form", () => {
       },
       title: "Titre initial",
       description: "Description initiale",
-      formats: ["website"],
+      formats: [
+        {
+          id: 33,
+          name: "Fichier Tabulaire",
+        },
+      ],
       producerEmail: "service.initial@mydomain.org",
       contactEmails: ["person@mydomain.org"],
       service: "A nice service",
@@ -207,7 +234,16 @@ describe("Test the dataset form", () => {
       extraFieldValues: [{ extraFieldId: "<extraField1Id>", value: "Réponse" }],
       publicationRestriction: "draft",
     };
-    const props = { catalog: catalogWithExtraFields, initial };
+    const props = {
+      catalog: catalogWithExtraFields,
+      initial,
+      formats: [
+        {
+          id: 33,
+          name: "Fichier Tabulaire",
+        },
+      ],
+    };
 
     const { getByLabelText, getAllByLabelText, container, getAllByText } =
       render(DatasetForm, { props });
@@ -222,14 +258,7 @@ describe("Test the dataset form", () => {
     }) as HTMLInputElement;
     expect(description.value).toBe("Description initiale");
 
-    const getFormatCheckbox = (value: DataFormat) =>
-      container.querySelector(`input[value='${value}']`);
-    expect(getFormatCheckbox("file_tabular")).not.toBeChecked();
-    expect(getFormatCheckbox("file_gis")).not.toBeChecked();
-    expect(getFormatCheckbox("api")).not.toBeChecked();
-    expect(getFormatCheckbox("database")).not.toBeChecked();
-    expect(getFormatCheckbox("website")).toBeChecked();
-    expect(getFormatCheckbox("other")).not.toBeChecked();
+    container.querySelector(`input[value="Fichier Tabulaire"]`);
 
     const producerEmail = getByLabelText(
       "Adresse e-mail du service producteur",
@@ -286,7 +315,12 @@ describe("Test the dataset form", () => {
       },
       title: "Titre initial",
       description: "Description initiale",
-      formats: ["website"],
+      formats: [
+        {
+          name: "fichier Tabulaire",
+          id: 55,
+        },
+      ],
       producerEmail: "",
       contactEmails: ["person@mydomain.org"],
       service: "A nice service",
@@ -300,7 +334,16 @@ describe("Test the dataset form", () => {
       extraFieldValues: [{ extraFieldId: "<extraField1Id>", value: "" }],
       publicationRestriction: "draft",
     };
-    const props = { catalog, initial };
+    const props = {
+      catalog,
+      initial,
+      formats: [
+        {
+          name: "fichier Tabulaire",
+          id: 55,
+        },
+      ],
+    };
     const { getByLabelText, getByRole, component } = render(DatasetForm, {
       props,
     });

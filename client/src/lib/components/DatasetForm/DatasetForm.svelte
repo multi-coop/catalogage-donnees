@@ -3,7 +3,6 @@
   import { createEventDispatcher } from "svelte";
   import { createForm } from "svelte-forms-lib";
   import type {
-    DataFormat,
     DatasetFormData,
     DatasetFormInitial,
     PublicationRestriction,
@@ -11,7 +10,6 @@
   } from "src/definitions/datasets";
   import type { Tag } from "src/definitions/tag";
   import {
-    DATA_FORMAT_LABELS,
     PUBLICATION_RESTRICTIONS_OPTIONS,
     UPDATE_FREQUENCY_LABELS,
   } from "src/constants";
@@ -25,19 +23,20 @@
   import TextareaField from "../TextareaField/TextareaField.svelte";
   import { toSelectOptions } from "src/lib/transformers/form";
   import { handleSelectChange } from "src/lib/util/form";
-  import { Maybe } from "$lib/util/maybe";
   import TagSelector from "../TagSelector/TagSelector.svelte";
   import RadioGroupField from "../RadioGroupField/RadioGroupField.svelte";
   import LicenseField from "./_LicenseField.svelte";
   import type { Catalog, ExtraFieldValue } from "src/definitions/catalogs";
   import ExtraField from "./_ExtraField.svelte";
   import Alert from "../Alert/Alert.svelte";
+  import type { DataFormat } from "src/definitions/dataformat";
 
   export let submitLabel = "Publier la fiche de données";
   export let loadingLabel = "Publication en cours...";
   export let loading = false;
   export let catalog: Catalog;
   export let tags: Tag[] = [];
+  export let formats: DataFormat[];
   export let licenses: string[] = [];
   export let geographicalCoverages: string[] = [];
 
@@ -65,17 +64,13 @@
     publicationRestriction: PublicationRestriction;
   };
 
-  const dataFormatChoices = Object.entries(DATA_FORMAT_LABELS).map(
-    ([value, label]: [DataFormat, string]) => ({ value, label })
-  );
-
   const initialValues: DatasetFormValues = {
     organizationSiret: catalog.organization.siret,
     title: initial?.title || "",
     description: initial?.description || "",
     service: initial?.service || "",
-    dataFormats: dataFormatChoices.map(
-      ({ value }) => !!(initial?.formats || []).find((v) => v === value)
+    dataFormats: formats.map(
+      ({ id }) => !!(initial?.formats || []).find((v) => v.id === id)
     ),
     producerEmail: initial?.producerEmail || "",
     contactEmails: initial?.contactEmails || [$account?.email || ""],
@@ -140,11 +135,9 @@
         extraFieldValues: yup.array().of(yup.string()),
       }),
       onSubmit: (values: DatasetFormValues) => {
-        const formats = values.dataFormats
-          .map((checked, index) =>
-            checked ? dataFormatChoices[index].value : null
-          )
-          .filter(Maybe.Some);
+        const updatedFormats = values.dataFormats
+          .map((checked, index) => (checked ? formats[index] : null))
+          .filter((item) => item) as DataFormat[];
 
         // Ensure "" becomes null.
         const producerEmail = values.producerEmail
@@ -174,7 +167,7 @@
 
         const data: DatasetFormData = {
           ...values,
-          formats,
+          formats: updatedFormats,
           producerEmail,
           contactEmails,
           lastUpdatedAt,
@@ -310,20 +303,20 @@
         </span>
       </legend>
       <div class="fr-fieldset__content">
-        {#each dataFormatChoices as { value, label }, index (value)}
-          {@const id = `dataformats-${value}`}
+        {#each formats as { id, name }, index}
+          {@const identifier = `dataformats-${id}`}
           <div class="fr-checkbox-group">
             <input
               type="checkbox"
-              {id}
+              id={identifier}
               name="dataformats"
-              {value}
+              value={id}
               required={dataFormatsValue.every((checked) => !checked)}
               checked={dataFormatsValue[index]}
               on:change={(event) => handleDataformatChange(event, index)}
             />
-            <label for={id}>
-              {label}
+            <label for={identifier}>
+              {name}
             </label>
           </div>
         {/each}

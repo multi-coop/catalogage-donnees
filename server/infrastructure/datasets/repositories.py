@@ -15,11 +15,11 @@ from ..catalog_records.models import CatalogRecordModel
 from ..catalog_records.raw_queries import get_catalog_record_instance_by_id
 from ..catalogs.models import CatalogModel
 from ..database import Database
+from ..dataformats.raw_queries import get_all_dataformat_instances_by_ids
 from ..helpers.sqlalchemy import get_count_from, to_limit_offset
 from ..tags.raw_queries import get_all_tag_instances_by_ids
 from .models import DatasetModel
 from .queries.get_all import GetAllQuery
-from .raw_queries import get_all_dataformat_instances
 from .transformers import make_entity, make_instance, update_instance
 
 
@@ -38,6 +38,8 @@ class SqlDatasetRepository(DatasetRepository):
         async with self._db.session() as session:
             query = GetAllQuery(spec, account=account)
             stmt = query.statement
+
+            print(spec.format__id__in)
 
             count = await get_count_from(stmt, session)
 
@@ -118,7 +120,10 @@ class SqlDatasetRepository(DatasetRepository):
                 catalog_record = await get_catalog_record_instance_by_id(
                     session, entity.catalog_record.id
                 )
-                formats = await get_all_dataformat_instances(session, entity.formats)
+                formats = await get_all_dataformat_instances_by_ids(
+                    session, [format.id for format in entity.formats]
+                )
+
                 tags = await get_all_tag_instances_by_ids(
                     session, [tag.id for tag in entity.tags]
                 )
@@ -138,7 +143,9 @@ class SqlDatasetRepository(DatasetRepository):
                 if instance is None:
                     return
 
-                formats = await get_all_dataformat_instances(session, entity.formats)
+                formats = await get_all_dataformat_instances_by_ids(
+                    session, [format.id for format in entity.formats]
+                )
                 tags = await get_all_tag_instances_by_ids(
                     session, [tag.id for tag in entity.tags]
                 )

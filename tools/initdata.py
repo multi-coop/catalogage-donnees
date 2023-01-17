@@ -6,7 +6,7 @@ import os
 import pathlib
 import sys
 import traceback
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 import click
 import yaml
@@ -23,6 +23,8 @@ from server.domain.auth.entities import UserRole
 from server.domain.auth.repositories import PasswordUserRepository
 from server.domain.catalogs.repositories import CatalogRepository
 from server.domain.common.types import Skip
+from server.domain.dataformats.entities import DataFormat
+from server.domain.dataformats.repositories import DataFormatRepository
 from server.domain.datasets.entities import Dataset
 from server.domain.datasets.repositories import DatasetRepository
 from server.domain.organizations.repositories import OrganizationRepository
@@ -48,6 +50,7 @@ class InitData(BaseModel):
     users: list
     tags: list
     datasets: list
+    formats: list
 
 
 class UserExtras(BaseModel):
@@ -157,11 +160,36 @@ async def handle_tag(item: dict) -> None:
     print(f"{success('created')}: {command!r}")
 
 
+async def handle_format(item: str) -> Optional[int]:
+    repository = resolve(DataFormatRepository)
+
+    existing_data_format = await repository.get_by_name(item)
+
+    if existing_data_format is not None:
+        print(f"{info('ok')}: {existing_data_format!r}")
+        return existing_data_format.id
+
+    new_data_format_id = await repository.insert(DataFormat(name=item))
+
+    print(f"{success('created')}: Tag {item!r}")
+
+    return new_data_format_id
+
+
 async def handle_dataset(item: dict, reset: bool = False) -> None:
     def _get_dataset_attr(dataset: Dataset, attr: str) -> Any:
         if attr == "tag_ids":
             return [tag.id for tag in dataset.tags]
         return getattr(dataset, attr)
+
+    async def _get_format_ids(format_names: List[str]) -> List[Optional[int]]:
+        repository = resolve(DataFormatRepository)
+        format_ids: List[Optional[int]] = []
+        for format in format_names:
+            data_format = await repository.get_by_name(format)
+            if data_format is not None and data_format.id is not None:
+                format_ids.append(data_format.id)
+        return format_ids
 
     bus = resolve(MessageBus)
     repository = resolve(DatasetRepository)
@@ -169,8 +197,14 @@ async def handle_dataset(item: dict, reset: bool = False) -> None:
     id_ = item["id"]
     existing_dataset = await repository.get_by_id(id_)
 
+    format_ids: List[Optional[int]] = []
+
+    format_ids = await _get_format_ids(item["params"]["formats"])
+
     if existing_dataset is not None:
-        update_command = UpdateDataset(account=Skip(), id=id_, **item["params"])
+        update_command = UpdateDataset(
+            account=Skip(), id=id_, format_ids=format_ids, **item["params"]
+        )
 
         changed = any(
             getattr(update_command, k) != _get_dataset_attr(existing_dataset, k)
@@ -187,7 +221,9 @@ async def handle_dataset(item: dict, reset: bool = False) -> None:
         print(f"{info('ok')}: {dataset_repr}")
         return
 
-    create_command = CreateDataset(account=Skip(), **item["params"])
+    create_command = CreateDataset(
+        account=Skip(), format_ids=format_ids, **item["params"]
+    )
 
     await bus.execute(create_command, id_=id_)
     print(f"{success('created')}: {create_command!r}")
@@ -230,6 +266,11 @@ async def main(
 
     for item in spec.tags:
         await handle_tag(item)
+
+    print("\n", ruler("Formats"))
+
+    for item in spec.formats:
+        await handle_format(item)
 
     print("\n", ruler("Datasets"))
 

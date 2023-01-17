@@ -13,7 +13,7 @@ from server.application.datasets.commands import CreateDataset, UpdateDataset
 from server.application.organizations.commands import CreateOrganization
 from server.application.tags.commands import CreateTag
 from server.domain.common import datetime as dtutil
-from server.domain.datasets.entities import DataFormat, PublicationRestriction
+from server.domain.datasets.entities import PublicationRestriction
 from server.domain.licenses.entities import BUILTIN_LICENSE_SUGGESTIONS
 
 T = TypeVar("T", bound=BaseModel)
@@ -68,7 +68,7 @@ class _BaseCreateDatasetFactory:
     description = Use(fake.text)
     service = Use(fake.company)
     geographical_coverage = Use(lambda: random.choice(_FAKE_GEOGRAPHICAL_COVERAGES))
-    formats = Use(lambda: random.choices(list(DataFormat), k=random.randint(1, 3)))
+    format_ids = Use(lambda: [random.randint(1, 6)])
     technical_source = Use(
         lambda: fake.sentence(nb_words=3) if random.random() < 0.5 else None
     )
@@ -95,6 +95,7 @@ class CreateDatasetPayloadFactory(_BaseCreateDatasetFactory, Factory[DatasetCrea
 
 class _BaseUpdateDatasetFactory:
     tag_ids = Use(lambda: [])
+    format_ids = Use(lambda: [1, 2])
     extra_field_values = Use(lambda: [])
 
 

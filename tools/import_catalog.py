@@ -16,7 +16,7 @@ from server.application.organizations.queries import GetOrganizationBySiret
 from server.application.tags.queries import GetAllTags
 from server.config.di import bootstrap, resolve
 from server.domain.common.types import ID, id_factory
-from server.domain.datasets.entities import DataFormat, UpdateFrequency
+from server.domain.datasets.entities import UpdateFrequency
 from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 from tools.initdata import InitData
@@ -63,33 +63,20 @@ def _map_geographical_coverage(value: Optional[str], config: Config) -> str:
 def _map_formats(
     value: Optional[str], import_notes: TextIO, config: Config
 ) -> List[str]:
-    if value is None or value in config.input_csv.na_values:
-        import_notes.write("Format : (Information manquante)\n")
-        return [DataFormat.OTHER.value]  # At least one value is required.
 
-    value = value.lower().strip()
+    if not value:
+        return []
 
-    unknown_formats = []
-
-    def _map_format(value: str) -> List[DataFormat]:
-        if value in config.formats.list_map:
-            return [DataFormat(f) for f in config.formats.list_map[value]]
+    def _map_format(value: str) -> List[str]:
 
         dataformat = config.formats.map.get(value, value)
 
         try:
-            return [DataFormat(dataformat)]
+            return [dataformat]
         except ValueError:
-            unknown_formats.append(value)
-            return [DataFormat.OTHER]
+            return [value]
 
-    result = list(
-        set(f.value for val in value.split(",") for f in _map_format(val.strip()))
-    )
-
-    if unknown_formats:
-        line = f"Format (valeurs non-reconnues) : {', '.join(unknown_formats)}"
-        import_notes.writelines([line, "\n"])
+    result = list(set(f for val in value.split(",") for f in _map_format(val.strip())))
 
     return result
 
@@ -203,7 +190,7 @@ async def main(config_path: Path, out_path: Path) -> int:
         "nom_orga",
         "service",
         "couv_geo",
-        "format",
+        "formats",
         "si",
         "contact_service",
         "contact_personne",
@@ -247,7 +234,7 @@ async def main(config_path: Path, out_path: Path) -> int:
         params["geographical_coverage"] = _map_geographical_coverage(
             row["couv_geo"] or None, config
         )
-        params["formats"] = _map_formats(row["format"] or None, import_notes, config)
+        params["formats"] = _map_formats(row["formats"] or None, import_notes, config)
         params["technical_source"] = row["si"] or None
         params["producer_email"] = row["contact_service"] or None
         params["contact_emails"] = _map_contact_emails(row["contact_personne"] or None)
@@ -280,6 +267,7 @@ async def main(config_path: Path, out_path: Path) -> int:
         users=[],
         tags=tags_to_create,
         datasets=datasets,
+        formats=[],
     ).dict()
 
     out_path.write_text(yaml.safe_dump(initdata))
