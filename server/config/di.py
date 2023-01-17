@@ -108,6 +108,7 @@ T = TypeVar("T")
 MODULES = [
     "server.infrastructure.datasets.module.DatasetsModule",
     "server.infrastructure.tags.module.TagsModule",
+    "server.infrastructure.dataformats.module.DataFormatModule",
     "server.infrastructure.licenses.module.LicensesModule",
     "server.infrastructure.organizations.module.OrganizationsModule",
     "server.infrastructure.catalogs.module.CatalogsModule",
