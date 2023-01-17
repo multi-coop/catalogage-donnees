@@ -28,6 +28,7 @@ describe("transformers -- dataset", () => {
       ...getFakeDataset(),
       organizationSiret: "<siret>",
       tagIds: [],
+      formatIds: [],
     };
     const result = toPayload(data);
     expect(Object.keys(result).every((key) => key === key.toLowerCase())).toBe(
@@ -40,6 +41,7 @@ describe("transformers -- dataset", () => {
       ...getFakeDataset(),
       organizationSiret: "<siret>",
       tagIds: [],
+      formatIds: [],
     });
     const result = toDataset({
       ...data,

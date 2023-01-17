@@ -50,7 +50,8 @@ export type DatasetFormData = Omit<
   "id" | "catalogRecord" | "headlines"
 > & { organizationSiret: string };
 
-export type DatasetCreateData = Omit<DatasetFormData, "tags"> & {
+export type DatasetCreateData = Omit<DatasetFormData, "tags" | "formats"> & {
   tagIds: string[];
+  formatIds: number[];
 };
 export type DatasetUpdateData = DatasetCreateData;

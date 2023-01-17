@@ -3,7 +3,6 @@
 
   import paths from "$lib/paths";
   import {
-    DATA_FORMAT_LABELS,
     PUBLICATION_RESTRICTION,
     UPDATE_FREQUENCY_LABELS,
   } from "src/constants";
@@ -162,7 +161,7 @@
           <ul class="fr-raw-list">
             {#each dataset.formats as fmt}
               <li>
-                {DATA_FORMAT_LABELS[fmt]}
+                {fmt.name}
               </li>
             {/each}
           </ul>

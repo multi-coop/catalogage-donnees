@@ -1,4 +1,4 @@
-import type { DataFormat } from "src/definitions/datasets";
+import type { DataFormat } from "src/definitions/dataformat";
 import type { Fetch } from "src/definitions/fetch";
 import { getApiUrl, getHeaders, makeApiRequestOrFail } from "../fetch";
 

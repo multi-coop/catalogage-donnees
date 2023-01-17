@@ -9,7 +9,7 @@ async def test_dataformat_list(
     client: httpx.AsyncClient, temp_user: TestPasswordUser
 ) -> None:
 
-    response = await client.get("/dataformat/", auth=temp_user.auth)
+    response = await client.get("/dataformats/", auth=temp_user.auth)
     assert response.status_code == 200
 
     data = response.json()
@@ -28,5 +28,5 @@ class TestTagsPermissions:
     async def test_dataformat_list_not_authenticated(
         self, client: httpx.AsyncClient
     ) -> None:
-        response = await client.get("/dataformat/")
+        response = await client.get("/dataformats/")
         assert response.status_code == 401

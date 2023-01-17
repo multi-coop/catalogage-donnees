@@ -5,6 +5,7 @@ import { getCatalogBySiret } from "src/lib/repositories/catalogs";
 import { getDatasetByID } from "$lib/repositories/datasets";
 import { getTags } from "src/lib/repositories/tags";
 import { getLicenses } from "src/lib/repositories/licenses";
+import { getDataFormats } from "src/lib/repositories/dataformat";
 import { getDatasetFiltersInfo } from "src/lib/repositories/datasetFilters";
 import { apiToken as apiTokenStore } from "$lib/stores/auth";
 import { Maybe } from "$lib/util/maybe";
@@ -16,18 +17,20 @@ export const load: PageLoad = async ({ fetch, params }) => {
   try {
     const dataset = await getDatasetByID({ fetch, apiToken, id: params.id });
 
-    const [catalog, tags, licenses, filtersInfo] = await Promise.all([
-      Maybe.map(dataset, (dataset) =>
-        getCatalogBySiret({
-          fetch,
-          apiToken,
-          siret: dataset.catalogRecord.organization.siret,
-        })
-      ),
-      getTags({ fetch, apiToken }),
-      getLicenses({ fetch, apiToken }),
-      getDatasetFiltersInfo({ fetch, apiToken }),
-    ]);
+    const [catalog, tags, licenses, filtersInfo, dataformats] =
+      await Promise.all([
+        Maybe.map(dataset, (dataset) =>
+          getCatalogBySiret({
+            fetch,
+            apiToken,
+            siret: dataset.catalogRecord.organization.siret,
+          })
+        ),
+        getTags({ fetch, apiToken }),
+        getLicenses({ fetch, apiToken }),
+        getDatasetFiltersInfo({ fetch, apiToken }),
+        getDataFormats({ fetch, apiToken }),
+      ]);
 
     return {
       title: `Modifier la fiche de jeu de données - ${SITE_TITLE}`,
@@ -36,6 +39,7 @@ export const load: PageLoad = async ({ fetch, params }) => {
       tags,
       licenses,
       filtersInfo,
+      dataformats,
     };
   } catch (response) {
     if (response.status === 403) {
@@ -50,5 +54,6 @@ export const load: PageLoad = async ({ fetch, params }) => {
     tags: undefined,
     licenses: undefined,
     filtersInfo: undefined,
+    dataformats: undefined,
   };
 };

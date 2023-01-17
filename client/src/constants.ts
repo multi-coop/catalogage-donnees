@@ -1,5 +1,4 @@
 import type {
-  DataFormat,
   PublicationRestriction,
   UpdateFrequency,
 } from "./definitions/datasets";
@@ -23,24 +22,6 @@ const STATIC_PAGES = [
 ];
 
 export const NON_AUTH_GUARDED_PAGES = [...STATIC_PAGES, "/"];
-
-export const DATA_FORMAT_LABELS: { [K in DataFormat]: string } = {
-  file_tabular: "Fichier tabulaire (XLS, XLSX, CSV, ...)",
-  file_gis: "Fichier SIG (Shapefile, ...)",
-  api: "API (REST, GraphQL, ...)",
-  database: "Base de données",
-  website: "Site web",
-  other: "Autre",
-};
-
-export const DATA_FORMAT_SHORT_NAMES: { [K in DataFormat]: string } = {
-  file_tabular: "CSV",
-  file_gis: "SIG",
-  api: "API",
-  database: "BDD",
-  website: "Web",
-  other: "Autre",
-};
 
 export const PUBLICATION_RESTRICTIONS_OPTIONS: {
   [K in PublicationRestriction]: string | TrustedHtml;

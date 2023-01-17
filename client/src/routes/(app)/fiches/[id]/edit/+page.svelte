@@ -12,7 +12,7 @@
 
   export let data: PageData;
 
-  $: ({ catalog, dataset, tags, licenses, filtersInfo } = data);
+  $: ({ catalog, dataset, tags, licenses, filtersInfo, dataformats } = data);
 
   let modalControlId = "stop-editing-form-modal";
 
@@ -26,6 +26,7 @@
     }
 
     const tagIds = event.detail.tags.map((item) => item.id);
+    const fromatIds = event.detail.formats.map((item) => item.id);
 
     try {
       loading = true;
@@ -34,7 +35,7 @@
         fetch,
         apiToken: $apiTokenStore,
         id: dataset.id,
-        data: { ...event.detail, tagIds },
+        data: { ...event.detail, tagIds, formatIds: fromatIds },
       });
 
       if (Maybe.Some(updatedDataset)) {
@@ -70,7 +71,7 @@
   };
 </script>
 
-{#if Maybe.Some(catalog) && Maybe.Some(dataset) && Maybe.Some(tags) && Maybe.Some(licenses) && Maybe.Some(filtersInfo)}
+{#if Maybe.Some(catalog) && Maybe.Some(dataset) && Maybe.Some(tags) && Maybe.Some(licenses) && Maybe.Some(filtersInfo) && dataformats}
   <header class="fr-p-4w">
     <div class="fr-col">
       <h5 class="fr-grid-row fr-text--regular">
@@ -107,6 +108,7 @@
 
   <DatasetFormLayout>
     <DatasetForm
+      formats={dataformats}
       {catalog}
       {tags}
       {licenses}

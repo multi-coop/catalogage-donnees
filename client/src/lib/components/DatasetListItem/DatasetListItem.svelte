@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { Dataset } from "src/definitions/datasets";
-  import { DATA_FORMAT_SHORT_NAMES } from "src/constants";
   import paths from "$lib/paths";
   import { Maybe } from "$lib/util/maybe";
   import { capitalize, formatDaysMonthsOrYearsToNow } from "$lib/util/format";

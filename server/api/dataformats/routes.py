@@ -12,7 +12,7 @@ from ..auth.permissions import IsAuthenticated
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/dataformat", tags=["dataformat"])
+router = APIRouter(prefix="/dataformats", tags=["dataformat"])
 
 
 @router.get(

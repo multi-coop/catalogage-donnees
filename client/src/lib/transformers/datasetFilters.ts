@@ -28,8 +28,7 @@ export const toFiltersInfo = (data: any): DatasetFiltersInfo => {
 export const toFiltersValue = (
   searchParams: URLSearchParams
 ): DatasetFiltersValue => {
-
-  const formatId = searchParams.get('format_id');
+  const formatId = searchParams.get("format_id");
   return {
     organizationSiret: searchParams.get("organization_siret"),
     geographicalCoverage: searchParams.get("geographical_coverage"),

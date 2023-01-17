@@ -143,7 +143,7 @@ async def test_repo_initdata(
     num_datasets = 5
     num_organizations = 2
     num_catalogs = 1
-    num_formats = 3
+    num_formats = 1
     num_entities = (
         num_users
         + num_tags
