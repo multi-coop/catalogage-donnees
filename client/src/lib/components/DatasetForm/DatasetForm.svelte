@@ -30,6 +30,7 @@
   import ExtraField from "./_ExtraField.svelte";
   import Alert from "../Alert/Alert.svelte";
   import type { DataFormat } from "src/definitions/dataformat";
+  import FormatSelector from "./_FormatSelector.svelte";
 
   export let submitLabel = "Publier la fiche de données";
   export let loadingLabel = "Publication en cours...";
@@ -184,7 +185,8 @@
   $: emailErrors = $errors.contactEmails as unknown as string[];
 
   export const submitForm = (event: Event) => {
-    handleSubmit(event);
+    event.preventDefault();
+    // handleSubmit(event);
   };
 
   const handleFieldChange = async (event: Event) => {
@@ -237,6 +239,7 @@
 <form
   on:submit={submitForm}
   data-bitwarden-watching="1"
+  novalidate
   aria-label="Informations sur le jeu de données"
 >
   <h2 id="information-generales" class="fr-mb-5w">Informations générales</h2>
@@ -283,50 +286,11 @@
   <h2 id="source-formats" class="fr-mt-6w fr-mb-5w">Sources et formats</h2>
 
   <div class="form--content fr-mb-8w">
-    <fieldset
-      class="fr-fieldset fr-mb-4w {hasError($errors.dataFormats)
-        ? 'fr-fieldset--error'
-        : ''}"
-      aria-describedby={hasError($errors.dataFormats)
-        ? "dataformats-desc-error"
-        : null}
-    >
-      <legend
-        class="fr-fieldset__legend fr-text--regular"
-        id="dataformats-hint-legend"
-      >
-        Format(s) des données
-        <RequiredMarker />
-        <span class="fr-hint-text" id="select-hint-dataformats-hint">
-          Sélectionnez ici les différents formats de données qu'un réutilisateur
-          potentiel pourrait exploiter.
-        </span>
-      </legend>
-      <div class="fr-fieldset__content">
-        {#each formats as { id, name }, index}
-          {@const identifier = `dataformats-${id}`}
-          <div class="fr-checkbox-group">
-            <input
-              type="checkbox"
-              id={identifier}
-              name="dataformats"
-              value={id}
-              required={dataFormatsValue.every((checked) => !checked)}
-              checked={dataFormatsValue[index]}
-              on:change={(event) => handleDataformatChange(event, index)}
-            />
-            <label for={identifier}>
-              {name}
-            </label>
-          </div>
-        {/each}
-      </div>
-      {#if hasError($errors.dataFormats)}
-        <p id="dataformats-desc-error" class="fr-error-text">
-          {$errors.dataFormats}
-        </p>
-      {/if}
-    </fieldset>
+    <FormatSelector
+      value={$form.geographicalCoverage}
+      error={$errors.geographicalCoverage}
+      on:input={(ev) => updateValidateField("geographicalCoverage", ev.detail)}
+    />
 
     <InputField
       name="technicalSource"
