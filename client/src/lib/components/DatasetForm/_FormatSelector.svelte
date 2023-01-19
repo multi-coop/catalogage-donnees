@@ -7,6 +7,11 @@
   export let name: string;
   export let error = "";
 
+  let currentLiIndex = 0;
+
+  let suggestionList: HTMLElement;
+  let previousNode: HTMLElement;
+
   $: regexp = value ? new RegExp(escape(value), "i") : null;
   $: filteredSuggestions = showSuggestions
     ? suggestions.filter((item) => (regexp ? item.label.match(regexp) : true))
@@ -26,6 +31,10 @@
       value: 3,
     },
   ];
+
+  let setSelectedOption = (value: string): SelectOption<number> | undefined => {
+    return suggestions.find((item) => item.label === value);
+  };
   let showSuggestions = false;
 
   const handleInput = (ev: Event & { currentTarget: HTMLInputElement }) => {
@@ -33,10 +42,36 @@
   };
 
   const handleKeyboard = (e: KeyboardEvent) => {
+    let suggestionItems = suggestionList.childNodes;
+
+    console.log("BEFORE:", {
+      currentLiIndex,
+      itemLenght: suggestionItems.length,
+    });
+
     switch (e.key) {
       case "Enter":
         showSuggestions = !showSuggestions;
+
         break;
+
+      case "Escape":
+        showSuggestions = false;
+        break;
+
+      case "ArrowDown":
+        currentLiIndex = currentLiIndex + 1;
+        if (currentLiIndex === suggestionItems.length) {
+          currentLiIndex = 0;
+        }
+        break;
+
+      case "ArrowUp":
+        if (currentLiIndex === 0) {
+          currentLiIndex = suggestionItems.length - 1;
+        } else {
+          currentLiIndex = currentLiIndex - 1;
+        }
 
       default:
         break;
@@ -78,13 +113,20 @@
   />
 
   <ul
+    bind:this={suggestionList}
     class:hide={!showSuggestions}
     id={`${name}-suggestions`}
     role="listbox"
     aria-label="Formats de données"
   >
-    {#each filteredSuggestions as { label, value }}
-      <li id={value.toString()} role="option">{label}</li>
+    {#each filteredSuggestions as { label, value }, index}
+      <li
+        class:focused={index === currentLiIndex}
+        id={value.toString()}
+        role="option"
+      >
+        {label}
+      </li>
     {/each}
   </ul>
 </div>
@@ -92,5 +134,9 @@
 <style>
   .hide {
     display: none;
+  }
+
+  .focused {
+    background-color: bisque;
   }
 </style>

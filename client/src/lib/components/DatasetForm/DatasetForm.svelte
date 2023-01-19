@@ -287,6 +287,7 @@
 
   <div class="form--content fr-mb-8w">
     <FormatSelector
+      name="formats"
       value={$form.geographicalCoverage}
       error={$errors.geographicalCoverage}
       on:input={(ev) => updateValidateField("geographicalCoverage", ev.detail)}
