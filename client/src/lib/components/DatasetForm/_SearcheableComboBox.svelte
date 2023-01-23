@@ -2,68 +2,60 @@
   import type { SelectOption } from "src/definitions/form";
   import RequiredMarker from "../RequiredMarker/RequiredMarker.svelte";
   import { escape } from "src/lib/util/string";
+  import { createEventDispatcher } from "svelte";
+
+  const dispatch = createEventDispatcher<{ input: SelectOption<number>[] }>();
 
   export let name: string;
+  export let label: string;
+  export let hintText: string;
+  export let options: SelectOption<number>[];
   export let error = "";
 
   let suggestionList: HTMLElement;
-
   let value: string | null = null;
   let currentLiIndex: number = 0;
   let showSuggestions = false;
-  let selectedOption: SelectOption<number> | undefined;
+  let selectedOptions: SelectOption<number>[] = [];
 
   let textBoxHasFocus = false;
-
-  $: console.log({ value, showSuggestions, textBoxHasFocus, currentLiIndex });
 
   $: regexp = value ? new RegExp(escape(value), "i") : null;
 
   $: filteredSuggestions = showSuggestions
-    ? suggestions.filter((item) => (regexp ? item.label.match(regexp) : true))
+    ? options.filter((item) => (regexp ? item.label.match(regexp) : true))
     : [];
 
   $: activeSuggestionDescendant = currentLiIndex
     ? `suggestion-item-${currentLiIndex}`
     : null;
 
-  export let suggestions: SelectOption<number>[] = [
-    {
-      label: "tata",
-      value: 1,
-    },
-    {
-      label: "toto",
-      value: 2,
-    },
-    {
-      label: "titi",
-      value: 3,
-    },
-    {
-      label: "fruiti",
-      value: 4,
-    },
-    {
-      label: "tarte",
-      value: 5,
-    },
-  ];
+  const getSelectedOption = (value: string): SelectOption<number> | undefined =>
+    filteredSuggestions.find((item) => item.label === value.trim());
 
-  let setSelectedOption = (value: string): SelectOption<number> | undefined => {
-    return filteredSuggestions.find((item) => item.label === value.trim());
+  const handleSelectOption = (option: SelectOption<number>) => {
+    selectedOptions = [...selectedOptions, option];
+    dispatch("input", selectedOptions);
+  };
+
+  const handleFocusOut = (e: Event) => {
+    textBoxHasFocus = false;
+    showSuggestions = false;
   };
 
   const handleClickOption = (optionValue: string) => {
-    selectedOption = setSelectedOption(optionValue);
+    const foundOption = getSelectedOption(optionValue);
 
-    if (selectedOption) {
-      value = selectedOption.label;
+    if (foundOption) {
+      value = foundOption.label;
+      handleSelectOption(foundOption);
     }
     showSuggestions = false;
   };
 
   const handleInput = (ev: Event & { currentTarget: HTMLInputElement }) => {
+    textBoxHasFocus = true;
+    showSuggestions = true;
     value = ev.currentTarget.value;
   };
 
@@ -82,6 +74,8 @@
       switch (e.key) {
         case "Enter":
           //  Closes the listbox if it is displayed.
+
+          e.preventDefault();
 
           if (showSuggestions) {
             textBoxHasFocus = false;
@@ -137,7 +131,7 @@
           if (!value && !showSuggestions) {
             textBoxHasFocus = false;
             showSuggestions = true;
-            currentLiIndex = suggestions.length - 1;
+            currentLiIndex = options.length - 1;
           }
 
         default:
@@ -158,18 +152,19 @@
           Sets visual focus on the textbox.
 
         */
-          if (!currentLiIndex) {
-            return;
-          }
+
+          e.preventDefault();
+
           const selectedSuggestionItem =
             suggestionItems[currentLiIndex].textContent;
 
           if (showSuggestions && selectedSuggestionItem) {
-            selectedOption = setSelectedOption(selectedSuggestionItem);
+            const foundOption = getSelectedOption(selectedSuggestionItem);
 
-            if (selectedOption) {
-              value = selectedOption.label;
+            if (foundOption) {
+              value = foundOption.label;
               showSuggestions = false;
+              handleSelectOption(foundOption);
             }
           }
 
@@ -244,11 +239,10 @@
   class:fr-input-group--error={error}
 >
   <label class="fr-label" for={name}>
-    Format(s) des données
+    {label}
     <RequiredMarker />
-    <span class="fr-hint-text" id="select-hint-dataformats-hint">
-      Sélectionnez ici les différents formats de données qu'un réutilisateur
-      potentiel pourrait exploiter.
+    <span class="fr-hint-text" id={`select-hint-${name}-hint`}>
+      {hintText}
     </span>
   </label>
 
@@ -271,20 +265,23 @@
     aria-activedescendant={activeSuggestionDescendant}
     on:input={handleInput}
     on:focus={() => (textBoxHasFocus = true)}
-    on:focusout={() => (textBoxHasFocus = false)}
+    on:focusout={handleFocusOut}
   />
 
   <ul
     bind:this={suggestionList}
+    tabindex="-1"
     class:hide={!showSuggestions}
+    class="fr-raw-list dropdown--list"
     id={`${name}-suggestions`}
     role="listbox"
     aria-label="Formats de données"
-    class:focused={!textBoxHasFocus}
+    class:suggestionlist--focused={!textBoxHasFocus}
   >
     {#each filteredSuggestions as { label }, index}
       <li
         class:focused={index === currentLiIndex}
+        class="dropdown--list-item"
         id={`suggestion-item-${index}`}
         role="option"
         aria-label={name}
@@ -302,8 +299,15 @@
     display: none;
   }
 
+  .suggestionlist--focused {
+    outline: solid;
+    outline-offset: 2px;
+    outline-width: 2px;
+    outline-color: #0a76f6;
+  }
+
   .focused {
-    border: 1px solid saddlebrown;
+    background-color: var(--lt-color-background-dark);
   }
 
   input:focus-visible {
@@ -313,5 +317,26 @@
 
   .inputOutline {
     outline-style: solid !important;
+  }
+
+  .dropdown--list {
+    width: 100%;
+    max-height: 32vh;
+    overflow: scroll;
+    background-color: var(--grey-1000-75);
+    border: 1px solid var(--background-contrast-grey);
+    box-shadow: 0 0 10px var(--grey-925);
+    z-index: 10;
+  }
+
+  .dropdown--list-item {
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    margin: 0;
+    border-top: 1px solid var(--background-contrast-grey);
+  }
+
+  .dropdown--list-item:hover {
+    background-color: var(--background-contrast-grey);
   }
 </style>

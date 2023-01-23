@@ -14,14 +14,17 @@
     UPDATE_FREQUENCY_LABELS,
   } from "src/constants";
   import { formatHTMLDate } from "$lib/util/format";
-  import RequiredMarker from "../RequiredMarker/RequiredMarker.svelte";
   import { account } from "src/lib/stores/auth";
   import ContactEmailsField from "../ContactEmailsField/ContactEmailsField.svelte";
   import GeographicalCoverageField from "./_GeographicalCoverageField.svelte";
   import Select from "../Select/Select.svelte";
   import InputField from "../InputField/InputField.svelte";
   import TextareaField from "../TextareaField/TextareaField.svelte";
-  import { toSelectOptions } from "src/lib/transformers/form";
+  import {
+    toSelectOptions,
+    transformDataFormatToSelectOption,
+    transoformSelectOptionToDataFormat,
+  } from "src/lib/transformers/form";
   import { handleSelectChange } from "src/lib/util/form";
   import TagSelector from "../TagSelector/TagSelector.svelte";
   import RadioGroupField from "../RadioGroupField/RadioGroupField.svelte";
@@ -30,7 +33,9 @@
   import ExtraField from "./_ExtraField.svelte";
   import Alert from "../Alert/Alert.svelte";
   import type { DataFormat } from "src/definitions/dataformat";
-  import FormatSelector from "./_FormatSelector.svelte";
+  import FormatSelector from "./_SearcheableComboBox.svelte";
+  import type { SelectOption } from "src/definitions/form";
+  import SearcheableComboBox from "./_SearcheableComboBox.svelte";
 
   export let submitLabel = "Publier la fiche de données";
   export let loadingLabel = "Publication en cours...";
@@ -51,7 +56,7 @@
     title: string;
     description: string;
     service: string;
-    dataFormats: boolean[];
+    formats: SelectOption<number>[];
     producerEmail: string | null;
     contactEmails: string[];
     geographicalCoverage: string;
@@ -70,9 +75,9 @@
     title: initial?.title || "",
     description: initial?.description || "",
     service: initial?.service || "",
-    dataFormats: formats.map(
-      ({ id }) => !!(initial?.formats || []).find((v) => v.id === id)
-    ),
+    formats: initial
+      ? initial.formats.map(transformDataFormatToSelectOption)
+      : [],
     producerEmail: initial?.producerEmail || "",
     contactEmails: initial?.contactEmails || [$account?.email || ""],
     lastUpdatedAt: initial?.lastUpdatedAt
@@ -93,9 +98,6 @@
     publicationRestriction: initial?.publicationRestriction || "no_restriction",
   };
 
-  // Handle this value manually.
-  const dataFormatsValue = initialValues.dataFormats;
-
   const { form, errors, handleChange, handleSubmit, updateValidateField } =
     createForm({
       initialValues,
@@ -105,7 +107,15 @@
         title: yup.string().required("Ce champ est requis"),
         description: yup.string().required("Ce champs est requis"),
         service: yup.string().required("Ce champs est requis"),
-        dataFormats: yup.array(yup.boolean()).length(dataFormatsValue.length),
+        formats: yup
+          .array()
+          .of(
+            yup.object().shape({
+              label: yup.string(),
+              value: yup.number(),
+            })
+          )
+          .min(1, "Veuillez séléctionner au moins 1 mot-clé"),
         producerEmail: yup
           .string()
           .email("Ce champ doit contenir une adresse e-mail valide")
@@ -136,10 +146,6 @@
         extraFieldValues: yup.array().of(yup.string()),
       }),
       onSubmit: (values: DatasetFormValues) => {
-        const updatedFormats = values.dataFormats
-          .map((checked, index) => (checked ? formats[index] : null))
-          .filter((item) => item) as DataFormat[];
-
         // Ensure "" becomes null.
         const producerEmail = values.producerEmail
           ? values.producerEmail
@@ -168,7 +174,7 @@
 
         const data: DatasetFormData = {
           ...values,
-          formats: updatedFormats,
+          formats: values.formats.map(transoformSelectOptionToDataFormat),
           producerEmail,
           contactEmails,
           lastUpdatedAt,
@@ -184,9 +190,11 @@
 
   $: emailErrors = $errors.contactEmails as unknown as string[];
 
+  $: console.log($errors.formats);
+
   export const submitForm = (event: Event) => {
     event.preventDefault();
-    // handleSubmit(event);
+    handleSubmit(event);
   };
 
   const handleFieldChange = async (event: Event) => {
@@ -194,14 +202,10 @@
     dispatch("touched", true);
   };
 
-  const hasError = (error: string | string[]) => {
-    return typeof error === "string" && Boolean(error);
-  };
-
-  const handleDataformatChange = (event: Event, index: number) => {
-    const { checked } = event.target as HTMLInputElement;
-    dataFormatsValue[index] = checked;
-    updateValidateField("dataFormats", dataFormatsValue);
+  const handleDataFormatChanges = async (
+    event: CustomEvent<SelectOption<number>[]>
+  ) => {
+    updateValidateField("formats", event.detail);
     dispatch("touched");
   };
 
@@ -286,13 +290,14 @@
   <h2 id="source-formats" class="fr-mt-6w fr-mb-5w">Sources et formats</h2>
 
   <div class="form--content fr-mb-8w">
-    <FormatSelector
-      name="formats"
-      value={$form.geographicalCoverage}
-      error={$errors.geographicalCoverage}
-      on:input={(ev) => updateValidateField("geographicalCoverage", ev.detail)}
+    <SearcheableComboBox
+      label={"Format(s) des données"}
+      hintText={"Sélectionnez ici les différents formats de données qu'un réutilisateur potentiel pourrait exploiter."}
+      name="dataFormats"
+      options={formats.map(transformDataFormatToSelectOption)}
+      error={typeof $errors.formats === "string" ? $errors.formats : ""}
+      on:input={handleDataFormatChanges}
     />
-
     <InputField
       name="technicalSource"
       label="Système d'information source"
@@ -459,10 +464,7 @@
   {/if}
 
   <div class="fr-input-group button--container fr-mb-6w">
-    <button
-      type="submit"
-      class="fr-btn  fr-icon-upload-2-line fr-btn--icon-right"
-    >
+    <button class="fr-btn  fr-icon-upload-2-line fr-btn--icon-right">
       {saveBtnLabel}
     </button>
   </div>

@@ -108,7 +108,7 @@
 
   <DatasetFormLayout>
     <DatasetForm
-      formats={dataformats}
+      {dataformats}
       {catalog}
       {tags}
       {licenses}

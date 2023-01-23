@@ -19,7 +19,7 @@
 
   export let data: PageData;
 
-  $: ({ catalog, tags, licenses, filtersInfo, dataformats } = data);
+  $: ({ catalog, tags, licenses, filtersInfo, formats } = data);
 
   const onSave = async (event: CustomEvent<DatasetFormData>) => {
     try {
@@ -89,7 +89,7 @@
 
   <DatasetFormLayout>
     <DatasetForm
-      formats={dataformats}
+      {formats}
       {catalog}
       {tags}
       {licenses}
