@@ -4,8 +4,10 @@
   import { escape } from "src/lib/util/string";
   import { createEventDispatcher } from "svelte";
 
-  const dispatch =
-    createEventDispatcher<{ selectOption: SelectOption<number> }>();
+  const dispatch = createEventDispatcher<{
+    selectOption: SelectOption<number>;
+    addItem: string;
+  }>();
 
   export let name: string;
   export let label: string;
@@ -55,6 +57,10 @@
     textBoxHasFocus = true;
     showSuggestions = true;
     value = ev.currentTarget.value;
+  };
+
+  const handleAddItem = () => {
+    dispatch("addItem", value);
   };
 
   const manageKeyboardInterractions = (e: KeyboardEvent) => {
@@ -244,27 +250,37 @@
     </span>
   </label>
 
-  <input
-    on:keydown={manageKeyboardInterractions}
-    class="fr-input"
-    class:fr-input--error={error}
-    class:inputOutline={textBoxHasFocus}
-    type="text"
-    {name}
-    id={name}
-    {value}
-    required
-    role="combobox"
-    autocomplete="off"
-    aria-controls={`${name}-suggestions`}
-    aria-autocomplete="list"
-    aria-expanded={showSuggestions}
-    aria-describedby={error ? "geographicalCoverage-desc-error" : null}
-    aria-activedescendant={`suggestion-item-${currentLiIndex}`}
-    on:input={handleInput}
-    on:focus={() => (textBoxHasFocus = true)}
-    on:focusout={handleFocusOut}
-  />
+  <div class="input-container">
+    <input
+      on:keydown={manageKeyboardInterractions}
+      class="fr-input"
+      class:fr-input--error={error}
+      class:inputOutline={textBoxHasFocus}
+      type="text"
+      {name}
+      id={name}
+      {value}
+      required
+      role="combobox"
+      autocomplete="off"
+      aria-controls={`${name}-suggestions`}
+      aria-autocomplete="list"
+      aria-expanded={showSuggestions}
+      aria-describedby={error ? "geographicalCoverage-desc-error" : null}
+      aria-activedescendant={`suggestion-item-${currentLiIndex}`}
+      on:input={handleInput}
+      on:focus={() => (textBoxHasFocus = true)}
+      on:focusout={handleFocusOut}
+    />
+
+    <button
+      disabled={!value}
+      aria-disabled={!value}
+      on:click={handleAddItem}
+      type="button"
+      class="fr-btn fr-icon-add-line"
+    />
+  </div>
 
   <ul
     bind:this={suggestionList}
@@ -336,5 +352,12 @@
 
   .dropdown--list-item:hover {
     background-color: var(--background-contrast-grey);
+  }
+
+  .input-container {
+    gap: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 </style>

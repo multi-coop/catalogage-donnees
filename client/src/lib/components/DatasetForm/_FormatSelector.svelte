@@ -20,6 +20,7 @@
   label={"Format(s) des données"}
   hintText={"Sélectionnez ici les différents formats de données qu'un réutilisateur potentiel pourrait exploiter."}
   name="dataFormats"
+  on:addItem
   {options}
   {error}
   on:selectOption={handleSelectFormat}

@@ -10,6 +10,7 @@
   import DatasetFormLayout from "src/lib/components/DatasetFormLayout/DatasetFormLayout.svelte";
   import ModalExitFormConfirmation from "src/lib/components/ModalExitFormConfirmation/ModalExitFormConfirmation.svelte";
   import { hasHistory } from "src/lib/util/history";
+  import { postDataFormat } from "src/lib/repositories/dataformat";
 
   let modalControlId = "confirm-stop-contributing-modal";
 
@@ -46,6 +47,10 @@
     } else {
       await goto(paths.home);
     }
+  };
+
+  const handleAddFormat = async (e: CustomEvent<string>) => {
+    await postDataFormat({ fetch, apiToken: $apiTokenStore, value: e.detail });
   };
 </script>
 
@@ -97,6 +102,7 @@
       {loading}
       on:save={onSave}
       on:touched={() => (formHasBeenTouched = true)}
+      on:addItem={handleAddFormat}
     />
   </DatasetFormLayout>
 {/if}

@@ -291,6 +291,7 @@
       options={formats.map(transformDataFormatToSelectOption)}
       error={typeof $errors.formats === "string" ? $errors.formats : ""}
       on:input={handleDataFormatChanges}
+      on:addItem
     />
     <InputField
       name="technicalSource"
@@ -458,7 +459,10 @@
   {/if}
 
   <div class="fr-input-group button--container fr-mb-6w">
-    <button class="fr-btn  fr-icon-upload-2-line fr-btn--icon-right">
+    <button
+      type="submit"
+      class="fr-btn  fr-icon-upload-2-line fr-btn--icon-right"
+    >
       {saveBtnLabel}
     </button>
   </div>
