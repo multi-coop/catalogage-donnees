@@ -1,0 +1,2 @@
+class CannotCreateDataFormat(Exception):
+    pass

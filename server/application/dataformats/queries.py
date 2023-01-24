@@ -7,3 +7,7 @@ from .views import DataFormatView
 
 class GetAllDataFormat(Query[List[DataFormatView]]):
     pass
+
+
+class GetDataFormatById(Query[DataFormatView]):
+    id: int

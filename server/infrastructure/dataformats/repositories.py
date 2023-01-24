@@ -43,3 +43,12 @@ class SqlDataFormatRepository(DataFormatRepository):
             if instance is None:
                 return None
             return make_entity(instance)
+
+    async def get_by_id(self, id: int) -> Optional[DataFormat]:
+        async with self._db.session() as session:
+            stmt = select(DataFormatModel).where(DataFormatModel.id == id)
+            result = await session.execute(stmt)
+            instance = result.unique().scalar_one_or_none()
+            if instance is None:
+                return None
+            return make_entity(instance)

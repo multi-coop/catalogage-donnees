@@ -30,3 +30,17 @@ class TestTagsPermissions:
     ) -> None:
         response = await client.get("/dataformats/")
         assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_create_dataformat(
+    client: httpx.AsyncClient, temp_user: TestPasswordUser
+) -> None:
+
+    payload = {"value": "toto"}
+
+    response = await client.post("/dataformats/", json=payload, auth=temp_user.auth)
+    assert response.status_code == 201
+
+    data = response.json()
+    assert data["name"] == "toto"
