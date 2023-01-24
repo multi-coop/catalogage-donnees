@@ -14,3 +14,6 @@ class DataFormatRepository(Repository):
 
     async def get_by_name(self, name: str) -> Optional[DataFormat]:
         raise NotImplementedError  # pragma: no cover
+
+    async def get_by_id(self, id: int) -> Optional[DataFormat]:
+        raise NotImplementedError  # pragma: no cover
