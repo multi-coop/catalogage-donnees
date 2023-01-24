@@ -4,19 +4,21 @@
   import { escape } from "src/lib/util/string";
   import { createEventDispatcher } from "svelte";
 
-  const dispatch = createEventDispatcher<{ input: SelectOption<number>[] }>();
+  const dispatch =
+    createEventDispatcher<{ selectOption: SelectOption<number> }>();
 
   export let name: string;
   export let label: string;
   export let hintText: string;
   export let options: SelectOption<number>[];
   export let error = "";
+  export let value = "";
 
   let suggestionList: HTMLElement;
-  let value: string | null = null;
+
   let currentLiIndex: number = 0;
   let showSuggestions = false;
-  let selectedOptions: SelectOption<number>[] = [];
+  let selectedOption: SelectOption<number>;
 
   let textBoxHasFocus = false;
 
@@ -26,16 +28,12 @@
     ? options.filter((item) => (regexp ? item.label.match(regexp) : true))
     : [];
 
-  $: activeSuggestionDescendant = currentLiIndex
-    ? `suggestion-item-${currentLiIndex}`
-    : null;
-
   const getSelectedOption = (value: string): SelectOption<number> | undefined =>
     filteredSuggestions.find((item) => item.label === value.trim());
 
   const handleSelectOption = (option: SelectOption<number>) => {
-    selectedOptions = [...selectedOptions, option];
-    dispatch("input", selectedOptions);
+    selectedOption = option;
+    dispatch("selectOption", selectedOption);
   };
 
   const handleFocusOut = (e: Event) => {
@@ -262,7 +260,7 @@
     aria-autocomplete="list"
     aria-expanded={showSuggestions}
     aria-describedby={error ? "geographicalCoverage-desc-error" : null}
-    aria-activedescendant={activeSuggestionDescendant}
+    aria-activedescendant={`suggestion-item-${currentLiIndex}`}
     on:input={handleInput}
     on:focus={() => (textBoxHasFocus = true)}
     on:focusout={handleFocusOut}

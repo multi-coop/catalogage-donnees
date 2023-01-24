@@ -12,7 +12,7 @@
 
   export let data: PageData;
 
-  $: ({ catalog, dataset, tags, licenses, filtersInfo, dataformats } = data);
+  $: ({ catalog, tags, licenses, filtersInfo, formats, dataset } = data);
 
   let modalControlId = "stop-editing-form-modal";
 
@@ -71,7 +71,7 @@
   };
 </script>
 
-{#if Maybe.Some(catalog) && Maybe.Some(dataset) && Maybe.Some(tags) && Maybe.Some(licenses) && Maybe.Some(filtersInfo) && dataformats}
+{#if Maybe.Some(catalog) && Maybe.Some(dataset) && Maybe.Some(tags) && Maybe.Some(licenses) && Maybe.Some(filtersInfo) && formats}
   <header class="fr-p-4w">
     <div class="fr-col">
       <h5 class="fr-grid-row fr-text--regular">
@@ -108,7 +108,7 @@
 
   <DatasetFormLayout>
     <DatasetForm
-      {dataformats}
+      {formats}
       {catalog}
       {tags}
       {licenses}

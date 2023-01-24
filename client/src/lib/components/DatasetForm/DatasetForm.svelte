@@ -33,9 +33,8 @@
   import ExtraField from "./_ExtraField.svelte";
   import Alert from "../Alert/Alert.svelte";
   import type { DataFormat } from "src/definitions/dataformat";
-  import FormatSelector from "./_SearcheableComboBox.svelte";
+  import FormatSelector from "./_FormatSelector.svelte";
   import type { SelectOption } from "src/definitions/form";
-  import SearcheableComboBox from "./_SearcheableComboBox.svelte";
 
   export let submitLabel = "Publier la fiche de données";
   export let loadingLabel = "Publication en cours...";
@@ -190,8 +189,6 @@
 
   $: emailErrors = $errors.contactEmails as unknown as string[];
 
-  $: console.log($errors.formats);
-
   export const submitForm = (event: Event) => {
     event.preventDefault();
     handleSubmit(event);
@@ -290,10 +287,7 @@
   <h2 id="source-formats" class="fr-mt-6w fr-mb-5w">Sources et formats</h2>
 
   <div class="form--content fr-mb-8w">
-    <SearcheableComboBox
-      label={"Format(s) des données"}
-      hintText={"Sélectionnez ici les différents formats de données qu'un réutilisateur potentiel pourrait exploiter."}
-      name="dataFormats"
+    <FormatSelector
       options={formats.map(transformDataFormatToSelectOption)}
       error={typeof $errors.formats === "string" ? $errors.formats : ""}
       on:input={handleDataFormatChanges}
