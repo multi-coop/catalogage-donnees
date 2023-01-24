@@ -5,6 +5,7 @@ from server.application.dataformats.queries import GetAllDataFormat, GetDataForm
 from server.application.dataformats.views import DataFormatView
 from server.config.di import resolve
 from server.domain.dataformats.entities import DataFormat
+from server.domain.dataformats.exceptions import DataFormatAlreadyExists
 from server.domain.dataformats.repositories import DataFormatRepository
 
 
@@ -16,6 +17,10 @@ async def get_all_dataformats(query: GetAllDataFormat) -> List[DataFormatView]:
 
 async def create_dataformat(command: CreateDataFormat) -> Optional[int]:
     repository = resolve(DataFormatRepository)
+    existing_dataformat = await repository.get_by_name(command.value)
+
+    if existing_dataformat is not None:
+        raise DataFormatAlreadyExists(existing_dataformat)
     return await repository.insert(DataFormat(name=command.value))
 
 
