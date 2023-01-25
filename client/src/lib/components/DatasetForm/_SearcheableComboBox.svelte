@@ -61,6 +61,7 @@
 
   const handleAddItem = () => {
     dispatch("addItem", value);
+    value = "";
   };
 
   const manageKeyboardInterractions = (e: KeyboardEvent) => {

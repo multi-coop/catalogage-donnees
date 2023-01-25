@@ -5,14 +5,21 @@
 
   export let options: SelectOption<number>[];
   export let error: string;
-  let selectedFormatOptions: SelectOption<number>[] = [];
+  let selectedFormatOptions: Omit<SelectOption<number>, "value">[] = [];
 
   const handleSelectFormat = (e: CustomEvent<SelectOption<number>>) => {
-    const itemAlreadyExists = selectedFormatOptions.indexOf(e.detail) !== -1;
+    const itemAlreadyExists =
+      selectedFormatOptions.findIndex(
+        (item) => item.label == e.detail.label
+      ) !== -1;
 
     if (!itemAlreadyExists) {
       selectedFormatOptions = [...selectedFormatOptions, e.detail];
     }
+  };
+
+  const handleAddItem = (e: CustomEvent<string>) => {
+    selectedFormatOptions = [...selectedFormatOptions, { label: e.detail }];
   };
 </script>
 
@@ -20,6 +27,7 @@
   label={"Format(s) des données"}
   hintText={"Sélectionnez ici les différents formats de données qu'un réutilisateur potentiel pourrait exploiter."}
   name="dataFormats"
+  on:addItem={handleAddItem}
   on:addItem
   {options}
   {error}
@@ -28,7 +36,7 @@
 
 <div role="list" aria-live="polite">
   {#each selectedFormatOptions as { label, value }}
-    <Tag id={value.toString()} name={label} role="list" on:click={() => {}} />
+    <Tag id={label} name={label} role="list" on:click={() => {}} />
   {/each}
 </div>
 

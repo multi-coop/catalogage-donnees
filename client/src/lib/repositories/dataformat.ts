@@ -24,7 +24,7 @@ export const postDataFormat = async ({
   value,
 }: Options & { value: string }): Promise<DataFormat> => {
   const body = JSON.stringify({ value });
-  const url = `${getApiUrl()}/datasets/`;
+  const url = `${getApiUrl()}/dataformats/`;
   const request = new Request(url, {
     method: "POST",
     headers: new Headers([
