@@ -44,3 +44,14 @@ async def test_create_dataformat(
 
     data = response.json()
     assert data["name"] == "toto"
+
+
+@pytest.mark.asyncio
+async def test_create_duplicated_dataformat(
+    client: httpx.AsyncClient, temp_user: TestPasswordUser
+) -> None:
+
+    payload = {"value": "API (REST, GraphQL, ...)"}
+
+    response = await client.post("/dataformats/", json=payload, auth=temp_user.auth)
+    assert response.status_code == 200

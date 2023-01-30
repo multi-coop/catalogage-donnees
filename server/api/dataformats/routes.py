@@ -9,6 +9,7 @@ from server.application.dataformats.exceptions import CannotCreateDataFormat
 from server.application.dataformats.queries import GetAllDataFormat, GetDataFormatById
 from server.application.dataformats.views import DataFormatView
 from server.config.di import resolve
+from server.domain.dataformats.exceptions import DataFormatAlreadyExists
 from server.seedwork.application.messages import MessageBus
 
 from ..auth.permissions import IsAuthenticated
@@ -45,6 +46,10 @@ async def create_dataformat(data: DataFormatCreate) -> DataFormatView:
         id = await bus.execute(command)
         query = GetDataFormatById(id=id)
         return await bus.execute(query)
+
+    except DataFormatAlreadyExists as exc:
+        logger.exception(exc)
+        raise HTTPException(200, detail="Already Exists")
 
     except CannotCreateDataFormat as exc:
         logger.exception(exc)
