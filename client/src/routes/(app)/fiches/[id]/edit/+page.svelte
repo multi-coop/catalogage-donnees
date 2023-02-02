@@ -3,12 +3,20 @@
   import type { DatasetFormData } from "src/definitions/datasets";
   import DatasetForm from "$lib/components/DatasetForm/DatasetForm.svelte";
   import paths from "$lib/paths";
-  import { isAdmin, apiToken as apiTokenStore } from "$lib/stores/auth";
+  import {
+    isAdmin,
+    apiToken as apiTokenStore,
+    apiToken,
+  } from "$lib/stores/auth";
   import { deleteDataset, updateDataset } from "$lib/repositories/datasets";
   import { Maybe } from "$lib/util/maybe";
   import DatasetFormLayout from "src/lib/components/DatasetFormLayout/DatasetFormLayout.svelte";
   import ModalExitFormConfirmation from "src/lib/components/ModalExitFormConfirmation/ModalExitFormConfirmation.svelte";
   import type { PageData } from "./$types";
+  import {
+    getDataFormats,
+    postDataFormat,
+  } from "src/lib/repositories/dataformat";
 
   export let data: PageData;
 
@@ -19,6 +27,16 @@
   let loading = false;
 
   let formHasbeenTouched = false;
+
+  const handleCreateDataFormat = async (e: CustomEvent<string>) => {
+    await postDataFormat({
+      fetch,
+      apiToken: $apiToken,
+      value: e.detail,
+    });
+
+    formats = await getDataFormats({ fetch, apiToken: $apiToken });
+  };
 
   const onSave = async (event: CustomEvent<DatasetFormData>) => {
     if (!Maybe.Some(dataset)) {
@@ -118,6 +136,7 @@
       submitLabel="Enregistrer les modifications"
       loadingLabel="Modification en cours..."
       on:save={onSave}
+      on:createDataFormat={handleCreateDataFormat}
       on:touched={() => (formHasbeenTouched = true)}
     />
 

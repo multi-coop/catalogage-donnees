@@ -46,6 +46,7 @@
 
   const handleAddItem = (e: CustomEvent<string>) => {
     selectedFormatOptions = [...selectedFormatOptions, { name: e.detail }];
+    dispatch("change", selectedFormatOptions);
   };
 </script>
 

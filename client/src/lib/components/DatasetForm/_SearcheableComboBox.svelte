@@ -60,6 +60,7 @@
   };
 
   const handleAddItem = () => {
+    showSuggestions = false;
     dispatch("addItem", value);
     value = "";
   };

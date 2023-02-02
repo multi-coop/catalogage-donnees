@@ -47,8 +47,11 @@
 
   export let initial: DatasetFormInitial | null = null;
 
-  const dispatch =
-    createEventDispatcher<{ save: DatasetFormData; touched: boolean }>();
+  const dispatch = createEventDispatcher<{
+    save: DatasetFormData;
+    touched: boolean;
+    createDataFormat: string;
+  }>();
 
   type DatasetFormValues = {
     organizationSiret: string;
@@ -241,6 +244,10 @@
     updateValidateField("extraFieldValues", v);
     dispatch("touched");
   };
+
+  const handleAddDataFormat = (e: CustomEvent<string>) => {
+    dispatch("createDataFormat", e.detail);
+  };
 </script>
 
 <form
@@ -296,7 +303,7 @@
     <FormatSelector
       formatOptions={formats}
       error={typeof $errors.formats === "string" ? $errors.formats : ""}
-      on:addItem
+      on:addItem={handleAddDataFormat}
       on:change={handleDataFormatChanges}
     />
     <InputField
