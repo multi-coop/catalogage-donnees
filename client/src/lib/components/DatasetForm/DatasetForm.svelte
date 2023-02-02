@@ -288,10 +288,11 @@
 
   <div class="form--content fr-mb-8w">
     <FormatSelector
-      options={formats.map(transformDataFormatToSelectOption)}
+      formatOptions={formats}
       error={typeof $errors.formats === "string" ? $errors.formats : ""}
       on:input={handleDataFormatChanges}
       on:addItem
+      on:change
     />
     <InputField
       name="technicalSource"

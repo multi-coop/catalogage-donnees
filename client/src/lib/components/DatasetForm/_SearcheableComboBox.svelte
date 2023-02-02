@@ -271,7 +271,6 @@
       aria-activedescendant={`suggestion-item-${currentLiIndex}`}
       on:input={handleInput}
       on:focus={() => (textBoxHasFocus = true)}
-      on:focusout={handleFocusOut}
     />
 
     <button
