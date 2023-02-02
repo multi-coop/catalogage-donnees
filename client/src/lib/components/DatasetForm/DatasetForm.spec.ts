@@ -4,7 +4,7 @@
 import "@testing-library/jest-dom";
 
 import DatasetForm from "./DatasetForm.svelte";
-import { render, fireEvent, getByLabelText } from "@testing-library/svelte";
+import { render, fireEvent } from "@testing-library/svelte";
 import type {
   DatasetFormData,
   DatasetFormInitial,
