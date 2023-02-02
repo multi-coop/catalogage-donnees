@@ -1,3 +1,4 @@
+import type { DataFormat } from "src/definitions/dataformat";
 import type { SelectOption } from "src/definitions/form";
 
 import type { Tag } from "src/definitions/tag";
@@ -14,10 +15,25 @@ export const toSelectOptions = (
     label: labelsMap[key],
     value: key,
   }));
+
   return map as Array<SelectOption<TrustedHtml | string>>;
 };
 
 export const transformTagToSelectOption = (tag: Tag): SelectOption => ({
   label: tag.name,
   value: `${tag.id}`,
+});
+
+export const transformDataFormatToSelectOption = (
+  dataformat: DataFormat
+): SelectOption<number> => ({
+  label: dataformat.name,
+  value: dataformat.id,
+});
+
+export const transoformSelectOptionToDataFormat = (
+  selectOption: SelectOption<number>
+): DataFormat => ({
+  name: selectOption.label,
+  id: selectOption.value,
 });

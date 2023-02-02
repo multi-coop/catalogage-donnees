@@ -47,8 +47,8 @@ export type DatasetFormInitial = Omit<Dataset, "id">;
 
 export type DatasetFormData = Omit<
   Dataset,
-  "id" | "catalogRecord" | "headlines"
-> & { organizationSiret: string };
+  "id" | "catalogRecord" | "headlines" | "formats"
+> & { organizationSiret: string; formats: Partial<DataFormat>[] };
 
 export type DatasetCreateData = Omit<DatasetFormData, "tags" | "formats"> & {
   tagIds: string[];

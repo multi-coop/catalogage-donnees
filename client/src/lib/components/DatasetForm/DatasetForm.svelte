@@ -14,7 +14,6 @@
     UPDATE_FREQUENCY_LABELS,
   } from "src/constants";
   import { formatHTMLDate } from "$lib/util/format";
-  import RequiredMarker from "../RequiredMarker/RequiredMarker.svelte";
   import { account } from "src/lib/stores/auth";
   import ContactEmailsField from "../ContactEmailsField/ContactEmailsField.svelte";
   import GeographicalCoverageField from "./_GeographicalCoverageField.svelte";
@@ -30,6 +29,7 @@
   import ExtraField from "./_ExtraField.svelte";
   import Alert from "../Alert/Alert.svelte";
   import type { DataFormat } from "src/definitions/dataformat";
+  import FormatSelector from "./_FormatSelector.svelte";
 
   export let submitLabel = "Publier la fiche de données";
   export let loadingLabel = "Publication en cours...";
@@ -42,15 +42,18 @@
 
   export let initial: DatasetFormInitial | null = null;
 
-  const dispatch =
-    createEventDispatcher<{ save: DatasetFormData; touched: boolean }>();
+  const dispatch = createEventDispatcher<{
+    save: DatasetFormData;
+    touched: boolean;
+    createDataFormat: string;
+  }>();
 
   type DatasetFormValues = {
     organizationSiret: string;
     title: string;
     description: string;
     service: string;
-    dataFormats: boolean[];
+    formats: Partial<DataFormat>[];
     producerEmail: string | null;
     contactEmails: string[];
     geographicalCoverage: string;
@@ -69,9 +72,7 @@
     title: initial?.title || "",
     description: initial?.description || "",
     service: initial?.service || "",
-    dataFormats: formats.map(
-      ({ id }) => !!(initial?.formats || []).find((v) => v.id === id)
-    ),
+    formats: initial ? initial.formats : [],
     producerEmail: initial?.producerEmail || "",
     contactEmails: initial?.contactEmails || [$account?.email || ""],
     lastUpdatedAt: initial?.lastUpdatedAt
@@ -92,9 +93,6 @@
     publicationRestriction: initial?.publicationRestriction || "no_restriction",
   };
 
-  // Handle this value manually.
-  const dataFormatsValue = initialValues.dataFormats;
-
   const { form, errors, handleChange, handleSubmit, updateValidateField } =
     createForm({
       initialValues,
@@ -104,7 +102,15 @@
         title: yup.string().required("Ce champ est requis"),
         description: yup.string().required("Ce champs est requis"),
         service: yup.string().required("Ce champs est requis"),
-        dataFormats: yup.array(yup.boolean()).length(dataFormatsValue.length),
+        formats: yup
+          .array()
+          .of(
+            yup.object().shape({
+              name: yup.string(),
+              id: yup.string().nullable(),
+            })
+          )
+          .min(1, "Veuillez séléctionner au moins 1 format de donnée"),
         producerEmail: yup
           .string()
           .email("Ce champ doit contenir une adresse e-mail valide")
@@ -135,10 +141,6 @@
         extraFieldValues: yup.array().of(yup.string()),
       }),
       onSubmit: (values: DatasetFormValues) => {
-        const updatedFormats = values.dataFormats
-          .map((checked, index) => (checked ? formats[index] : null))
-          .filter((item) => item) as DataFormat[];
-
         // Ensure "" becomes null.
         const producerEmail = values.producerEmail
           ? values.producerEmail
@@ -167,7 +169,6 @@
 
         const data: DatasetFormData = {
           ...values,
-          formats: updatedFormats,
           producerEmail,
           contactEmails,
           lastUpdatedAt,
@@ -184,6 +185,7 @@
   $: emailErrors = $errors.contactEmails as unknown as string[];
 
   export const submitForm = (event: Event) => {
+    event.preventDefault();
     handleSubmit(event);
   };
 
@@ -192,14 +194,8 @@
     dispatch("touched", true);
   };
 
-  const hasError = (error: string | string[]) => {
-    return typeof error === "string" && Boolean(error);
-  };
-
-  const handleDataformatChange = (event: Event, index: number) => {
-    const { checked } = event.target as HTMLInputElement;
-    dataFormatsValue[index] = checked;
-    updateValidateField("dataFormats", dataFormatsValue);
+  const handleDataFormatChanges = async (event: CustomEvent<DataFormat[]>) => {
+    updateValidateField("formats", event.detail);
     dispatch("touched");
   };
 
@@ -232,11 +228,16 @@
     updateValidateField("extraFieldValues", v);
     dispatch("touched");
   };
+
+  const handleAddDataFormat = (e: CustomEvent<string>) => {
+    dispatch("createDataFormat", e.detail);
+  };
 </script>
 
 <form
   on:submit={submitForm}
   data-bitwarden-watching="1"
+  novalidate
   aria-label="Informations sur le jeu de données"
 >
   <h2 id="information-generales" class="fr-mb-5w">Informations générales</h2>
@@ -283,51 +284,13 @@
   <h2 id="source-formats" class="fr-mt-6w fr-mb-5w">Sources et formats</h2>
 
   <div class="form--content fr-mb-8w">
-    <fieldset
-      class="fr-fieldset fr-mb-4w {hasError($errors.dataFormats)
-        ? 'fr-fieldset--error'
-        : ''}"
-      aria-describedby={hasError($errors.dataFormats)
-        ? "dataformats-desc-error"
-        : null}
-    >
-      <legend
-        class="fr-fieldset__legend fr-text--regular"
-        id="dataformats-hint-legend"
-      >
-        Format(s) des données
-        <RequiredMarker />
-        <span class="fr-hint-text" id="select-hint-dataformats-hint">
-          Sélectionnez ici les différents formats de données qu'un réutilisateur
-          potentiel pourrait exploiter.
-        </span>
-      </legend>
-      <div class="fr-fieldset__content">
-        {#each formats as { id, name }, index}
-          {@const identifier = `dataformats-${id}`}
-          <div class="fr-checkbox-group">
-            <input
-              type="checkbox"
-              id={identifier}
-              name="dataformats"
-              value={id}
-              required={dataFormatsValue.every((checked) => !checked)}
-              checked={dataFormatsValue[index]}
-              on:change={(event) => handleDataformatChange(event, index)}
-            />
-            <label for={identifier}>
-              {name}
-            </label>
-          </div>
-        {/each}
-      </div>
-      {#if hasError($errors.dataFormats)}
-        <p id="dataformats-desc-error" class="fr-error-text">
-          {$errors.dataFormats}
-        </p>
-      {/if}
-    </fieldset>
-
+    <FormatSelector
+      formatOptions={formats}
+      error={typeof $errors.formats === "string" ? $errors.formats : ""}
+      on:addItem={handleAddDataFormat}
+      on:change={handleDataFormatChanges}
+      bind:selectedFormatOptions={initialValues.formats}
+    />
     <InputField
       name="technicalSource"
       label="Système d'information source"

@@ -64,7 +64,7 @@ describe("Test the dataset form", () => {
   });
 
   test('The "formats" field is present', async () => {
-    const { getAllByRole } = render(DatasetForm, {
+    const { getByLabelText } = render(DatasetForm, {
       catalog,
       formats: [
         {
@@ -73,8 +73,10 @@ describe("Test the dataset form", () => {
         },
       ],
     });
-    const checkboxes = getAllByRole("checkbox");
-    expect(checkboxes.length).toBeGreaterThan(0);
+    const formatfield = getByLabelText("Format(s) des données", {
+      exact: false,
+    });
+    expect(formatfield).toBeInTheDocument();
   });
 
   test('The "geographicalCoverage" field is present', async () => {
@@ -101,26 +103,6 @@ describe("Test the dataset form", () => {
       exact: false,
     });
     expect(tags).toBeInTheDocument();
-  });
-
-  test("At least one format is required", async () => {
-    const { getAllByRole } = render(DatasetForm, {
-      catalog,
-      formats: [
-        {
-          id: 55,
-          name: "fichier tabulaire",
-        },
-      ],
-    });
-    const checkboxes = getAllByRole("checkbox", { checked: false });
-    checkboxes.forEach((checkbox) => expect(checkbox).toBeRequired());
-    await fireEvent.click(checkboxes[0]);
-    expect(checkboxes[0]).toBeChecked();
-    checkboxes
-      .slice(1)
-      .forEach((checkbox) => expect(checkbox).not.toBeChecked());
-    checkboxes.forEach((checkbox) => expect(checkbox).not.toBeRequired());
   });
 
   test('The "producerEmail" field is present', () => {
