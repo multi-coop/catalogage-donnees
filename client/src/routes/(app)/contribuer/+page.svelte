@@ -3,13 +3,18 @@
   import type { PageData } from "./$types";
   import type { DatasetFormData } from "src/definitions/datasets";
   import paths from "$lib/paths";
-  import { apiToken as apiTokenStore } from "$lib/stores/auth";
+  import { apiToken } from "$lib/stores/auth";
   import DatasetForm from "$lib/components/DatasetForm/DatasetForm.svelte";
   import { createDataset } from "$lib/repositories/datasets";
   import { Maybe } from "$lib/util/maybe";
   import DatasetFormLayout from "src/lib/components/DatasetFormLayout/DatasetFormLayout.svelte";
   import ModalExitFormConfirmation from "src/lib/components/ModalExitFormConfirmation/ModalExitFormConfirmation.svelte";
   import { hasHistory } from "src/lib/util/history";
+  import {
+    getDataFormats,
+    postDataFormat,
+  } from "src/lib/repositories/dataformat";
+  import type { DataFormat } from "src/definitions/dataformat";
 
   let modalControlId = "confirm-stop-contributing-modal";
 
@@ -17,19 +22,41 @@
 
   let formHasBeenTouched = false;
 
+  let freshDataFormat: DataFormat[];
+
   export let data: PageData;
 
-  $: ({ catalog, tags, licenses, filtersInfo, dataformats } = data);
+  $: ({ catalog, tags, licenses, filtersInfo, formats } = data);
 
   const onSave = async (event: CustomEvent<DatasetFormData>) => {
     try {
       loading = true;
       const tagIds = event.detail.tags.map((item) => item.id);
-      const formatIds = event.detail.formats.map((item) => item.id);
+
+      const mergedDataFormatsIds = event.detail.formats.reduce((prev, next) => {
+        if (!next.name) {
+          return prev;
+        }
+
+        if (!next.id) {
+          const foundItemId = freshDataFormat.find(
+            (item) => item.name === next.name
+          )?.id;
+
+          if (!foundItemId) {
+            return prev;
+          }
+
+          return [...prev, foundItemId];
+        }
+
+        return [...prev, next.id];
+      }, [] as number[]);
+
       const dataset = await createDataset({
         fetch,
-        apiToken: $apiTokenStore,
-        data: { ...event.detail, tagIds, formatIds },
+        apiToken: $apiToken,
+        data: { ...event.detail, tagIds, formatIds: mergedDataFormatsIds },
       });
 
       if (Maybe.Some(dataset)) {
@@ -46,6 +73,17 @@
     } else {
       await goto(paths.home);
     }
+  };
+  const handleCreateDataFormat = async (e: CustomEvent<string>) => {
+    const dataformat = await postDataFormat({
+      fetch,
+      apiToken: $apiToken,
+      value: e.detail,
+    });
+
+    freshDataFormat = [...freshDataFormat, dataformat];
+
+    formats = await getDataFormats({ fetch, apiToken: $apiToken });
   };
 </script>
 
@@ -89,7 +127,7 @@
 
   <DatasetFormLayout>
     <DatasetForm
-      formats={dataformats}
+      {formats}
       {catalog}
       {tags}
       {licenses}
@@ -97,6 +135,7 @@
       {loading}
       on:save={onSave}
       on:touched={() => (formHasBeenTouched = true)}
+      on:createDataFormat={handleCreateDataFormat}
     />
   </DatasetFormLayout>
 {/if}

@@ -32,13 +32,6 @@
             politique de la donnée.
           </p>
 
-          <p>
-            <strong
-              >Votre organisation doit être enregistrée pour vous identifier.<strong
-              />
-            </strong>
-          </p>
-
           <div class="button-container">
             <MonCompteProButton on:click={triggerDataPassLoginFlow} />
           </div>
@@ -53,7 +46,7 @@
     Les organisations enregistrées sur catalogue.data.gouv.fr
   </h2>
   <div class="fr-grid-row fr-grid-row--gutters">
-    <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-4">
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
       <OrganizationCard
         name="Ministère de la Culture"
         src={logoMC}
@@ -61,25 +54,25 @@
       />
     </div>
 
-    <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-4">
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
       <OrganizationCard
-        name="Ministère de l’Europe et des Affaires Étrangères"
+        name="Ministère de l’Europe et des Affaires étrangères"
         src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/affaires-etrangeres/logo.svg"
         status="catalog"
       />
     </div>
-    <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-4">
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
       <OrganizationCard
-        name="Anah"
+        name="Agence nationale de l'habitat"
         src={"https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/anah/logo.svg"}
         status="pending"
       />
     </div>
 
-    <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-4">
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
       <OrganizationCard
-        name="DINUM"
-        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/affaires-etrangeres/logo.svg"
+        name="Direction interministérielle du numérique"
+        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/dinum/logo.svg"
         status="pending"
       />
     </div>

@@ -17,20 +17,19 @@ export const load: PageLoad = async ({ fetch, params }) => {
   try {
     const dataset = await getDatasetByID({ fetch, apiToken, id: params.id });
 
-    const [catalog, tags, licenses, filtersInfo, dataformats] =
-      await Promise.all([
-        Maybe.map(dataset, (dataset) =>
-          getCatalogBySiret({
-            fetch,
-            apiToken,
-            siret: dataset.catalogRecord.organization.siret,
-          })
-        ),
-        getTags({ fetch, apiToken }),
-        getLicenses({ fetch, apiToken }),
-        getDatasetFiltersInfo({ fetch, apiToken }),
-        getDataFormats({ fetch, apiToken }),
-      ]);
+    const [catalog, tags, licenses, filtersInfo, formats] = await Promise.all([
+      Maybe.map(dataset, (dataset) =>
+        getCatalogBySiret({
+          fetch,
+          apiToken,
+          siret: dataset.catalogRecord.organization.siret,
+        })
+      ),
+      getTags({ fetch, apiToken }),
+      getLicenses({ fetch, apiToken }),
+      getDatasetFiltersInfo({ fetch, apiToken }),
+      getDataFormats({ fetch, apiToken }),
+    ]);
 
     return {
       title: `Modifier la fiche de jeu de données - ${SITE_TITLE}`,
@@ -39,7 +38,7 @@ export const load: PageLoad = async ({ fetch, params }) => {
       tags,
       licenses,
       filtersInfo,
-      dataformats,
+      formats,
     };
   } catch (response) {
     if (response.status === 403) {

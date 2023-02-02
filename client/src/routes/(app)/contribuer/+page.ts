@@ -14,15 +14,13 @@ export const load: PageLoad = async ({ fetch }) => {
   const apiToken = get(apiTokenStore);
   const siret = Maybe.expect(get(account), "$account").organizationSiret;
 
-  const [catalog, tags, licenses, filtersInfo, dataformats] = await Promise.all(
-    [
-      getCatalogBySiret({ fetch, apiToken, siret }),
-      getTags({ fetch, apiToken }),
-      getLicenses({ fetch, apiToken }),
-      getDatasetFiltersInfo({ fetch, apiToken }),
-      getDataFormats({ fetch, apiToken }),
-    ]
-  );
+  const [catalog, tags, licenses, filtersInfo, formats] = await Promise.all([
+    getCatalogBySiret({ fetch, apiToken, siret }),
+    getTags({ fetch, apiToken }),
+    getLicenses({ fetch, apiToken }),
+    getDatasetFiltersInfo({ fetch, apiToken }),
+    getDataFormats({ fetch, apiToken }),
+  ]);
 
   return {
     title: `Contribuer une fiche de jeu de données - ${SITE_TITLE}`,
@@ -30,6 +28,6 @@ export const load: PageLoad = async ({ fetch }) => {
     tags,
     licenses,
     filtersInfo,
-    dataformats,
+    formats,
   };
 };

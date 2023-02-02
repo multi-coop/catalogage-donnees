@@ -54,8 +54,12 @@ test.describe("Basic form submission", () => {
 
     // "Sources et formats" section
 
-    const apiFormat = page.locator("label[for=dataformats-1]");
-    await apiFormat.check();
+    await page
+      .getByLabel(
+        "Format(s) des données * Sélectionnez ici les différents formats de données qu'un réutilisateur potentiel pourrait exploiter."
+      )
+      .fill("d");
+    await page.getByText("Base de données").click();
 
     const technicalSource = page.locator("form [name=technicalSource]");
     await technicalSource.fill(technicalSourceText);
@@ -146,8 +150,8 @@ test.describe("Basic form submission", () => {
     expect(json.geographical_coverage).toBe("Europe continentale");
     expect(json.formats).toStrictEqual([
       {
-        id: 1,
-        name: "Fichier tabulaire (XLS, XLSX, CSV, ...)",
+        id: 4,
+        name: "Base de données",
       },
     ]);
     expect(json.producer_email).toBe(producerEmailText);

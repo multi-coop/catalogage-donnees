@@ -3,16 +3,21 @@
   import type { DatasetFormData } from "src/definitions/datasets";
   import DatasetForm from "$lib/components/DatasetForm/DatasetForm.svelte";
   import paths from "$lib/paths";
-  import { isAdmin, apiToken as apiTokenStore } from "$lib/stores/auth";
+  import { isAdmin, apiToken } from "$lib/stores/auth";
   import { deleteDataset, updateDataset } from "$lib/repositories/datasets";
   import { Maybe } from "$lib/util/maybe";
   import DatasetFormLayout from "src/lib/components/DatasetFormLayout/DatasetFormLayout.svelte";
   import ModalExitFormConfirmation from "src/lib/components/ModalExitFormConfirmation/ModalExitFormConfirmation.svelte";
   import type { PageData } from "./$types";
+  import {
+    getDataFormats,
+    postDataFormat,
+  } from "src/lib/repositories/dataformat";
+  import type { DataFormat } from "src/definitions/dataformat";
 
   export let data: PageData;
 
-  $: ({ catalog, dataset, tags, licenses, filtersInfo, dataformats } = data);
+  $: ({ catalog, tags, licenses, filtersInfo, formats, dataset } = data);
 
   let modalControlId = "stop-editing-form-modal";
 
@@ -20,22 +25,54 @@
 
   let formHasbeenTouched = false;
 
+  let freshDataFormat: DataFormat[] = [];
+
+  const handleCreateDataFormat = async (e: CustomEvent<string>) => {
+    const dataFormat = await postDataFormat({
+      fetch,
+      apiToken: $apiToken,
+      value: e.detail,
+    });
+
+    freshDataFormat = [...freshDataFormat, dataFormat];
+
+    formats = await getDataFormats({ fetch, apiToken: $apiToken });
+  };
+
   const onSave = async (event: CustomEvent<DatasetFormData>) => {
     if (!Maybe.Some(dataset)) {
       return;
     }
 
     const tagIds = event.detail.tags.map((item) => item.id);
-    const fromatIds = event.detail.formats.map((item) => item.id);
+    const mergedDataFormatsIds = event.detail.formats.reduce((prev, next) => {
+      if (!next.name) {
+        return prev;
+      }
+
+      if (!next.id) {
+        const foundItemId = freshDataFormat.find(
+          (item) => item.name === next.name
+        )?.id;
+
+        if (!foundItemId) {
+          return prev;
+        }
+
+        return [...prev, foundItemId];
+      }
+
+      return [...prev, next.id];
+    }, [] as number[]);
 
     try {
       loading = true;
 
       const updatedDataset = await updateDataset({
         fetch,
-        apiToken: $apiTokenStore,
+        apiToken: $apiToken,
         id: dataset.id,
-        data: { ...event.detail, tagIds, formatIds: fromatIds },
+        data: { ...event.detail, tagIds, formatIds: mergedDataFormatsIds },
       });
 
       if (Maybe.Some(updatedDataset)) {
@@ -59,7 +96,7 @@
       return;
     }
 
-    await deleteDataset({ fetch, apiToken: $apiTokenStore, id: dataset.id });
+    await deleteDataset({ fetch, apiToken: $apiToken, id: dataset.id });
     await goto(paths.home);
   };
 
@@ -71,7 +108,7 @@
   };
 </script>
 
-{#if Maybe.Some(catalog) && Maybe.Some(dataset) && Maybe.Some(tags) && Maybe.Some(licenses) && Maybe.Some(filtersInfo) && dataformats}
+{#if Maybe.Some(catalog) && Maybe.Some(dataset) && Maybe.Some(tags) && Maybe.Some(licenses) && Maybe.Some(filtersInfo) && formats}
   <header class="fr-p-4w">
     <div class="fr-col">
       <h5 class="fr-grid-row fr-text--regular">
@@ -108,7 +145,7 @@
 
   <DatasetFormLayout>
     <DatasetForm
-      formats={dataformats}
+      {formats}
       {catalog}
       {tags}
       {licenses}
@@ -118,6 +155,7 @@
       submitLabel="Enregistrer les modifications"
       loadingLabel="Modification en cours..."
       on:save={onSave}
+      on:createDataFormat={handleCreateDataFormat}
       on:touched={() => (formHasbeenTouched = true)}
     />
 
