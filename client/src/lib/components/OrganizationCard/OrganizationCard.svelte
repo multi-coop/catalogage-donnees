@@ -34,10 +34,8 @@
 
 <style>
   .card-image {
-    display: flex;
-    justify-content: center;
-    max-width: 20rem;
-    margin: 0 auto;
-    object-fit: cover;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
   }
 </style>
