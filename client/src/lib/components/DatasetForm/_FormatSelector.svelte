@@ -16,7 +16,7 @@
   export let formatOptions: DataFormat[];
   export let error: string;
 
-  let selectedFormatOptions: Partial<DataFormat>[] = [];
+  export let selectedFormatOptions: Partial<DataFormat>[] = [];
 
   const handleSelectFormat = (e: CustomEvent<SelectOption<number>>) => {
     const selectedOption = transoformSelectOptionToDataFormat(e.detail);

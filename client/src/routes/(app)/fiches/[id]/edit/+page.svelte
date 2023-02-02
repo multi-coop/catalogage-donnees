@@ -13,6 +13,7 @@
     getDataFormats,
     postDataFormat,
   } from "src/lib/repositories/dataformat";
+  import type { DataFormat } from "src/definitions/dataformat";
 
   export let data: PageData;
 
@@ -24,12 +25,16 @@
 
   let formHasbeenTouched = false;
 
+  let freshDataFormat: DataFormat[] = [];
+
   const handleCreateDataFormat = async (e: CustomEvent<string>) => {
-    await postDataFormat({
+    const dataFormat = await postDataFormat({
       fetch,
       apiToken: $apiToken,
       value: e.detail,
     });
+
+    freshDataFormat = [...freshDataFormat, dataFormat];
 
     formats = await getDataFormats({ fetch, apiToken: $apiToken });
   };
@@ -40,7 +45,25 @@
     }
 
     const tagIds = event.detail.tags.map((item) => item.id);
-    const fromatIds = event.detail.formats.map((item) => item.id);
+    const mergedDataFormatsIds = event.detail.formats.reduce((prev, next) => {
+      if (!next.name) {
+        return prev;
+      }
+
+      if (!next.id) {
+        const foundItemId = freshDataFormat.find(
+          (item) => item.name === next.name
+        )?.id;
+
+        if (!foundItemId) {
+          return prev;
+        }
+
+        return [...prev, foundItemId];
+      }
+
+      return [...prev, next.id];
+    }, [] as number[]);
 
     try {
       loading = true;
@@ -49,7 +72,7 @@
         fetch,
         apiToken: $apiToken,
         id: dataset.id,
-        data: { ...event.detail, tagIds, formatIds: fromatIds },
+        data: { ...event.detail, tagIds, formatIds: mergedDataFormatsIds },
       });
 
       if (Maybe.Some(updatedDataset)) {

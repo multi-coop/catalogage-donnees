@@ -156,16 +156,6 @@
         const url = values.url ? values.url : null;
         const license = values.license ? values.license : null;
 
-        const formats = values.formats
-          .filter((item) => {
-            if (!item.id || !item.name) {
-              return;
-            }
-
-            return item;
-          })
-          .filter((item) => item) as DataFormat[];
-
         let extraFieldValues: ExtraFieldValue[] = [];
 
         values.extraFieldValues.forEach((value, index) => {
@@ -179,7 +169,6 @@
 
         const data: DatasetFormData = {
           ...values,
-          formats,
           producerEmail,
           contactEmails,
           lastUpdatedAt,
@@ -300,6 +289,7 @@
       error={typeof $errors.formats === "string" ? $errors.formats : ""}
       on:addItem={handleAddDataFormat}
       on:change={handleDataFormatChanges}
+      bind:selectedFormatOptions={initialValues.formats}
     />
     <InputField
       name="technicalSource"

@@ -14,12 +14,15 @@
     getDataFormats,
     postDataFormat,
   } from "src/lib/repositories/dataformat";
+  import type { DataFormat } from "src/definitions/dataformat";
 
   let modalControlId = "confirm-stop-contributing-modal";
 
   let loading = false;
 
   let formHasBeenTouched = false;
+
+  let freshDataFormat: DataFormat[];
 
   export let data: PageData;
 
@@ -29,11 +32,31 @@
     try {
       loading = true;
       const tagIds = event.detail.tags.map((item) => item.id);
-      const formatIds = event.detail.formats.map((item) => item.id);
+
+      const mergedDataFormatsIds = event.detail.formats.reduce((prev, next) => {
+        if (!next.name) {
+          return prev;
+        }
+
+        if (!next.id) {
+          const foundItemId = freshDataFormat.find(
+            (item) => item.name === next.name
+          )?.id;
+
+          if (!foundItemId) {
+            return prev;
+          }
+
+          return [...prev, foundItemId];
+        }
+
+        return [...prev, next.id];
+      }, [] as number[]);
+
       const dataset = await createDataset({
         fetch,
         apiToken: $apiToken,
-        data: { ...event.detail, tagIds, formatIds },
+        data: { ...event.detail, tagIds, formatIds: mergedDataFormatsIds },
       });
 
       if (Maybe.Some(dataset)) {
@@ -52,11 +75,13 @@
     }
   };
   const handleCreateDataFormat = async (e: CustomEvent<string>) => {
-    await postDataFormat({
+    const dataformat = await postDataFormat({
       fetch,
       apiToken: $apiToken,
       value: e.detail,
     });
+
+    freshDataFormat = [...freshDataFormat, dataformat];
 
     formats = await getDataFormats({ fetch, apiToken: $apiToken });
   };
