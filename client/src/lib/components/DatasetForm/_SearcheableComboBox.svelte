@@ -16,12 +16,11 @@
   export let error = "";
   export let value = "";
 
+  let disableAddItem = true;
   let suggestionList: HTMLElement;
-
   let currentLiIndex: number = 0;
   let showSuggestions = false;
   let selectedOption: SelectOption<number>;
-
   let textBoxHasFocus = false;
 
   $: regexp = value ? new RegExp(escape(value), "i") : null;
@@ -57,6 +56,13 @@
     textBoxHasFocus = true;
     showSuggestions = true;
     value = ev.currentTarget.value;
+
+    const optionAlreadyExists =
+      options.findIndex((item) => item.label === value) !== -1;
+
+    if (!optionAlreadyExists) {
+      disableAddItem = false;
+    }
   };
 
   const handleAddItem = () => {
@@ -268,15 +274,15 @@
       aria-controls={`${name}-suggestions`}
       aria-autocomplete="list"
       aria-expanded={showSuggestions}
-      aria-describedby={error ? "geographicalCoverage-desc-error" : null}
+      aria-describedby={error ? `${name}-desc-error` : null}
       aria-activedescendant={`suggestion-item-${currentLiIndex}`}
       on:input={handleInput}
       on:focus={() => (textBoxHasFocus = true)}
     />
 
     <button
-      disabled={!value}
-      aria-disabled={!value}
+      disabled={!value || disableAddItem}
+      aria-disabled={!value || disableAddItem}
       on:click={handleAddItem}
       type="button"
       class="fr-btn fr-icon-add-line"
@@ -307,6 +313,12 @@
       </li>
     {/each}
   </ul>
+
+  {#if error}
+    <p id="{name}-desc-error" class="fr-error-text">
+      {error}
+    </p>
+  {/if}
 </div>
 
 <style>

@@ -15,6 +15,7 @@
 
   export let formatOptions: DataFormat[];
   export let error: string;
+
   let selectedFormatOptions: Partial<DataFormat>[] = [];
 
   const handleSelectFormat = (e: CustomEvent<SelectOption<number>>) => {
@@ -50,28 +51,30 @@
   };
 </script>
 
-<SearcheableComboBox
-  label={"Format(s) des données"}
-  hintText={"Sélectionnez ici les différents formats de données qu'un réutilisateur potentiel pourrait exploiter."}
-  name="dataFormats"
-  on:addItem={handleAddItem}
-  on:addItem
-  options={formatOptions.map(transformDataFormatToSelectOption)}
-  {error}
-  on:selectOption={handleSelectFormat}
-/>
+<div class="fr-my-1w">
+  <SearcheableComboBox
+    label={"Format(s) des données"}
+    hintText={"Sélectionnez ici les différents formats de données qu'un réutilisateur potentiel pourrait exploiter."}
+    name="dataFormats"
+    on:addItem={handleAddItem}
+    on:addItem
+    options={formatOptions.map(transformDataFormatToSelectOption)}
+    {error}
+    on:selectOption={handleSelectFormat}
+  />
 
-<div role="list" aria-live="polite">
-  {#each selectedFormatOptions as format, index}
-    {#if format.name}
-      <Tag
-        id={`${format.name}-option-${index}`}
-        name={format.name}
-        role="list"
-        on:click={handleRemoveDataFormat}
-      />
-    {/if}
-  {/each}
+  <div role="list" aria-live="polite">
+    {#each selectedFormatOptions as format, index}
+      {#if format.name}
+        <Tag
+          id={`${format.name}-option-${index}`}
+          name={format.name}
+          role="list"
+          on:click={handleRemoveDataFormat}
+        />
+      {/if}
+    {/each}
+  </div>
 </div>
 
 <style>
