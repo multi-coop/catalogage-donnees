@@ -3,7 +3,6 @@
 
   import books from "$lib/assets/books-circle.svg";
   import logoMC from "$lib/assets/organizations/logoMC.svg";
-  import logoAdeme from "$lib/assets/organizations/logoAdeme.svg";
   import flowChart from "$lib/assets/registration_flow_chart.svg";
   import {
     REGISTER_ORGANIZATION_LINK,
@@ -42,15 +41,6 @@
 
           <div class="button-container">
             <MonCompteProButton on:click={triggerDataPassLoginFlow} />
-            <div>
-              <a
-                target="_blank"
-                rel="noopener"
-                class="fr-btn fr-btn--secondary fr-btn--icon-right fr-icon-edit-fill"
-                href={REGISTER_ORGANIZATION_LINK}
-                >Enregistrer mon organisation</a
-              >
-            </div>
           </div>
         </div>
       </div>
@@ -63,7 +53,7 @@
     Les organisations enregistrées sur catalogue.data.gouv.fr
   </h2>
   <div class="fr-grid-row fr-grid-row--gutters">
-    <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-3">
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-4">
       <OrganizationCard
         name="Ministère de la Culture"
         src={logoMC}
@@ -71,14 +61,14 @@
       />
     </div>
 
-    <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-3">
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-4">
       <OrganizationCard
         name="Ministère de l’Europe et des Affaires Étrangères"
         src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/affaires-etrangeres/logo.svg"
         status="catalog"
       />
     </div>
-    <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-3">
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-4">
       <OrganizationCard
         name="Anah"
         src={"https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/anah/logo.svg"}
@@ -86,17 +76,32 @@
       />
     </div>
 
-    <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-3">
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-lg-4">
       <OrganizationCard
         name="DINUM"
-        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/dinum/logo.svg"
-        status="catalog"
+        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/affaires-etrangeres/logo.svg"
+        status="pending"
       />
     </div>
   </div>
+
+  <p class="fr-mt-4w">
+    Si votre organisation n’est pas enregistrée vous ne pourrez pas vous
+    connecter au catalogue. Vous pouvez cependant en faire la demande en
+    cliquant sur le lien suivant.
+  </p>
+
+  <div>
+    <a
+      target="_blank"
+      rel="noopener"
+      class="fr-btn fr-btn--secondary fr-btn--icon-right fr-icon-edit-fill"
+      href={REGISTER_ORGANIZATION_LINK}>Enregistrer mon organisation</a
+    >
+  </div>
 </section>
 
-<section class="fr-container fr-py-8w">
+<section class="fr-container fr-mb-6w">
   <div class="fr-grid-row">
     <div class="fr-col-12">
       <h2 class="fr-h3">Comment accéder aux catalogues ?</h2>
