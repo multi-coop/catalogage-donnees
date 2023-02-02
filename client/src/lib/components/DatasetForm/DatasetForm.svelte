@@ -55,7 +55,7 @@
     title: string;
     description: string;
     service: string;
-    formats: SelectOption<number>[];
+    formats: Partial<DataFormat>[];
     producerEmail: string | null;
     contactEmails: string[];
     geographicalCoverage: string;
@@ -74,9 +74,7 @@
     title: initial?.title || "",
     description: initial?.description || "",
     service: initial?.service || "",
-    formats: initial
-      ? initial.formats.map(transformDataFormatToSelectOption)
-      : [],
+    formats: initial ? initial.formats : [],
     producerEmail: initial?.producerEmail || "",
     contactEmails: initial?.contactEmails || [$account?.email || ""],
     lastUpdatedAt: initial?.lastUpdatedAt
@@ -110,8 +108,8 @@
           .array()
           .of(
             yup.object().shape({
-              label: yup.string(),
-              value: yup.number(),
+              name: yup.string(),
+              id: yup.string().nullable(),
             })
           )
           .min(1, "Veuillez séléctionner au moins 1 mot-clé"),
@@ -160,6 +158,16 @@
         const url = values.url ? values.url : null;
         const license = values.license ? values.license : null;
 
+        const formats = values.formats
+          .filter((item) => {
+            if (!item.id || !item.name) {
+              return;
+            }
+
+            return item;
+          })
+          .filter((item) => item) as DataFormat[];
+
         let extraFieldValues: ExtraFieldValue[] = [];
 
         values.extraFieldValues.forEach((value, index) => {
@@ -173,7 +181,7 @@
 
         const data: DatasetFormData = {
           ...values,
-          formats: values.formats.map(transoformSelectOptionToDataFormat),
+          formats,
           producerEmail,
           contactEmails,
           lastUpdatedAt,
@@ -199,9 +207,7 @@
     dispatch("touched", true);
   };
 
-  const handleDataFormatChanges = async (
-    event: CustomEvent<SelectOption<number>[]>
-  ) => {
+  const handleDataFormatChanges = async (event: CustomEvent<DataFormat[]>) => {
     updateValidateField("formats", event.detail);
     dispatch("touched");
   };
@@ -290,9 +296,8 @@
     <FormatSelector
       formatOptions={formats}
       error={typeof $errors.formats === "string" ? $errors.formats : ""}
-      on:input={handleDataFormatChanges}
       on:addItem
-      on:change
+      on:change={handleDataFormatChanges}
     />
     <InputField
       name="technicalSource"
