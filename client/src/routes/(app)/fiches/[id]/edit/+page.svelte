@@ -3,11 +3,7 @@
   import type { DatasetFormData } from "src/definitions/datasets";
   import DatasetForm from "$lib/components/DatasetForm/DatasetForm.svelte";
   import paths from "$lib/paths";
-  import {
-    isAdmin,
-    apiToken as apiTokenStore,
-    apiToken,
-  } from "$lib/stores/auth";
+  import { isAdmin, apiToken } from "$lib/stores/auth";
   import { deleteDataset, updateDataset } from "$lib/repositories/datasets";
   import { Maybe } from "$lib/util/maybe";
   import DatasetFormLayout from "src/lib/components/DatasetFormLayout/DatasetFormLayout.svelte";
@@ -51,7 +47,7 @@
 
       const updatedDataset = await updateDataset({
         fetch,
-        apiToken: $apiTokenStore,
+        apiToken: $apiToken,
         id: dataset.id,
         data: { ...event.detail, tagIds, formatIds: fromatIds },
       });
@@ -77,7 +73,7 @@
       return;
     }
 
-    await deleteDataset({ fetch, apiToken: $apiTokenStore, id: dataset.id });
+    await deleteDataset({ fetch, apiToken: $apiToken, id: dataset.id });
     await goto(paths.home);
   };
 

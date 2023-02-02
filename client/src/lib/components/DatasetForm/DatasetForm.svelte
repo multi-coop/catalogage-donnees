@@ -20,11 +20,7 @@
   import Select from "../Select/Select.svelte";
   import InputField from "../InputField/InputField.svelte";
   import TextareaField from "../TextareaField/TextareaField.svelte";
-  import {
-    toSelectOptions,
-    transformDataFormatToSelectOption,
-    transoformSelectOptionToDataFormat,
-  } from "src/lib/transformers/form";
+  import { toSelectOptions } from "src/lib/transformers/form";
   import { handleSelectChange } from "src/lib/util/form";
   import TagSelector from "../TagSelector/TagSelector.svelte";
   import RadioGroupField from "../RadioGroupField/RadioGroupField.svelte";
@@ -34,7 +30,6 @@
   import Alert from "../Alert/Alert.svelte";
   import type { DataFormat } from "src/definitions/dataformat";
   import FormatSelector from "./_FormatSelector.svelte";
-  import type { SelectOption } from "src/definitions/form";
 
   export let submitLabel = "Publier la fiche de données";
   export let loadingLabel = "Publication en cours...";
@@ -115,7 +110,7 @@
               id: yup.string().nullable(),
             })
           )
-          .min(1, "Veuillez séléctionner au moins 1 mot-clé"),
+          .min(1, "Veuillez séléctionner au moins 1 format de donnée"),
         producerEmail: yup
           .string()
           .email("Ce champ doit contenir une adresse e-mail valide")

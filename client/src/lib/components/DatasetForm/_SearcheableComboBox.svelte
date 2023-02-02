@@ -18,7 +18,7 @@
 
   let disableAddItem = true;
   let suggestionList: HTMLElement;
-  let currentLiIndex: number = 0;
+  let currentLiIndex = 0;
   let showSuggestions = false;
   let selectedOption: SelectOption<number>;
   let textBoxHasFocus = false;
@@ -37,11 +37,6 @@
     dispatch("selectOption", selectedOption);
   };
 
-  const handleFocusOut = (e: Event) => {
-    textBoxHasFocus = false;
-    showSuggestions = false;
-  };
-
   const handleClickOption = (optionValue: string) => {
     const foundOption = getSelectedOption(optionValue);
 
@@ -53,8 +48,21 @@
   };
 
   const handleInput = (ev: Event & { currentTarget: HTMLInputElement }) => {
+    disableAddItem = true;
     textBoxHasFocus = true;
     showSuggestions = true;
+    value = ev.currentTarget.value;
+
+    const optionAlreadyExists =
+      options.findIndex((item) => item.label === value) !== -1;
+
+    if (!optionAlreadyExists) {
+      disableAddItem = false;
+    }
+  };
+
+  const handeChange = (ev: Event & { currentTarget: HTMLInputElement }) => {
+    disableAddItem = true;
     value = ev.currentTarget.value;
 
     const optionAlreadyExists =
@@ -146,6 +154,8 @@
             currentLiIndex = options.length - 1;
           }
 
+          break;
+
         default:
           break;
       }
@@ -156,7 +166,7 @@
 
     if (!textBoxHasFocus) {
       switch (e.key) {
-        case "Enter":
+        case "Enter": {
           /**
          * 
           Sets the textbox value to the content of the focused option in the listbox.
@@ -182,6 +192,7 @@
 
           textBoxHasFocus = true;
           break;
+        }
 
         case "Escape":
           /**
@@ -239,6 +250,7 @@
            *  	Moves visual focus to the textbox and moves the editing cursor one character to the left.
            */
           textBoxHasFocus = true;
+          break;
         default:
           break;
       }
@@ -260,6 +272,7 @@
 
   <div class="input-container">
     <input
+      on:change={handeChange}
       on:keydown={manageKeyboardInterractions}
       class="fr-input"
       class:fr-input--error={error}
@@ -334,7 +347,7 @@
   }
 
   .focused {
-    background-color: var(--lt-color-background-dark);
+    background-color: var(--background-default-grey-hover);
   }
 
   input:focus-visible {

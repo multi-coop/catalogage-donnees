@@ -3,7 +3,7 @@
   import type { PageData } from "./$types";
   import type { DatasetFormData } from "src/definitions/datasets";
   import paths from "$lib/paths";
-  import { apiToken as apiTokenStore } from "$lib/stores/auth";
+  import { apiToken } from "$lib/stores/auth";
   import DatasetForm from "$lib/components/DatasetForm/DatasetForm.svelte";
   import { createDataset } from "$lib/repositories/datasets";
   import { Maybe } from "$lib/util/maybe";
@@ -32,7 +32,7 @@
       const formatIds = event.detail.formats.map((item) => item.id);
       const dataset = await createDataset({
         fetch,
-        apiToken: $apiTokenStore,
+        apiToken: $apiToken,
         data: { ...event.detail, tagIds, formatIds },
       });
 
@@ -51,10 +51,14 @@
       await goto(paths.home);
     }
   };
+  const handleCreateDataFormat = async (e: CustomEvent<string>) => {
+    await postDataFormat({
+      fetch,
+      apiToken: $apiToken,
+      value: e.detail,
+    });
 
-  const handleAddFormat = async (e: CustomEvent<string>) => {
-    await postDataFormat({ fetch, apiToken: $apiTokenStore, value: e.detail });
-    formats = await getDataFormats({ fetch, apiToken: $apiTokenStore });
+    formats = await getDataFormats({ fetch, apiToken: $apiToken });
   };
 </script>
 
@@ -106,7 +110,7 @@
       {loading}
       on:save={onSave}
       on:touched={() => (formHasBeenTouched = true)}
-      on:addItem={handleAddFormat}
+      on:createDataFormat={handleCreateDataFormat}
     />
   </DatasetFormLayout>
 {/if}
