@@ -36,6 +36,7 @@
         <div class="fr-col-sm-4 fr-col-md-3 fr-col-lg-2">
           {#if catalog.organization.logoUrl}
             <img
+              class="organization-logo"
               src={catalog.organization.logoUrl}
               alt={`logo ${catalog.organization.name}`}
             />
@@ -208,6 +209,10 @@
 </section>
 
 <style>
+  .organization-logo {
+    width: 100%;
+    height: auto;
+  }
   .header__tags {
     display: flex;
     gap: 10px;
