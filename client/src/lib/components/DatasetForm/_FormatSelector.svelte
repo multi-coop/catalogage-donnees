@@ -7,7 +7,7 @@
   } from "src/lib/transformers/form";
   import { createEventDispatcher } from "svelte";
   import Tag from "../Tag/Tag.svelte";
-  import SearcheableComboBox from "./_SearcheableComboBox.svelte";
+  import SearcheableComboBox from "../SearchableComboBox/SearcheableComboBox.svelte";
 
   const dispatch = createEventDispatcher<{
     change: Partial<DataFormat>[];

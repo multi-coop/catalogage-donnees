@@ -304,7 +304,6 @@
 
   <ul
     bind:this={suggestionList}
-    tabindex="-1"
     class:hide={!showSuggestions}
     class="fr-raw-list dropdown--list"
     id={`${name}-suggestions`}
