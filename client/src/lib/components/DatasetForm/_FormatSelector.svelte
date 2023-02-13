@@ -14,7 +14,7 @@
   }>();
 
   export let formatOptions: DataFormat[];
-  export let error: string;
+  export let error = "";
 
   export let selectedFormatOptions: Partial<DataFormat>[] = [];
 
@@ -63,13 +63,12 @@
     on:selectOption={handleSelectFormat}
   />
 
-  <div role="list" aria-live="polite">
+  <div role="list">
     {#each selectedFormatOptions as format, index}
       {#if format.name}
         <Tag
           id={`${format.name}-option-${index}`}
           name={format.name}
-          role="list"
           on:click={handleRemoveDataFormat}
         />
       {/if}

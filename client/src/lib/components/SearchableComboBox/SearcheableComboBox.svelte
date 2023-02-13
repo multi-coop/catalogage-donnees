@@ -37,16 +37,11 @@
     dispatch("selectOption", selectedOption);
   };
 
-  const handleInputFocused = () => {
-    showSuggestions = true;
-    textBoxHasFocus = true;
-  };
-
   const handleClickOption = (optionValue: string) => {
     const foundOption = getSelectedOption(optionValue);
 
     if (foundOption) {
-      value = foundOption.label;
+      value = "";
       handleSelectOption(foundOption);
     }
     showSuggestions = false;
@@ -82,6 +77,11 @@
     showSuggestions = false;
     dispatch("addItem", value);
     value = "";
+  };
+
+  const handleInputFocused = () => {
+    showSuggestions = true;
+    textBoxHasFocus = true;
   };
 
   const manageKeyboardInterractions = (e: KeyboardEvent) => {
@@ -296,6 +296,7 @@
       aria-activedescendant={`suggestion-item-${currentLiIndex}`}
       on:input={handleInput}
       on:focus={handleInputFocused}
+      on:focusout={() => (showSuggestions = false)}
     />
 
     <button
@@ -324,7 +325,7 @@
         role="option"
         aria-label={name}
         aria-selected={index === currentLiIndex}
-        on:click={() => handleClickOption(label)}
+        on:mousedown={() => handleClickOption(label)}
       >
         {label}
       </li>
