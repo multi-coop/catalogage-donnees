@@ -37,7 +37,8 @@
     info.organizationSiret
   );
   $: tagIdToName = createTagIdOrFormatIdToNameMap(info.tagId);
-  $: formatIdToName = createTagIdOrFormatIdToNameMap(info.tagId);
+  $: formatIdToName = createTagIdOrFormatIdToNameMap(info.formatId);
+
   $: filtersOptions = toFiltersOptions(info);
   $: buttonTexts = toFiltersButtonTexts(
     value,
