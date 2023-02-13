@@ -106,7 +106,7 @@ export const toFiltersButtonTexts = (
     ),
     geographicalCoverage: value.geographicalCoverage,
     service: value.service,
-    formatId: Maybe.map(value.tagId, (v) => formatIdToName[v]),
+    formatId: Maybe.map(value.formatId, (v) => formatIdToName[v]),
     technicalSource: value.technicalSource,
     tagId: Maybe.map(value.tagId, (v) => tagIdToName[v]),
     license: Maybe.map(value.license, (v) =>
