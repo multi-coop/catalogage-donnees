@@ -37,6 +37,11 @@
     dispatch("selectOption", selectedOption);
   };
 
+  const handleInputFocused = () => {
+    showSuggestions = true;
+    textBoxHasFocus = true;
+  };
+
   const handleClickOption = (optionValue: string) => {
     const foundOption = getSelectedOption(optionValue);
 
@@ -184,7 +189,7 @@
             const foundOption = getSelectedOption(selectedSuggestionItem);
 
             if (foundOption) {
-              value = foundOption.label;
+              value = "";
               showSuggestions = false;
               handleSelectOption(foundOption);
             }
@@ -290,7 +295,7 @@
       aria-describedby={error ? `${name}-desc-error` : null}
       aria-activedescendant={`suggestion-item-${currentLiIndex}`}
       on:input={handleInput}
-      on:focus={() => (textBoxHasFocus = true)}
+      on:focus={handleInputFocused}
     />
 
     <button
