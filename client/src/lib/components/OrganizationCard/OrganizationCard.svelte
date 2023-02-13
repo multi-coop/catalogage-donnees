@@ -4,7 +4,7 @@
   export let status: "catalog" | "registered" | "pending";
 </script>
 
-<div class="fr-card">
+<div class="fr-card fr-card--sm ">
   <div class="fr-card__body">
     <div class="fr-card__content">
       <h3 class="fr-card__title">
@@ -18,7 +18,7 @@
             {:else if status == "registered"}
               <p class="fr-badge fr-badge--info">Enregistré</p>
             {:else if status == "pending"}
-              <p class="fr-badge fr-badge--new">En cours</p>
+              <p class="fr-badge fr-badge--new">Organisation enregistrée</p>
             {/if}
           </li>
         </ul>
@@ -34,10 +34,8 @@
 
 <style>
   .card-image {
-    display: flex;
-    justify-content: center;
-    max-width: 20rem;
-    margin: 0 auto;
-    object-fit: cover;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
   }
 </style>
