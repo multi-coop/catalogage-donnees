@@ -22,7 +22,7 @@
 
   let formHasBeenTouched = false;
 
-  let freshDataFormat: DataFormat[];
+  let freshDataFormat: DataFormat[] = [];
 
   export let data: PageData;
 
