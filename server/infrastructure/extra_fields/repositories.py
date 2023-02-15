@@ -1,0 +1,24 @@
+from typing import List, Optional
+
+from sqlalchemy import select
+
+from server.domain.extra_fields.entities import ExtraField
+from server.domain.extra_fields.repositories import ExtraFieldRepository
+
+from ..database import Database
+from .models import ExtraFieldModel
+from .transformers import make_entity
+
+
+class SqlExtraFieldRepository(ExtraFieldRepository):
+    def __init__(self, db: Database) -> None:
+        self._db = db
+
+    async def get_all(self, ids: List[Optional[int]] = None) -> List[ExtraField]:
+        async with self._db.session() as session:
+            stmt = select(ExtraFieldModel)
+            if ids is not None:
+                stmt = stmt.where(ExtraFieldModel.id.in_(ids))
+            result = await session.execute(stmt)
+            items = result.unique().scalars()
+            return [make_entity(item) for item in items]

@@ -20,8 +20,8 @@ from server.domain.datasets.entities import PublicationRestriction, UpdateFreque
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.extra_fields.entities import ExtraFieldValue, TextExtraField
 from server.domain.organizations.types import Siret
-from server.infrastructure.catalogs.models import ExtraFieldValueModel
 from server.infrastructure.database import Database
+from server.infrastructure.extra_fields.models import ExtraFieldValueModel
 from server.seedwork.application.messages import MessageBus
 from tests.factories import CreateDatasetFactory
 

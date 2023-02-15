@@ -71,6 +71,7 @@ from server.domain.catalog_records.repositories import CatalogRecordRepository
 from server.domain.catalogs.repositories import CatalogRepository
 from server.domain.dataformats.repositories import DataFormatRepository
 from server.domain.datasets.repositories import DatasetRepository
+from server.domain.extra_fields.repositories import ExtraFieldRepository
 from server.domain.organizations.repositories import OrganizationRepository
 from server.domain.tags.repositories import TagRepository
 from server.infrastructure.adapters.messages import MessageBusAdapter
@@ -95,6 +96,7 @@ from server.infrastructure.catalogs.repositories import SqlCatalogRepository
 from server.infrastructure.database import Database
 from server.infrastructure.dataformats.repositories import SqlDataFormatRepository
 from server.infrastructure.datasets.repositories import SqlDatasetRepository
+from server.infrastructure.extra_fields.repositories import SqlExtraFieldRepository
 from server.infrastructure.organizations.repositories import SqlOrganizationRepository
 from server.infrastructure.tags.repositories import SqlTagRepository
 from server.seedwork.application.di import Container
@@ -170,6 +172,7 @@ def configure(container: "Container") -> None:
     container.register_instance(OrganizationRepository, SqlOrganizationRepository(db))
     container.register_instance(CatalogRepository, SqlCatalogRepository(db))
     container.register_instance(DataFormatRepository, SqlDataFormatRepository(db))
+    container.register_instance(ExtraFieldRepository, SqlExtraFieldRepository(db))
 
     # Caching
     container.register_instance(ExportCache, ExportCache(max_age=dt.timedelta(days=1)))
