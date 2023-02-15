@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 from sqlalchemy import select
 
@@ -14,11 +14,14 @@ class SqlExtraFieldRepository(ExtraFieldRepository):
     def __init__(self, db: Database) -> None:
         self._db = db
 
-    async def get_all(self, ids: List[Optional[int]] = None) -> List[ExtraField]:
+    async def get_all(self, organization_siret: str) -> List[ExtraField]:
         async with self._db.session() as session:
-            stmt = select(ExtraFieldModel)
-            if ids is not None:
-                stmt = stmt.where(ExtraFieldModel.id.in_(ids))
+            stmt = select(ExtraFieldModel).where(
+                ExtraFieldModel.organization_siret == organization_siret
+            )
+
             result = await session.execute(stmt)
-            items = result.unique().scalars()
+
+            items = result.unique().scalars().all()
+
             return [make_entity(item) for item in items]

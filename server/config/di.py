@@ -115,6 +115,7 @@ MODULES = [
     "server.infrastructure.organizations.module.OrganizationsModule",
     "server.infrastructure.catalogs.module.CatalogsModule",
     "server.infrastructure.auth.module.AuthModule",
+    "server.infrastructure.extra_fields.module.ExtraFieldModule",
 ]
 
 
