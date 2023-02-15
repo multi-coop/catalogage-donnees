@@ -4,8 +4,8 @@ from typing import List, Optional
 
 from pydantic import Field
 
-from server.domain.catalogs.entities import ExtraFieldValue
 from server.domain.dataformats.entities import DataFormat
+from server.domain.extra_fields.entities import ExtraFieldValue
 from server.domain.tags.entities import Tag
 from server.seedwork.domain.entities import Entity
 

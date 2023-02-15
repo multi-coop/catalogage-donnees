@@ -4,9 +4,9 @@ from typing import List, Optional, Union
 from pydantic import EmailStr, Field
 
 from server.domain.auth.entities import Account
-from server.domain.catalogs.entities import ExtraFieldValue
 from server.domain.common.types import ID, Skip
 from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
+from server.domain.extra_fields.entities import ExtraFieldValue
 from server.domain.organizations.types import Siret
 from server.seedwork.application.commands import Command
 

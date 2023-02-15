@@ -1,10 +1,10 @@
-from server.domain.catalogs.entities import (
-    Catalog,
+from server.domain.catalogs.entities import Catalog
+from server.domain.common.types import ID
+from server.domain.extra_fields.entities import (
     ExtraField,
     ExtraFieldValue,
     parse_extra_field,
 )
-from server.domain.common.types import ID
 
 from ..organizations.transformers import make_entity as make_organization_entity
 from .models import CatalogModel, ExtraFieldModel, ExtraFieldValueModel

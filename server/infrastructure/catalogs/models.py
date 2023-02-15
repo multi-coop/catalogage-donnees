@@ -5,8 +5,8 @@ from sqlalchemy import CHAR, Column, DateTime, Enum, ForeignKey, Index, String, 
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import relationship
 
-from server.domain.catalogs.entities import ExtraFieldType
 from server.domain.common.types import ID
+from server.domain.extra_fields.entities import ExtraFieldType
 from server.domain.organizations.types import Siret
 
 from ..database import Base
