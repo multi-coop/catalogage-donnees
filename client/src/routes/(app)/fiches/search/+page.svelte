@@ -26,7 +26,7 @@
   onMount(() => {
     const searchParams = $pageStore.url.searchParams;
     const filtersParams = toFiltersValue(searchParams);
-    for (let property in filtersParams) {
+    displayFilters = Object.values(filtersParams).some(val => val === true);
       if (filtersParams[property] !== null) {
         displayFilters = true;
       }
