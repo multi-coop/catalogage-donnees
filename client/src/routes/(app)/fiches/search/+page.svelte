@@ -26,11 +26,7 @@
   onMount(() => {
     const searchParams = $pageStore.url.searchParams;
     const filtersParams = toFiltersValue(searchParams);
-    displayFilters = Object.values(filtersParams).some(val => val === true);
-      if (filtersParams[property] !== null) {
-        displayFilters = true;
-      }
-    }
+    displayFilters = Object.values(filtersParams).some((val) => val != null);
   });
 
   const updateSearch = async (event: CustomEvent<string>) => {
