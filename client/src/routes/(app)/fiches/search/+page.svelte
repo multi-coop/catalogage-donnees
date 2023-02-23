@@ -8,16 +8,30 @@
   import { pluralize } from "src/lib/util/format";
   import FilterPanel from "./_FilterPanel.svelte";
   import PaginationContainer from "$lib/components/PaginationContainer/PaginationContainer.svelte";
-  import { toFiltersParams } from "src/lib/transformers/datasetFilters";
+  import {
+    toFiltersParams,
+    toFiltersValue,
+  } from "src/lib/transformers/datasetFilters";
   import { makePageParam } from "$lib/util/pagination";
   import { page as pageStore } from "$app/stores";
   import type { PageData } from "./$types";
+  import { onMount } from "svelte";
 
   export let data: PageData;
 
   $: ({ paginatedDatasets, q, currentPage, filtersInfo, filtersValue } = data);
 
   let displayFilters = false;
+
+  onMount(() => {
+    const searchParams = $pageStore.url.searchParams;
+    const filtersParams = toFiltersValue(searchParams);
+    for (let property in filtersParams) {
+      if (filtersParams[property] !== null) {
+        displayFilters = true;
+      }
+    }
+  });
 
   const updateSearch = async (event: CustomEvent<string>) => {
     const href = patchQueryString($pageStore.url.searchParams, [
