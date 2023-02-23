@@ -7,14 +7,14 @@
   } from "src/lib/transformers/form";
   import { createEventDispatcher } from "svelte";
   import Tag from "../Tag/Tag.svelte";
-  import SearcheableComboBox from "../SearchableComboBox/SearcheableComboBox.svelte";
+  import SearcheableComboBoxWithAddItemButton from "../SearchableComboBox/WithAddItemButton.svelte";
 
   const dispatch = createEventDispatcher<{
     change: Partial<DataFormat>[];
   }>();
 
   export let formatOptions: DataFormat[];
-  export let error = "";
+  export let error: string;
 
   export let selectedFormatOptions: Partial<DataFormat>[] = [];
 
@@ -52,7 +52,7 @@
 </script>
 
 <div class="fr-my-1w">
-  <SearcheableComboBox
+  <SearcheableComboBoxWithAddItemButton
     label={"Format(s) des données"}
     hintText={"Sélectionnez ici les différents formats de données qu'un réutilisateur potentiel pourrait exploiter."}
     name="dataFormats"
@@ -63,12 +63,13 @@
     on:selectOption={handleSelectFormat}
   />
 
-  <div role="list">
+  <div role="list" aria-live="polite">
     {#each selectedFormatOptions as format, index}
       {#if format.name}
         <Tag
           id={`${format.name}-option-${index}`}
           name={format.name}
+          role="listitem"
           on:click={handleRemoveDataFormat}
         />
       {/if}

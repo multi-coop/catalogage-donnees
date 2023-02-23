@@ -3,47 +3,41 @@
  */
 import "@testing-library/jest-dom";
 import { fireEvent, render } from "@testing-library/svelte";
-import type { SelectOption } from "src/definitions/form";
-import SearcheableComboBox from "./SearcheableComboBox.svelte";
+import type { DataFormat } from "src/definitions/dataformat";
+import FormatSelector from "./FormatSelector.svelte";
 
-const options: SelectOption<number>[] = [
+const formatOptions: DataFormat[] = [
   {
-    label: "label-1",
-    value: 1,
+    name: "label-1",
+    id: 1,
   },
   {
-    label: "label-2",
-    value: 2,
+    name: "label-2",
+    id: 2,
   },
   {
-    label: "label-3",
-    value: 3,
+    name: "label-3",
+    id: 3,
   },
 ];
 
-describe("Test the select component", () => {
+describe("Test the Format Selector component", () => {
   test("should display a select input with 3 options", () => {
     const props = {
-      options,
-      label: "My Nice Select",
-      name: "mySelect",
-      hintText: "my nice hint text",
+      formatOptions,
     };
 
-    const { getAllByRole } = render(SearcheableComboBox, { props });
+    const { getAllByRole } = render(FormatSelector, { props });
 
     expect(getAllByRole("listbox").length).toBe(1);
   });
 
   test("should display a select input with 3 options after start to type", async () => {
     const props = {
-      options,
-      label: "My Nice Select",
-      name: "mySelect",
-      hintText: "my nice hint text",
+      formatOptions,
     };
 
-    const { getByRole, getAllByRole } = render(SearcheableComboBox, { props });
+    const { getByRole, getAllByRole } = render(FormatSelector, { props });
 
     const combobox = getByRole("combobox");
 
@@ -57,13 +51,10 @@ describe("Test the select component", () => {
 
   test("should display a select input with 3 options after  hitting  alt + down arrow", async () => {
     const props = {
-      options,
-      label: "My Nice Select",
-      name: "mySelect",
-      hintText: "my nice hint text",
+      formatOptions,
     };
 
-    const { getByRole, getAllByRole } = render(SearcheableComboBox, { props });
+    const { getByRole, getAllByRole } = render(FormatSelector, { props });
 
     const combobox = getByRole("combobox");
 
@@ -76,13 +67,10 @@ describe("Test the select component", () => {
 
   test("should display a select input with 3 options after  start typing and hitting down arrow key", async () => {
     const props = {
-      options,
-      label: "My Nice Select",
-      name: "mySelect",
-      hintText: "my nice hint text",
+      formatOptions,
     };
 
-    const { getByRole, getAllByRole } = render(SearcheableComboBox, { props });
+    const { getByRole, getAllByRole } = render(FormatSelector, { props });
 
     const combobox = getByRole("combobox");
 
@@ -100,13 +88,10 @@ describe("Test the select component", () => {
 
   test("should display a select input with 3 options after  start typing and hitting down arrow key", async () => {
     const props = {
-      options,
-      label: "My Nice Select",
-      name: "mySelect",
-      hintText: "my nice hint text",
+      formatOptions,
     };
 
-    const { getByRole, queryByRole } = render(SearcheableComboBox, { props });
+    const { getByRole, queryByRole } = render(FormatSelector, { props });
 
     const combobox = getByRole("combobox");
 
@@ -128,13 +113,10 @@ describe("Test the select component", () => {
 
   test("should select an option after hitting Enter", async () => {
     const props = {
-      options,
-      label: "My Nice Select",
-      name: "mySelect",
-      hintText: "my nice hint text",
+      formatOptions,
     };
 
-    const { getByRole } = render(SearcheableComboBox, { props });
+    const { getByRole, getAllByRole } = render(FormatSelector, { props });
 
     const combobox = getByRole("combobox");
 
@@ -151,19 +133,26 @@ describe("Test the select component", () => {
     await fireEvent.keyDown(combobox, {
       key: "Enter",
     });
+
+    const tags = getAllByRole("listitem");
+
+    expect(tags).toHaveLength(1);
+
+    expect(tags[0]).toHaveTextContent("label-1", {
+      normalizeWhitespace: true,
+    });
+
+    expect(combobox).toHaveValue("");
 
     expect(combobox).toHaveValue("");
   });
 
   test("should select the second option after hitting down arrow twice and Enter", async () => {
     const props = {
-      options,
-      label: "My Nice Select",
-      name: "mySelect",
-      hintText: "my nice hint text",
+      formatOptions,
     };
 
-    const { getByRole } = render(SearcheableComboBox, { props });
+    const { getByRole, getAllByRole } = render(FormatSelector, { props });
 
     const combobox = getByRole("combobox");
 
@@ -183,6 +172,13 @@ describe("Test the select component", () => {
 
     await fireEvent.keyDown(combobox, {
       key: "Enter",
+    });
+    const tags = getAllByRole("listitem");
+
+    expect(tags).toHaveLength(1);
+
+    expect(tags[0]).toHaveTextContent("label-2", {
+      normalizeWhitespace: true,
     });
 
     expect(combobox).toHaveValue("");
@@ -190,19 +186,16 @@ describe("Test the select component", () => {
 
   test("should select the second option after hitting down arrow 3 times and Enter", async () => {
     const props = {
-      options,
-      label: "My Nice Select",
-      name: "mySelect",
-      hintText: "my nice hint text",
+      formatOptions,
     };
 
-    const { getByRole } = render(SearcheableComboBox, { props });
+    const { getByRole, getAllByRole } = render(FormatSelector, { props });
 
     const combobox = getByRole("combobox");
 
     await fireEvent.input(combobox, {
       target: {
-        value: "lab",
+        value: "label-2",
       },
     });
 
@@ -224,6 +217,14 @@ describe("Test the select component", () => {
 
     await fireEvent.keyDown(combobox, {
       key: "Enter",
+    });
+
+    const tags = getAllByRole("listitem");
+
+    expect(tags).toHaveLength(1);
+
+    expect(tags[0]).toHaveTextContent("label-2", {
+      normalizeWhitespace: true,
     });
 
     expect(combobox).toHaveValue("");

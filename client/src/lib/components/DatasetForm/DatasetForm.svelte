@@ -29,7 +29,7 @@
   import ExtraField from "./_ExtraField.svelte";
   import Alert from "../Alert/Alert.svelte";
   import type { DataFormat } from "src/definitions/dataformat";
-  import FormatSelector from "./_FormatSelector.svelte";
+  import FormatSelector from "../FormatSelector/FormatSelector.svelte";
 
   export let submitLabel = "Publier la fiche de données";
   export let loadingLabel = "Publication en cours...";
