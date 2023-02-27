@@ -19,15 +19,21 @@
   let disableAddItem = true;
   let suggestionList: HTMLElement;
   let currentLiIndex = 0;
-  let showSuggestions = false;
+
   let selectedOption: SelectOption<number>;
   let textBoxHasFocus = false;
+  let listBoxHasFocus = false;
+  let showSuggestions = false;
 
   $: regexp = value ? new RegExp(escape(value), "i") : null;
 
   $: filteredSuggestions = showSuggestions
     ? options.filter((item) => (regexp ? item.label.match(regexp) : true))
     : [];
+
+  $: if (options.length === 0) {
+    showSuggestions = false;
+  }
 
   const getSelectedOption = (value: string): SelectOption<number> | undefined =>
     filteredSuggestions.find((item) => item.label === value.trim());
@@ -41,7 +47,7 @@
     const foundOption = getSelectedOption(optionValue);
 
     if (foundOption) {
-      value = foundOption.label;
+      value = "";
       handleSelectOption(foundOption);
     }
     showSuggestions = false;
@@ -77,6 +83,11 @@
     showSuggestions = false;
     dispatch("addItem", value);
     value = "";
+  };
+
+  const handleInputFocused = () => {
+    showSuggestions = true;
+    textBoxHasFocus = true;
   };
 
   const manageKeyboardInterractions = (e: KeyboardEvent) => {
@@ -124,7 +135,7 @@
         case "ArrowDown":
           // If the textbox is not empty and the listbox is displayed, moves visual focus to the first suggested value.
           textBoxHasFocus = false;
-
+          listBoxHasFocus = true;
           if (value && showSuggestions) {
             currentLiIndex = 0;
           }
@@ -139,7 +150,6 @@
           break;
 
         case "ArrowUp":
-          // console.log("tata");
           // if the textbox is not empty and the listbox is displayed, moves visual focus to the last suggested value.
 
           if (!value && showSuggestions) {
@@ -151,6 +161,7 @@
           if (!value && !showSuggestions) {
             textBoxHasFocus = false;
             showSuggestions = true;
+            listBoxHasFocus = true;
             currentLiIndex = options.length - 1;
           }
 
@@ -184,7 +195,7 @@
             const foundOption = getSelectedOption(selectedSuggestionItem);
 
             if (foundOption) {
-              value = foundOption.label;
+              value = "";
               showSuggestions = false;
               handleSelectOption(foundOption);
             }
@@ -204,6 +215,7 @@
         */
 
           showSuggestions = false;
+          listBoxHasFocus = false;
           textBoxHasFocus = true;
           break;
 
@@ -216,6 +228,7 @@
           */
 
         case "ArrowDown":
+          listBoxHasFocus = true;
           currentLiIndex += 1;
 
           if (currentLiIndex === suggestionItems.length) {
@@ -224,6 +237,7 @@
           break;
 
         case "ArrowUp":
+          listBoxHasFocus = true;
           /**
            * 
               Moves visual focus to the previous option.
@@ -243,12 +257,14 @@
             Moves visual focus to the textbox and moves the editing cursor one character to the right.
 
           */
+          listBoxHasFocus = false;
           textBoxHasFocus = true;
           break;
         case "ArrowLeft":
           /**
            *  	Moves visual focus to the textbox and moves the editing cursor one character to the left.
            */
+          listBoxHasFocus = false;
           textBoxHasFocus = true;
           break;
         default:
@@ -290,7 +306,11 @@
       aria-describedby={error ? `${name}-desc-error` : null}
       aria-activedescendant={`suggestion-item-${currentLiIndex}`}
       on:input={handleInput}
-      on:focus={() => (textBoxHasFocus = true)}
+      on:focus={handleInputFocused}
+      on:focusout={() => {
+        textBoxHasFocus = false;
+        showSuggestions = false;
+      }}
     />
 
     <button
@@ -304,12 +324,13 @@
 
   <ul
     bind:this={suggestionList}
+    tabindex="-1"
     class:hide={!showSuggestions}
     class="fr-raw-list dropdown--list"
     id={`${name}-suggestions`}
     role="listbox"
     aria-label="Formats de données"
-    class:suggestionlist--focused={!textBoxHasFocus}
+    class:suggestionlist--focused={listBoxHasFocus}
   >
     {#each filteredSuggestions as { label }, index}
       <li
@@ -319,7 +340,7 @@
         role="option"
         aria-label={name}
         aria-selected={index === currentLiIndex}
-        on:click={() => handleClickOption(label)}
+        on:mousedown={() => handleClickOption(label)}
       >
         {label}
       </li>
