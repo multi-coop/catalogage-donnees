@@ -298,7 +298,7 @@
         role="option"
         aria-label={name}
         aria-selected={index === currentLiIndex}
-        on:click={() => handleClickOption(label)}
+        on:mousedown={() => handleClickOption(label)}
       >
         {label}
       </li>
