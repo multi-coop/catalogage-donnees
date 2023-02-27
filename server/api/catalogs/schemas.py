@@ -3,8 +3,8 @@ from typing import List
 from pydantic import BaseModel, Field
 
 from server.application.catalogs.validation import CreateCatalogValidationMixin
-from server.domain.catalogs.entities import ExtraFieldType
 from server.domain.common.types import ID
+from server.domain.extra_fields.entities import ExtraFieldType
 from server.domain.organizations.types import Siret
 
 

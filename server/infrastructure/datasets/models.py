@@ -6,6 +6,7 @@ from sqlalchemy.dialects.postgresql import ARRAY, TSVECTOR, UUID
 from sqlalchemy.orm import Mapped, relationship
 
 from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
+from server.infrastructure.extra_fields.models import ExtraFieldValueModel
 
 from ..database import Base
 from ..dataformats.models import DataFormatModel, dataset_dataformat
@@ -13,7 +14,6 @@ from ..tags.models import TagModel, dataset_tag
 
 if TYPE_CHECKING:  # pragma: no cover
     from ..catalog_records.models import CatalogRecordModel
-    from ..catalogs.models import ExtraFieldValueModel
 
 
 class DatasetModel(Base):

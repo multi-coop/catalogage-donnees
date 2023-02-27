@@ -10,13 +10,13 @@ from server.application.catalogs.queries import GetCatalogBySiret
 from server.application.datasets.queries import GetDatasetByID
 from server.application.organizations.views import OrganizationView
 from server.config.di import resolve
-from server.domain.catalogs.entities import (
+from server.domain.common.types import Skip, id_factory
+from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
+from server.domain.extra_fields.entities import (
     ExtraFieldType,
     ExtraFieldValue,
     TextExtraField,
 )
-from server.domain.common.types import Skip, id_factory
-from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
 from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 

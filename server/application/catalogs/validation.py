@@ -2,7 +2,7 @@ from typing import Any, List
 
 from pydantic import BaseModel, ValidationError, root_validator, validator
 
-from server.domain.catalogs.entities import (
+from server.domain.extra_fields.entities import (
     ExtraField,
     ExtraFieldType,
     parse_extra_fields,

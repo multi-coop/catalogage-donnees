@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 from server.domain.auth.entities import Account
 from server.domain.common.pagination import Page, Pagination
@@ -21,4 +21,4 @@ class GetDatasetByID(Query[DatasetView]):
 
 
 class GetDatasetFilters(Query[DatasetFiltersView]):
-    pass
+    organization_id: Optional[str]

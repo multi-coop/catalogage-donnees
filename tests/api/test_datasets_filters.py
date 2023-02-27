@@ -7,9 +7,17 @@ import pytest
 from server.application.catalogs.commands import CreateCatalog
 from server.application.organizations.views import OrganizationView
 from server.config.di import resolve
-from server.domain.common.types import ID
+from server.domain.common.types import ID, id_factory
 from server.domain.dataformats.entities import DataFormat
 from server.domain.dataformats.repositories import DataFormatRepository
+from server.domain.extra_fields.entities import (
+    BoolExtraField,
+    EnumExtraField,
+    ExtraFieldType,
+    _BoolExtraFieldData,
+    _EnumExtraFieldData,
+    parse_extra_fields,
+)
 from server.domain.organizations.types import Siret
 from server.seedwork.application.messages import MessageBus
 
@@ -95,6 +103,7 @@ async def test_dataset_filters_info(
         "technical_source",
         "tag_id",
         "license",
+        "extra_fields",
     }
 
     assert data["organization_siret"] == [
@@ -157,27 +166,27 @@ class _Env:
 @pytest.mark.parametrize(
     "filtername, create_kwargs, negative_value, positive_value",
     [
-        # pytest.param(
-        #     "organization_siret",
-        #     lambda env: {"organization_siret": env.siret_match},
-        #     lambda env: [str(env.siret_any)],
-        #     lambda env: [str(env.siret_match)],
-        #     id="organization_siret",
-        # ),
-        # pytest.param(
-        #     "geographical_coverage",
-        #     lambda _: {"geographical_coverage": "France métropolitaine"},
-        #     lambda _: ["Hauts-de-France"],
-        #     lambda _: ["France métropolitaine"],
-        #     id="geographical_coverage",
-        # ),
-        # pytest.param(
-        #     "service",
-        #     lambda _: {"service": "Service cartes"},
-        #     lambda _: ["Autre direction"],
-        #     lambda _: ["Service cartes"],
-        #     id="service",
-        # ),
+        pytest.param(
+            "organization_siret",
+            lambda env: {"organization_siret": env.siret_match},
+            lambda env: [str(env.siret_any)],
+            lambda env: [str(env.siret_match)],
+            id="organization_siret",
+        ),
+        pytest.param(
+            "geographical_coverage",
+            lambda _: {"geographical_coverage": "France métropolitaine"},
+            lambda _: ["Hauts-de-France"],
+            lambda _: ["France métropolitaine"],
+            id="geographical_coverage",
+        ),
+        pytest.param(
+            "service",
+            lambda _: {"service": "Service cartes"},
+            lambda _: ["Autre direction"],
+            lambda _: ["Service cartes"],
+            id="service",
+        ),
         pytest.param(
             "format_id",
             lambda env: {"format_ids": [env.format_id]},
@@ -185,27 +194,27 @@ class _Env:
             lambda env: [str(env.format_id)],
             id="format_id",
         ),
-        # pytest.param(
-        #     "technical_source",
-        #     lambda _: {"technical_source": "SGBD central"},
-        #     lambda _: ["Autre système"],
-        #     lambda _: ["SGBD central"],
-        #     id="technical_source",
-        # ),
-        # pytest.param(
-        #     "tag_id",
-        #     lambda env: {"tag_ids": [env.tag_id]},
-        #     lambda _: [str(id_factory())],
-        #     lambda env: [str(env.tag_id)],
-        #     id="tag_id",
-        # ),
-        # pytest.param(
-        #     "license",
-        #     lambda _: {"license": "Licence Ouverte"},
-        #     lambda _: ["ODC Open License v1.0"],
-        #     lambda _: "Licence Ouverte",
-        #     id="license",
-        # ),
+        pytest.param(
+            "technical_source",
+            lambda _: {"technical_source": "SGBD central"},
+            lambda _: ["Autre système"],
+            lambda _: ["SGBD central"],
+            id="technical_source",
+        ),
+        pytest.param(
+            "tag_id",
+            lambda env: {"tag_ids": [env.tag_id]},
+            lambda _: [str(id_factory())],
+            lambda env: [str(env.tag_id)],
+            id="tag_id",
+        ),
+        pytest.param(
+            "license",
+            lambda _: {"license": "Licence Ouverte"},
+            lambda _: ["ODC Open License v1.0"],
+            lambda _: "Licence Ouverte",
+            id="license",
+        ),
     ],
 )
 async def test_dataset_filters_apply(
@@ -286,7 +295,86 @@ async def test_dataset_filters_license_any(
     assert response.status_code == 200
     data = response.json()
     assert len(data["items"]) == 2
+
     assert [item["id"] for item in data["items"]] == [
         str(dataset2_id),
         str(dataset1_id),
     ]
+
+
+@pytest.mark.asyncio
+async def test_dataset_filters_with_extra_fields(
+    client: httpx.AsyncClient,
+    temp_user: TestPasswordUser,
+) -> None:
+    bus = resolve(MessageBus)
+
+    siret_match = await bus.execute(CreateOrganizationFactory.build())
+
+    text_extra_field_title = "mon champs complémentaire"
+    text_extra_field_name = "mon champs complémentaire"
+    text_extra_field_hint_text = "Veuillez remplir ce champs"
+
+    bool_extra_field = BoolExtraField(
+        organization_siret=siret_match,
+        title=text_extra_field_title,
+        name=text_extra_field_name,
+        hint_text=text_extra_field_hint_text,
+        data=_BoolExtraFieldData(true_value="oui", false_value="non"),
+    )
+
+    enum_extra_field_title = "mon champs complémentaire"
+    enum_extra_field_name = "mon champs complémentaire enum"
+    enum_extra_field_hint_text = "Veuillez remplir ce champs"
+
+    enum_extra_field = EnumExtraField(
+        organization_siret=siret_match,
+        title=enum_extra_field_title,
+        name=enum_extra_field_name,
+        hint_text=enum_extra_field_hint_text,
+        data=_EnumExtraFieldData(values=["value_1", "value_2"]),
+    )
+
+    extra_fields = [bool_extra_field, enum_extra_field]
+
+    await bus.execute(
+        CreateCatalog(
+            organization_siret=siret_match,
+            extra_fields=parse_extra_fields(extra_fields),
+        )
+    )
+
+    kwargs: dict = {"organization_siret": siret_match}
+
+    await create_test_password_user(
+        CreatePasswordUserFactory.build(organization_siret=kwargs["organization_siret"])
+    )
+
+    params = {"organization_id": siret_match}
+
+    response = await client.get(
+        "/datasets/filters/", params=params, auth=temp_user.auth
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    response_extra_fields = data["extra_fields"]
+
+    assert len(response_extra_fields) == 2
+
+    response_boolean_extra_field = response_extra_fields[0]
+
+    assert response_boolean_extra_field["organization_siret"] == siret_match
+    assert response_boolean_extra_field["type"] == ExtraFieldType.BOOL.value
+    assert response_boolean_extra_field["title"] == text_extra_field_title
+    assert response_boolean_extra_field["data"] == {
+        "false_value": "non",
+        "true_value": "oui",
+    }
+
+    response_enum_extra_field = response_extra_fields[1]
+
+    assert response_enum_extra_field["type"] == ExtraFieldType.ENUM.value
+    assert response_enum_extra_field["data"] == enum_extra_field.data

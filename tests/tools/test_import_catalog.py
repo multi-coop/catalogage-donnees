@@ -6,7 +6,7 @@ import yaml
 
 from server.application.catalogs.commands import CreateCatalog
 from server.config.di import resolve
-from server.domain.catalogs.entities import BoolExtraField
+from server.domain.extra_fields.entities import BoolExtraField
 from server.seedwork.application.messages import MessageBus
 from tools import import_catalog
 
