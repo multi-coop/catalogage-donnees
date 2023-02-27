@@ -13,6 +13,7 @@ export const toFiltersInfo = (data: any): DatasetFiltersInfo => {
     technical_source,
     tag_id,
     format_id,
+    extra_fields,
     ...rest
   } = data;
   return {
@@ -21,6 +22,7 @@ export const toFiltersInfo = (data: any): DatasetFiltersInfo => {
     technicalSource: technical_source,
     tagId: tag_id,
     formatId: format_id,
+    extraFields: extra_fields,
     ...rest,
   };
 };

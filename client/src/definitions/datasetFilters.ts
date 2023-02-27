@@ -11,6 +11,7 @@ export type DatasetFiltersInfo = {
   technicalSource: string[];
   tagId: Tag[];
   license: string[];
+  extraFields: ExtraField[];
 };
 
 export type DatasetFiltersValue = {

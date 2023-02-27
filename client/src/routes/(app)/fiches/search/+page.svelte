@@ -43,6 +43,7 @@
       ...toFiltersParams(e.detail),
       makePageParam(1),
     ]);
+
     goto(href, { noscroll: true });
   };
 </script>
