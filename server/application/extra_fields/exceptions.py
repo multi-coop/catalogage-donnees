@@ -1,0 +1,2 @@
+class CanNotGetExtraFields(Exception):
+    pass

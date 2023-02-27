@@ -4,11 +4,11 @@ from server.domain.datasets.entities import Dataset
 
 from ..catalog_records.models import CatalogRecordModel
 from ..catalog_records.transformers import make_entity as make_catalog_record_entity
-from ..catalogs.transformers import (
+from ..dataformats.transformers import make_entity as make_data_format_entity
+from ..extra_fields.transformers import (
     make_extra_field_value_entity,
     make_extra_field_value_instance,
 )
-from ..dataformats.transformers import make_entity as make_data_format_entity
 from ..tags.models import TagModel
 from ..tags.transformers import make_entity as make_tag_entity
 from .models import DataFormatModel, DatasetModel

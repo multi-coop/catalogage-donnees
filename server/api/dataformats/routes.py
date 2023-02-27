@@ -38,7 +38,6 @@ async def list_dataformat() -> List[DataFormatView]:
 )
 async def create_dataformat(data: DataFormatCreate) -> DataFormatView:
     bus = resolve(MessageBus)
-    print(data)
 
     command = CreateDataFormat(value=data.value)
 

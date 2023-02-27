@@ -1,4 +1,6 @@
 from server.application.catalogs.queries import GetAllCatalogs
+from server.application.dataformats.queries import GetAllDataFormat
+from server.application.extra_fields.queries import GetAllExtraFields
 from server.application.licenses.queries import GetLicenseSet
 from server.application.tags.queries import GetAllTags
 from server.config.di import resolve
@@ -127,15 +129,21 @@ async def delete_dataset(command: DeleteDataset) -> None:
 async def get_dataset_filters(query: GetDatasetFilters) -> DatasetFiltersView:
     bus = resolve(MessageBus)
     repository = resolve(DatasetRepository)
-    data_format_repository = resolve(DataFormatRepository)
+
+    extra_fields = []
 
     catalogs = await bus.execute(GetAllCatalogs())
     geographical_coverages = await repository.get_geographical_coverage_set()
     services = await repository.get_service_set()
     technical_sources = await repository.get_technical_source_set()
     tags = await bus.execute(GetAllTags())
-    formats = await data_format_repository.get_all()
+    formats = await bus.execute(GetAllDataFormat())
     licenses = await bus.execute(GetLicenseSet())
+
+    if query.organization_id:
+        extra_fields = await bus.execute(
+            GetAllExtraFields(organization_id=query.organization_id)
+        )
 
     return DatasetFiltersView(
         organization_siret=[
@@ -149,6 +157,7 @@ async def get_dataset_filters(query: GetDatasetFilters) -> DatasetFiltersView:
         technical_source=list(technical_sources),
         tag_id=tags,
         license=["*", *licenses],
+        extra_fields=extra_fields,
     )
 
 

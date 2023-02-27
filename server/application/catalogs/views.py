@@ -6,9 +6,9 @@ from pydantic import BaseModel
 from server.application.dataformats.views import DataFormatView
 from server.application.datasets.views import ExtraFieldValueView
 from server.application.tags.views import TagView
-from server.domain.catalogs.entities import ExtraFieldType
 from server.domain.common.types import ID
 from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
+from server.domain.extra_fields.entities import ExtraFieldType
 
 from ..organizations.views import OrganizationView
 

@@ -13,15 +13,15 @@ from server.application.organizations.views import OrganizationView
 from server.application.tags.commands import CreateTag
 from server.application.tags.queries import GetTagByID
 from server.config.di import resolve
-from server.domain.catalogs.entities import ExtraFieldValue, TextExtraField
 from server.domain.common.types import ID, Skip, id_factory
 from server.domain.dataformats.entities import DataFormat
 from server.domain.dataformats.repositories import DataFormatRepository
 from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
 from server.domain.datasets.exceptions import DatasetDoesNotExist
+from server.domain.extra_fields.entities import ExtraFieldValue, TextExtraField
 from server.domain.organizations.types import Siret
-from server.infrastructure.catalogs.models import ExtraFieldValueModel
 from server.infrastructure.database import Database
+from server.infrastructure.extra_fields.models import ExtraFieldValueModel
 from server.seedwork.application.messages import MessageBus
 from tests.factories import CreateDatasetFactory
 
