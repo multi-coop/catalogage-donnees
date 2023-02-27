@@ -3,11 +3,13 @@ import type {
   DatasetFiltersOptions,
   DatasetFiltersValue,
 } from "src/definitions/datasetFilters";
+import type { BoolExtraField } from "src/definitions/extraField";
 import { toQueryString } from "../util/urls";
 import {
   toFiltersOptions,
   toFiltersParams,
   toFiltersValue,
+  transformRawExtraFieldToBoolExtraField,
 } from "./datasetFilters";
 
 describe("transformers -- Dataset filters", () => {
@@ -36,6 +38,7 @@ describe("transformers -- Dataset filters", () => {
       },
     ],
     license: ["*", "Licence Ouverte"],
+    extraFields: [],
   };
 
   const value: DatasetFiltersValue = {
@@ -46,6 +49,7 @@ describe("transformers -- Dataset filters", () => {
     technicalSource: "Serveur GIS",
     tagId: null,
     license: "Licence Ouverte",
+    extraFieldValue: null,
   };
 
   test("toFiltersParams", () => {
@@ -97,5 +101,35 @@ describe("transformers -- Dataset filters", () => {
     };
 
     expect(toFiltersOptions(info)).toEqual(options);
+  });
+
+  test("transformExtraFieldData", () => {
+    const rawExtraField = {
+      type: "BOOL",
+      id: "myid",
+      hintText: "my hint text",
+      name: "myName",
+      title: "myTitle",
+      data: {
+        true_value: "Oui",
+        false_value: "Non",
+      },
+    };
+
+    const expectedResult: BoolExtraField = {
+      type: "BOOL",
+      id: "myid",
+      hintText: "my hint text",
+      name: "myName",
+      title: "myTitle",
+      data: {
+        trueValue: "Oui",
+        falseValue: "Non",
+      },
+    };
+
+    expect(transformRawExtraFieldToBoolExtraField(rawExtraField)).toEqual(
+      expectedResult
+    );
   });
 });

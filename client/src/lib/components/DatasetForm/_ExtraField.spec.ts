@@ -4,7 +4,8 @@
 import "@testing-library/jest-dom";
 
 import { render } from "@testing-library/svelte";
-import type { ExtraField } from "src/definitions/catalogs";
+import type { ExtraField } from "src/definitions/extraField";
+
 import ExtraFieldComponent from "./_ExtraField.svelte";
 
 describe("Extra field", () => {

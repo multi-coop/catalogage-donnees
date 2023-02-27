@@ -3,8 +3,35 @@ import type {
   DatasetFiltersOptions,
   DatasetFiltersValue,
 } from "src/definitions/datasetFilters";
+import type { BoolExtraField, ExtraField } from "src/definitions/extraField";
 import type { QueryParamRecord } from "src/definitions/url";
 import { Maybe } from "../util/maybe";
+
+export const transformRawExtraFieldToBoolExtraField = (
+  rawExtraField: any
+): BoolExtraField => {
+  return {
+    hintText: rawExtraField.hintText,
+    name: rawExtraField.name,
+    title: rawExtraField.title,
+    type: rawExtraField.type,
+    id: rawExtraField.id,
+    data: {
+      trueValue: rawExtraField.data.true_value,
+      falseValue: rawExtraField.data.false_value,
+    },
+  };
+};
+
+export const tranformRawExtraField = (rawExtraField: any): ExtraField => {
+  switch (rawExtraField.type) {
+    case "BOOL":
+      return transformRawExtraFieldToBoolExtraField(rawExtraField);
+
+    default:
+      return rawExtraField;
+  }
+};
 
 export const toFiltersInfo = (data: any): DatasetFiltersInfo => {
   const {
@@ -22,7 +49,7 @@ export const toFiltersInfo = (data: any): DatasetFiltersInfo => {
     technicalSource: technical_source,
     tagId: tag_id,
     formatId: format_id,
-    extraFields: extra_fields,
+    extraFields: extra_fields.map(tranformRawExtraField),
     ...rest,
   };
 };
@@ -31,6 +58,8 @@ export const toFiltersValue = (
   searchParams: URLSearchParams
 ): DatasetFiltersValue => {
   const formatId = searchParams.get("format_id");
+
+  const extraFields = searchParams.get("extra_fields");
   return {
     organizationSiret: searchParams.get("organization_siret"),
     geographicalCoverage: searchParams.get("geographical_coverage"),
@@ -39,6 +68,7 @@ export const toFiltersValue = (
     technicalSource: searchParams.get("technical_source"),
     tagId: searchParams.get("tag_id"),
     license: searchParams.get("license"),
+    extraFieldValue: extraFields ? JSON.parse(extraFields) : null,
   };
 };
 
@@ -53,6 +83,7 @@ export const toFiltersParams = (
     technicalSource,
     tagId,
     license,
+    extraFieldValue,
   } = value;
 
   return [
@@ -63,6 +94,7 @@ export const toFiltersParams = (
     ["technical_source", technicalSource],
     ["tag_id", tagId],
     ["license", license],
+    ["extra_fields", JSON.stringify(extraFieldValue)],
   ];
 };
 
@@ -100,7 +132,9 @@ export const toFiltersButtonTexts = (
   organizationSiretToName: Record<string, string>,
   tagIdToName: Record<string, string>,
   formatIdToName: Record<string, string>
-): { [K in keyof DatasetFiltersValue]: Maybe<string> } => {
+): {
+  [K in keyof Omit<DatasetFiltersValue, "extraFieldValue">]: Maybe<string>;
+} => {
   return {
     organizationSiret: Maybe.map(
       value.organizationSiret,

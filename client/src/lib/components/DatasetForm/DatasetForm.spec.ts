@@ -11,8 +11,9 @@ import type {
 } from "src/definitions/datasets";
 import { login, logout } from "$lib/stores/auth";
 import { buildFakeTag } from "src/tests/factories/tags";
-import type { Catalog, ExtraField } from "src/definitions/catalogs";
+import type { Catalog } from "src/definitions/catalogs";
 import type { Organization } from "src/definitions/organization";
+import type { ExtraField } from "src/definitions/extraField";
 
 describe("Test the dataset form", () => {
   beforeAll(() =>

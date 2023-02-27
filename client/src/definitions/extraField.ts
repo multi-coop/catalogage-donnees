@@ -10,7 +10,7 @@ type TextExtraField = {
   data: Record<string, never>;
 } & ExtraFieldBase;
 
-type BoolExtraField = {
+export type BoolExtraField = {
   type: "BOOL";
   data: {
     trueValue: string;

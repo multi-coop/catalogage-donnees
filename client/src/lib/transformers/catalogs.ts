@@ -1,4 +1,5 @@
-import type { Catalog, ExtraField } from "src/definitions/catalogs";
+import type { Catalog } from "src/definitions/catalogs";
+import type { ExtraField } from "src/definitions/extraField";
 import { toOrganization } from "./organization";
 
 const toExtraField = (data: any): ExtraField => {
