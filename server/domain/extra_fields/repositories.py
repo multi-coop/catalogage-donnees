@@ -6,5 +6,5 @@ from .entities import ExtraField
 
 
 class ExtraFieldRepository(Repository):
-    async def get_all(self, catalog_id: str) -> List[ExtraField]:
+    async def get_all(self, organization_siret: str) -> List[ExtraField]:
         raise NotImplementedError  # pragma: no cover

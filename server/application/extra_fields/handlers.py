@@ -8,7 +8,7 @@ from server.domain.extra_fields.repositories import ExtraFieldRepository
 
 async def get_all_extra_fields(query: GetAllExtraFields) -> List[ExtraFieldView]:
     repository = resolve(ExtraFieldRepository)
-    extra_fields = await repository.get_all(query.organization_id)
+    extra_fields = await repository.get_all(query.organization_siret)
 
     return [
         ExtraFieldView(

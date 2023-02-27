@@ -6,4 +6,4 @@ from server.seedwork.application.queries import Query
 
 
 class GetAllExtraFields(GetCatalogExtraFields, Query[List[ExtraFieldView]]):
-    organization_id: str
+    organization_siret: str
