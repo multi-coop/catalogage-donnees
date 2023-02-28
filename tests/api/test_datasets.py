@@ -1,4 +1,6 @@
+import json
 import random
+from turtle import title
 from typing import Any, List, Tuple
 
 import httpx
@@ -1129,6 +1131,48 @@ class TestExtraFieldValues:
             )
             result = await session.execute(stmt)
             assert not list(result.scalars())
+
+    async def test_fetch_dataset_filtered_by_extra_field_value(
+        self, client: httpx.AsyncClient
+    ) -> None:
+        bus = resolve(MessageBus)
+        siret, user, extra_field_id = await self._setup()
+
+        value = "204 Go"
+
+        command = CreateDatasetFactory.build(
+            account=user.account,
+            organization_siret=siret,
+            format_ids=[1, 2],
+            extra_field_values=[
+                ExtraFieldValue(extra_field_id=extra_field_id, value=value)
+            ],
+        )
+
+        await bus.execute(command)
+
+        command = CreateDatasetFactory.build(
+            title="Tata",
+            account=user.account,
+            organization_siret=siret,
+            format_ids=[1, 2],
+        )
+
+        await bus.execute(command)
+
+        params = {
+            "extra_field_value": json.dumps(
+                {"extra_field_id": str(extra_field_id), "value": value}
+            )
+        }
+
+        response = await client.get(f"/datasets/", params=params, auth=user.auth)
+
+        assert response.status_code == 200
+
+        data = response.json()
+
+        assert data["total_items"] == 1
 
 
 @pytest.mark.asyncio

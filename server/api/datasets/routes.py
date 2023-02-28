@@ -23,6 +23,8 @@ from server.domain.common.pagination import Page, Pagination
 from server.domain.common.types import ID
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.datasets.specifications import DatasetSpec
+from server.domain.extra_fields.entities import ExtraFieldValue
+from server.infrastructure.helpers.fast_api import json_param
 from server.seedwork.application.messages import MessageBus
 
 from ..auth.permissions import HasRole, IsAuthenticated
@@ -61,6 +63,7 @@ async def list_datasets(
             technical_source__in=params.technical_source,
             tag__id__in=params.tag_id,
             license=params.license,
+            extra_field_value=params.extra_field_value,
         ),
         account=request.user.account,
     )
