@@ -9,6 +9,14 @@
   export let label: string;
   export let options: SelectOption<any>[];
 
+  $: options = [
+    {
+      label: "Réinistialiser le filtre",
+      value: null,
+    },
+    ...options,
+  ];
+
   let showOverLay = false;
 
   const handleShowOverLay = () => {

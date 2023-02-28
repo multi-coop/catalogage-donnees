@@ -83,6 +83,14 @@
             showSuggestions = false;
           }
 
+          if (value) {
+            const selectedOption = getSelectedOption(value);
+
+            if (selectedOption) {
+              handleSelectOption(selectedOption);
+            }
+          }
+
           break;
 
         case "Escape":
