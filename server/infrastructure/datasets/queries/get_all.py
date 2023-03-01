@@ -1,6 +1,6 @@
 from typing import Union
 
-from sqlalchemy import String, and_, desc, func, or_, select, text
+from sqlalchemy import and_, desc, func, or_, select, text
 from sqlalchemy.engine import Row
 from sqlalchemy.orm import contains_eager, selectinload
 
