@@ -43,6 +43,7 @@
       ...toFiltersParams(e.detail),
       makePageParam(1),
     ]);
+
     goto(href, { noscroll: true });
   };
 </script>
@@ -81,16 +82,11 @@
     </div>
 
     {#if Maybe.Some(filtersInfo) && displayFilters}
-      <div
-        data-test-id="filter-panel"
-        class="fr-grid-row fr-grid-row--gutters fr-py-3w filters"
-      >
-        <FilterPanel
-          on:change={handleFilterChange}
-          info={filtersInfo}
-          value={filtersValue}
-        />
-      </div>
+      <FilterPanel
+        on:change={handleFilterChange}
+        info={filtersInfo}
+        value={filtersValue}
+      />
     {/if}
 
     <div class="fr-grid-row">
@@ -113,11 +109,6 @@
 
   h2 {
     padding: 0;
-  }
-
-  .filters {
-    border-bottom: 1px solid var(--border-default-grey);
-    justify-content: space-between;
   }
 
   .summary__header {

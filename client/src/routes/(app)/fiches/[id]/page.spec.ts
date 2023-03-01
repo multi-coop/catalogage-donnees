@@ -6,15 +6,12 @@ import "@testing-library/jest-dom";
 import { render } from "@testing-library/svelte";
 import index from "./+page.svelte";
 import { getFakeDataset } from "src/tests/factories/dataset";
-import type {
-  Catalog,
-  ExtraField,
-  ExtraFieldValue,
-} from "src/definitions/catalogs";
+import type { Catalog, ExtraFieldValue } from "src/definitions/catalogs";
 import { login, logout } from "src/lib/stores/auth";
 import { getFakeOrganization } from "src/tests/factories/organizations";
 import { getFakeCatalogRecord } from "src/tests/factories/catalog_records";
 import { getFakeAccount } from "src/tests/factories/accounts";
+import type { ExtraField } from "src/definitions/extraField";
 
 const organization = getFakeOrganization();
 

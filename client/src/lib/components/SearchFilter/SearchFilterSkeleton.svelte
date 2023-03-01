@@ -40,7 +40,8 @@
     z-index: 10;
     max-height: 32vh;
     width: 100%;
-    overflow: scroll;
+    overflow-x: hidden;
+    overflow-y: scroll;
     position: absolute;
     border: 1px solid var(--background-contrast-grey);
   }

@@ -140,7 +140,10 @@ datasets:
       tag_ids:
         - "9c1549a5-02ef-43a9-aa20-6babdce0b733"
         - "5fb62590-7398-431a-bd60-cce1fd7bd45b" # This dataset has a duplicated tag : "environement"
-      extra_field_values: []
+      extra_field_values:
+          - dataset_id: "16b398af-f8c7-48b9-898a-18ad3404f528"
+            extra_field_id: "97668c15-5cd3-4efa-9ded-89a47eae6e99"
+            value: "Oui"
       publication_restriction: "no_restriction"
 
   - # Mimicks: https://www.data.gouv.fr/fr/datasets/ensemble-des-lieux-de-restauration-des-crous-france-entiere-1/

@@ -129,7 +129,6 @@
           break;
 
         case "ArrowUp":
-          // console.log("tata");
           // if the textbox is not empty and the listbox is displayed, moves visual focus to the last suggested value.
 
           if (!value && showSuggestions) {

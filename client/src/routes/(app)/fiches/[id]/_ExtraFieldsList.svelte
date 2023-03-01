@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { ExtraField, ExtraFieldValue } from "src/definitions/catalogs";
+  import type { ExtraFieldValue } from "src/definitions/catalogs";
+  import type { ExtraField } from "src/definitions/extraField";
   import { Maybe } from "src/lib/util/maybe";
 
   export let extraFields: ExtraField[];
