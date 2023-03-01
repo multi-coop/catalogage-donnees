@@ -7,7 +7,7 @@
   import type { SelectOption } from "src/definitions/form";
   import type { Organization } from "src/definitions/organization";
   import type { Tag } from "src/definitions/tag";
-  import SearchableSelect from "src/lib/components/SearchableSelect/SearchableSelect.svelte";
+  import TextSearchFilter from "src/lib/components/SearchFilter/TextSearchFilter.svelte";
   import {
     toFiltersButtonTexts,
     toFiltersOptions,
@@ -49,9 +49,9 @@
 
   const dispatch = createEventDispatcher<{ change: DatasetFiltersValue }>();
 
-  const handleSelectFilter = <K extends keyof DatasetFiltersValue>(
-    key: K,
-    e: CustomEvent<SelectOption<DatasetFiltersValue[K]> | null>
+  const handleSelectFilter = (
+    key: string,
+    e: CustomEvent<SelectOption<any>>
   ) => {
     value[key] = e.detail?.value || null;
     dispatch("change", value);
@@ -62,48 +62,40 @@
   <h6>Informations générales</h6>
 
   <div class="fr-mb-2w">
-    <SearchableSelect
+    <TextSearchFilter
       label="Couverture géographique"
-      buttonPlaceholder="Rechercher..."
-      inputPlaceholder="Rechercher..."
-      buttonText={buttonTexts.geographicalCoverage || "Rechercher..."}
-      on:clickItem={(e) => handleSelectFilter("geographicalCoverage", e)}
       options={filtersOptions.geographicalCoverage}
+      buttonText={buttonTexts.geographicalCoverage}
+      on:selectOption={(e) => handleSelectFilter("geographicalCoverage", e)}
     />
   </div>
 
   <div class="fr-mb-2w">
-    <SearchableSelect
+    <TextSearchFilter
       label="Service producteur de la donnée"
-      buttonPlaceholder="Rechercher..."
-      inputPlaceholder="Rechercher..."
-      buttonText={buttonTexts.service || "Rechercher..."}
-      on:clickItem={(e) => handleSelectFilter("service", e)}
       options={filtersOptions.service}
+      buttonText={buttonTexts.service}
+      on:selectOption={(e) => handleSelectFilter("service", e)}
     />
   </div>
 
   <div class="fr-mb-2w">
-    <SearchableSelect
+    <TextSearchFilter
       label="Licence de réutilisation"
-      buttonPlaceholder="Rechercher..."
-      inputPlaceholder="Rechercher..."
-      buttonText={buttonTexts.license || "Rechercher..."}
-      on:clickItem={(e) => handleSelectFilter("license", e)}
       options={filtersOptions.license}
+      buttonText={buttonTexts.license}
+      on:selectOption={(e) => handleSelectFilter("license", e)}
     />
   </div>
 
   <h6 class="fr-mt-3w">Catalogues</h6>
 
   <div class="fr-mb-2w">
-    <SearchableSelect
+    <TextSearchFilter
       label="Catalogue"
-      buttonPlaceholder="Rechercher..."
-      inputPlaceholder="Rechercher..."
-      buttonText={buttonTexts.organizationSiret || "Rechercher..."}
-      on:clickItem={(e) => handleSelectFilter("organizationSiret", e)}
       options={filtersOptions.organizationSiret}
+      buttonText={buttonTexts.organizationSiret}
+      on:selectOption={(e) => handleSelectFilter("organizationSiret", e)}
     />
   </div>
 </section>
@@ -112,24 +104,20 @@
   <h6>Sources et formats</h6>
 
   <div class="fr-mb-2w">
-    <SearchableSelect
+    <TextSearchFilter
       label="Format de mise à disposition"
-      buttonPlaceholder="Rechercher..."
-      inputPlaceholder="Rechercher..."
-      buttonText={buttonTexts.formatId || "Rechercher..."}
-      on:clickItem={(e) => handleSelectFilter("formatId", e)}
       options={filtersOptions.formatId}
+      buttonText={buttonTexts.formatId}
+      on:selectOption={(e) => handleSelectFilter("formatId", e)}
     />
   </div>
 
   <div class="fr-mb-2w">
-    <SearchableSelect
+    <TextSearchFilter
       label="Système d'information source"
-      buttonPlaceholder="Rechercher..."
-      inputPlaceholder="Rechercher..."
-      buttonText={buttonTexts.technicalSource || "Rechercher..."}
-      on:clickItem={(e) => handleSelectFilter("technicalSource", e)}
       options={filtersOptions.technicalSource}
+      buttonText={buttonTexts.technicalSource}
+      on:selectOption={(e) => handleSelectFilter("technicalSource", e)}
     />
   </div>
 </section>
@@ -138,13 +126,11 @@
   <h6>Mots-clés thématiques</h6>
 
   <div class="fr-mb-2w">
-    <SearchableSelect
+    <TextSearchFilter
       label="Mot-clé"
-      buttonPlaceholder="Rechercher..."
-      inputPlaceholder="Rechercher..."
-      buttonText={buttonTexts.tagId || "Rechercher..."}
-      on:clickItem={(e) => handleSelectFilter("tagId", e)}
       options={filtersOptions.tagId}
+      buttonText={buttonTexts.tagId}
+      on:selectOption={(e) => handleSelectFilter("tagId", e)}
     />
   </div>
 </section>

@@ -1,31 +1,31 @@
 import type { Organization } from "./organization";
 
-interface ExtraFieldBase {
+type ExtraFieldBase = {
   id: string;
   name: string;
   title: string;
   hintText: string;
-}
+};
 
-interface TextExtraField extends ExtraFieldBase {
+type TextExtraField = {
   type: "TEXT";
   data: Record<string, never>;
-}
+} & ExtraFieldBase;
 
-interface BoolExtraField extends ExtraFieldBase {
+type BoolExtraField = {
   type: "BOOL";
   data: {
     trueValue: string;
     falseValue: string;
   };
-}
+} & ExtraFieldBase;
 
-interface EnumExtraField extends ExtraFieldBase {
+type EnumExtraField = {
   type: "ENUM";
   data: {
     values: string[];
   };
-}
+} & ExtraFieldBase;
 
 export type ExtraField = TextExtraField | BoolExtraField | EnumExtraField;
 
