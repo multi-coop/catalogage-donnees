@@ -9,13 +9,9 @@ from server.application.datasets.validation import (
     CreateDatasetValidationMixin,
     UpdateDatasetValidationMixin,
 )
-
 from server.domain.common.types import ID
 from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
-from server.domain.extra_fields.entities import ExtraField, ExtraFieldValue
-
 from server.domain.organizations.types import Siret
-from server.infrastructure.helpers.fast_api import json_param
 
 
 class DatasetListParams:
@@ -32,9 +28,7 @@ class DatasetListParams:
         tag_id: Optional[List[ID]] = Query(None),
         license: Optional[str] = Query(None),
         publication_restriction: Optional[PublicationRestriction] = Query(None),
-        extra_field_value: Optional[ExtraFieldValue] = json_param(
-            "extra_field_value", Optional[ExtraFieldValue]
-        ),
+        extra_field_value: Optional[str] = Query(None),
     ) -> None:
         self.q = q
         self.organization_siret = organization_siret

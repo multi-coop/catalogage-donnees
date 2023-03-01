@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional, Sequence
 
-
 from server.domain.common.types import ID
 from server.domain.extra_fields.entities import ExtraFieldValue
 from server.domain.organizations.types import Siret

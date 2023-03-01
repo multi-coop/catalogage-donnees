@@ -1,6 +1,6 @@
 from typing import Union
 
-from sqlalchemy import and_, desc, func, or_, select, text, String
+from sqlalchemy import String, and_, desc, func, or_, select, text
 from sqlalchemy.engine import Row
 from sqlalchemy.orm import contains_eager, selectinload
 
@@ -9,7 +9,6 @@ from server.domain.common.types import Skip
 from server.domain.datasets.entities import PublicationRestriction
 from server.domain.datasets.repositories import DatasetGetAllExtras
 from server.domain.datasets.specifications import DatasetSpec
-from server.domain.extra_fields.entities import ExtraFieldValue
 from server.infrastructure.extra_fields.models import ExtraFieldValueModel
 
 from ...catalog_records.models import CatalogRecordModel
@@ -135,10 +134,8 @@ class GetAllQuery:
 
         if (extra_field_value := spec.extra_field_value) is not None:
             joinclauses.append((DatasetModel.extra_field_values, {"isouter": True}))
-
-            ExtraFieldValueModel.value.cast(String)
             whereclauses.append(
-                ExtraFieldValueModel.value.astext.like(f"%{extra_field_value.value}%")
+                ExtraFieldValueModel.value.like(f"%{extra_field_value.value}%")
             )
 
         stmt = (
@@ -163,8 +160,6 @@ class GetAllQuery:
             .where(*whereclauses)
             .order_by(*orderbyclauses, CatalogRecordModel.created_at.desc())
         )
-
-        breakpoint()
 
     def instance(self, row: Row) -> DatasetModel:
         return row[0]

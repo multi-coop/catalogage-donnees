@@ -1,6 +1,5 @@
 import json
 import random
-from turtle import title
 from typing import Any, List, Tuple
 
 import httpx
@@ -1166,7 +1165,7 @@ class TestExtraFieldValues:
             )
         }
 
-        response = await client.get(f"/datasets/", params=params, auth=user.auth)
+        response = await client.get("/datasets/", params=params, auth=user.auth)
 
         assert response.status_code == 200
 
