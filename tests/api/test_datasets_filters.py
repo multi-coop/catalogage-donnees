@@ -350,7 +350,7 @@ async def test_dataset_filters_with_extra_fields(
         CreatePasswordUserFactory.build(organization_siret=kwargs["organization_siret"])
     )
 
-    params = {"organization_id": siret_match}
+    params = {"organization_siret": siret_match}
 
     response = await client.get(
         "/datasets/filters/", params=params, auth=temp_user.auth

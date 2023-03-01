@@ -20,4 +20,6 @@ async def get_dataset_filters(
     params: DatasetFiltersParams = Depends(),
 ) -> DatasetFiltersView:
     bus = resolve(MessageBus)
-    return await bus.execute(GetDatasetFilters(organization_id=params.organization_id))
+    return await bus.execute(
+        GetDatasetFilters(organization_siret=params.organization_siret)
+    )

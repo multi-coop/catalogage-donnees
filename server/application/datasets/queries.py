@@ -21,4 +21,4 @@ class GetDatasetByID(Query[DatasetView]):
 
 
 class GetDatasetFilters(Query[DatasetFiltersView]):
-    organization_id: Optional[str]
+    organization_siret: Optional[str]

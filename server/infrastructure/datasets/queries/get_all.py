@@ -9,6 +9,7 @@ from server.domain.common.types import Skip
 from server.domain.datasets.entities import PublicationRestriction
 from server.domain.datasets.repositories import DatasetGetAllExtras
 from server.domain.datasets.specifications import DatasetSpec
+from server.infrastructure.extra_fields.models import ExtraFieldValueModel
 
 from ...catalog_records.models import CatalogRecordModel
 from ...catalogs.models import CatalogModel
@@ -130,6 +131,12 @@ class GetAllQuery:
                 whereclauses.append(DatasetModel.license.is_not(None))
             else:
                 whereclauses.append(DatasetModel.license == license)
+
+        if (extra_field_value := spec.extra_field_value) is not None:
+            joinclauses.append((DatasetModel.extra_field_values, {"isouter": True}))
+            whereclauses.append(
+                ExtraFieldValueModel.value.like(f"%{extra_field_value.value}%")
+            )
 
         stmt = (
             select(DatasetModel, *columns)
