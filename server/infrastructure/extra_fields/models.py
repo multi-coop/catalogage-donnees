@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING, List
 
 from sqlalchemy import CHAR, Column, Enum, ForeignKey, Index, String
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -64,4 +64,4 @@ class ExtraFieldValueModel(Base):
     extra_field: "ExtraFieldModel" = relationship(
         "ExtraFieldModel", back_populates="values"
     )
-    value: Any = Column(JSONB(), nullable=False)
+    value: str = Column(String(), nullable=False)

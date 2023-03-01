@@ -94,6 +94,13 @@
           break;
 
         case "Escape":
+          // if the listbox is not displayed, clears the textbox.
+
+          if (!showSuggestions) {
+            textBoxHasFocus = true;
+            value = "";
+            return;
+          }
           //If the listbox is displayed, closes it.
 
           if (showSuggestions) {
@@ -102,12 +109,6 @@
             return;
           }
 
-          // if the listbox is not displayed, clears the textbox.
-
-          if (!showSuggestions) {
-            textBoxHasFocus = true;
-            value = "";
-          }
           break;
 
         case "ArrowDown":
@@ -245,6 +246,11 @@
       }
     }
   };
+
+  const handleFocusIn = () => {
+    showSuggestions = true;
+    textBoxHasFocus = false;
+  };
 </script>
 
 <div class="fr-input-group dropdown" class:fr-input-group--error={error}>
@@ -282,7 +288,7 @@
         ? `suggestion-item-${currentLiIndex}`
         : null}
       on:input={handleInput}
-      on:focus={() => (textBoxHasFocus = true)}
+      on:focus={handleFocusIn}
       on:focusout
     />
 

@@ -1,4 +1,6 @@
+import json
 import logging
+from typing import Optional
 
 from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
@@ -23,6 +25,7 @@ from server.domain.common.pagination import Page, Pagination
 from server.domain.common.types import ID
 from server.domain.datasets.exceptions import DatasetDoesNotExist
 from server.domain.datasets.specifications import DatasetSpec
+from server.domain.extra_fields.entities import ExtraFieldValue
 from server.seedwork.application.messages import MessageBus
 
 from ..auth.permissions import HasRole, IsAuthenticated
@@ -50,6 +53,12 @@ async def list_datasets(
 
     page = Page(number=params.page_number, size=params.page_size)
 
+    extra_field_value: Optional[ExtraFieldValue] = None
+
+    if params.extra_field_value is not None:
+        item = json.loads(params.extra_field_value)
+        extra_field_value = ExtraFieldValue(**item)
+
     query = GetAllDatasets(
         page=page,
         spec=DatasetSpec(
@@ -61,6 +70,7 @@ async def list_datasets(
             technical_source__in=params.technical_source,
             tag__id__in=params.tag_id,
             license=params.license,
+            extra_field_value=extra_field_value,
         ),
         account=request.user.account,
     )

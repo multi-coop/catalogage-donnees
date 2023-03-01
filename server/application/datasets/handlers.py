@@ -140,9 +140,9 @@ async def get_dataset_filters(query: GetDatasetFilters) -> DatasetFiltersView:
     formats = await bus.execute(GetAllDataFormat())
     licenses = await bus.execute(GetLicenseSet())
 
-    if query.organization_id:
+    if query.organization_siret:
         extra_fields = await bus.execute(
-            GetAllExtraFields(organization_id=query.organization_id)
+            GetAllExtraFields(organization_siret=query.organization_siret)
         )
 
     return DatasetFiltersView(
