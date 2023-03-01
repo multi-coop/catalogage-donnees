@@ -64,4 +64,4 @@ class ExtraFieldValueModel(Base):
     extra_field: "ExtraFieldModel" = relationship(
         "ExtraFieldModel", back_populates="values"
     )
-    value: Any = Column(JSONB(), nullable=False)
+    value: Any = Column(String(), nullable=False)
