@@ -39,7 +39,6 @@
   };
 
   const handleFilterChange = async (e: CustomEvent<DatasetFiltersValue>) => {
-    console.log(e.detail);
     const href = patchQueryString($pageStore.url.searchParams, [
       ...toFiltersParams(e.detail),
       makePageParam(1),

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ExtraField } from "src/definitions/catalogs";
+  import type { ExtraField } from "src/definitions/extraField";
   import { toSelectOptions } from "src/lib/transformers/form";
   import { renderMarkdown } from "src/lib/util/markdown";
   import InputField from "../InputField/InputField.svelte";

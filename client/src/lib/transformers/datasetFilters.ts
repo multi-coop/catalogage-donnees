@@ -1,3 +1,4 @@
+import type { ExtraFieldValue } from "src/definitions/catalogs";
 import type {
   DatasetFiltersInfo,
   DatasetFiltersOptions,
@@ -20,6 +21,28 @@ export const transformRawExtraFieldToBoolExtraField = (
       trueValue: rawExtraField.data.true_value,
       falseValue: rawExtraField.data.false_value,
     },
+  };
+};
+
+const transformExtraFieldValueToAPIQueryParam = (
+  extraFieldValue: ExtraFieldValue
+): {
+  value: string;
+  extra_field_id: string;
+} => {
+  return {
+    extra_field_id: extraFieldValue.extraFieldId,
+    value: extraFieldValue.value,
+  };
+};
+
+export const transformAPIQueryParamToExtraFieldValue = (value: {
+  value: string;
+  extra_field_id: string;
+}): ExtraFieldValue => {
+  return {
+    extraFieldId: value.extra_field_id,
+    value: value.value,
   };
 };
 
@@ -59,7 +82,7 @@ export const toFiltersValue = (
 ): DatasetFiltersValue => {
   const formatId = searchParams.get("format_id");
 
-  const extraFields = searchParams.get("extra_fields");
+  const extraFieldValue = searchParams.get("extra_field_value");
   return {
     organizationSiret: searchParams.get("organization_siret"),
     geographicalCoverage: searchParams.get("geographical_coverage"),
@@ -68,7 +91,9 @@ export const toFiltersValue = (
     technicalSource: searchParams.get("technical_source"),
     tagId: searchParams.get("tag_id"),
     license: searchParams.get("license"),
-    extraFieldValue: extraFields ? JSON.parse(extraFields) : null,
+    extraFieldValue: extraFieldValue
+      ? transformAPIQueryParamToExtraFieldValue(JSON.parse(extraFieldValue))
+      : null,
   };
 };
 
@@ -94,7 +119,14 @@ export const toFiltersParams = (
     ["technical_source", technicalSource],
     ["tag_id", tagId],
     ["license", license],
-    ["extra_fields", JSON.stringify(extraFieldValue)],
+    [
+      "extra_field_value",
+      extraFieldValue
+        ? JSON.stringify(
+            transformExtraFieldValueToAPIQueryParam(extraFieldValue)
+          )
+        : null,
+    ],
   ];
 };
 

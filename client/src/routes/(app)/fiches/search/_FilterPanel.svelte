@@ -51,20 +51,25 @@
 
   const dispatch = createEventDispatcher<{ change: DatasetFiltersValue }>();
 
-  const handleSelectFilter = (
-    key: string,
-    e: CustomEvent<SelectOption<any>>
+  const handleSelectFilter = <K extends keyof DatasetFiltersValue>(
+    key: K,
+    e: CustomEvent<SelectOption<any> | null>
   ) => {
+    if (key === "organizationSiret" && !e.detail?.value) {
+      value.extraFieldValue = null;
+    }
+
     value[key] = e.detail?.value || null;
     dispatch("change", value);
   };
 
-  const handleExtraFieldChange = (name: string, event: Event) => {
+  const handleExtraFieldValueChange = (name: string, event: Event) => {
+    const target = event.target as HTMLInputElement;
     value = {
       ...value,
       extraFieldValue: {
         extraFieldId: name,
-        value: event.currentTarget?.value,
+        value: target.value,
       },
     };
 
@@ -153,7 +158,7 @@
     </div>
   </section>
 </div>
-{#if info.extraFields.length > 0}
+{#if info.extraFields.length > 0 && info.extraFields.some((item) => item.type === "BOOL")}
   <div class="fr-grid-row fr-grid-row--gutters fr-py-3w filters">
     <section>
       <h6>Champs complémentaires</h6>
@@ -164,7 +169,7 @@
             name={extraField.name}
             options={toSelectOption(extraField)}
             label={extraField.title}
-            on:change={(e) => handleExtraFieldChange(extraField.id, e)}
+            on:change={(e) => handleExtraFieldValueChange(extraField.id, e)}
           />
         {/if}
       {/each}

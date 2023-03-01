@@ -61,6 +61,7 @@ describe("transformers -- Dataset filters", () => {
       ["technical_source", "Serveur GIS"],
       ["tag_id", null],
       ["license", "Licence Ouverte"],
+      ["extra_field_value", null],
     ];
 
     expect(toFiltersParams(value)).toEqual(params);

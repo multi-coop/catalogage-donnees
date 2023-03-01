@@ -49,7 +49,7 @@ type GetDatasets = (opts: {
   apiToken: string;
   page: number;
   q?: string;
-  filters?: Maybe<DatasetFiltersValue>;
+  filters?: DatasetFiltersValue;
 }) => Promise<Maybe<Paginated<Dataset>>>;
 
 export const getDatasets: GetDatasets = async ({
@@ -64,12 +64,13 @@ export const getDatasets: GetDatasets = async ({
     ["page_size", DATASETS_PER_PAGE.toString()],
   ];
 
-  if (Maybe.Some(q) && q) {
+  if (q) {
     queryItems.push(["q", q]);
   }
 
-  if (Maybe.Some(filters)) {
-    queryItems.push(...toFiltersParams(filters));
+  if (filters) {
+    const filterParams = toFiltersParams(filters);
+    queryItems.push(...filterParams);
   }
 
   const queryString = toQueryString(queryItems);
