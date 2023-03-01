@@ -1,4 +1,6 @@
+import type { ExtraFieldValue } from "./catalogs";
 import type { DataFormat } from "./dataformat";
+import type { ExtraField } from "./extraField";
 import type { SelectOption } from "./form";
 import type { Organization } from "./organization";
 import type { Tag } from "./tag";
@@ -11,6 +13,7 @@ export type DatasetFiltersInfo = {
   technicalSource: string[];
   tagId: Tag[];
   license: string[];
+  extraFields: ExtraField[];
 };
 
 export type DatasetFiltersValue = {
@@ -21,8 +24,11 @@ export type DatasetFiltersValue = {
   technicalSource: string | null;
   tagId: string | null;
   license: string | null;
+  extraFieldValue: ExtraFieldValue | null;
 };
 
 export type DatasetFiltersOptions = {
-  [K in keyof DatasetFiltersValue]: SelectOption<DatasetFiltersValue[K]>[];
+  [K in keyof Omit<DatasetFiltersValue, "extraFieldValue">]: SelectOption<
+    DatasetFiltersValue[K]
+  >[];
 };

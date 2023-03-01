@@ -7,11 +7,13 @@
   import type { SelectOption } from "src/definitions/form";
   import type { Organization } from "src/definitions/organization";
   import type { Tag } from "src/definitions/tag";
+  import BooleanSearchFilter from "src/lib/components/SearchFilter/BooleanSearchFilter.svelte";
   import TextSearchFilter from "src/lib/components/SearchFilter/TextSearchFilter.svelte";
   import {
     toFiltersButtonTexts,
     toFiltersOptions,
   } from "src/lib/transformers/datasetFilters";
+  import { toSelectOption } from "src/lib/transformers/extraField";
   import { createEventDispatcher } from "svelte";
 
   export let info: DatasetFiltersInfo;
@@ -49,88 +51,134 @@
 
   const dispatch = createEventDispatcher<{ change: DatasetFiltersValue }>();
 
-  const handleSelectFilter = (
-    key: string,
-    e: CustomEvent<SelectOption<any>>
+  const handleSelectFilter = <K extends keyof DatasetFiltersValue>(
+    key: K,
+    e: CustomEvent<SelectOption<any> | null>
   ) => {
+    if (key === "organizationSiret" && !e.detail?.value) {
+      value.extraFieldValue = null;
+    }
+
     value[key] = e.detail?.value || null;
+    dispatch("change", value);
+  };
+
+  const handleExtraFieldValueChange = (name: string, event: Event) => {
+    const target = event.target as HTMLInputElement;
+    value = {
+      ...value,
+      extraFieldValue: {
+        extraFieldId: name,
+        value: target.value,
+      },
+    };
+
     dispatch("change", value);
   };
 </script>
 
-<section>
-  <h6>Informations générales</h6>
+<div
+  data-test-id="filter-panel"
+  class="fr-grid-row fr-grid-row--gutters fr-py-3w filters"
+>
+  <section>
+    <h6>Informations générales</h6>
 
-  <div class="fr-mb-2w">
-    <TextSearchFilter
-      label="Couverture géographique"
-      options={filtersOptions.geographicalCoverage}
-      buttonText={buttonTexts.geographicalCoverage}
-      on:selectOption={(e) => handleSelectFilter("geographicalCoverage", e)}
-    />
+    <div class="fr-mb-2w">
+      <TextSearchFilter
+        label="Couverture géographique"
+        options={filtersOptions.geographicalCoverage}
+        buttonText={buttonTexts.geographicalCoverage}
+        on:selectOption={(e) => handleSelectFilter("geographicalCoverage", e)}
+      />
+    </div>
+
+    <div class="fr-mb-2w">
+      <TextSearchFilter
+        label="Service producteur de la donnée"
+        options={filtersOptions.service}
+        buttonText={buttonTexts.service}
+        on:selectOption={(e) => handleSelectFilter("service", e)}
+      />
+    </div>
+
+    <div class="fr-mb-2w">
+      <TextSearchFilter
+        label="Licence de réutilisation"
+        options={filtersOptions.license}
+        buttonText={buttonTexts.license}
+        on:selectOption={(e) => handleSelectFilter("license", e)}
+      />
+    </div>
+
+    <h6 class="fr-mt-3w">Catalogues</h6>
+
+    <div class="fr-mb-2w">
+      <TextSearchFilter
+        label="Catalogue"
+        options={filtersOptions.organizationSiret}
+        buttonText={buttonTexts.organizationSiret}
+        on:selectOption={(e) => handleSelectFilter("organizationSiret", e)}
+      />
+    </div>
+  </section>
+
+  <section>
+    <h6>Sources et formats</h6>
+
+    <div class="fr-mb-2w">
+      <TextSearchFilter
+        label="Format de mise à disposition"
+        options={filtersOptions.formatId}
+        buttonText={buttonTexts.formatId}
+        on:selectOption={(e) => handleSelectFilter("formatId", e)}
+      />
+    </div>
+
+    <div class="fr-mb-2w">
+      <TextSearchFilter
+        label="Système d'information source"
+        options={filtersOptions.technicalSource}
+        buttonText={buttonTexts.technicalSource}
+        on:selectOption={(e) => handleSelectFilter("technicalSource", e)}
+      />
+    </div>
+  </section>
+
+  <section>
+    <h6>Mots-clés thématiques</h6>
+
+    <div class="fr-mb-2w">
+      <TextSearchFilter
+        label="Mot-clé"
+        options={filtersOptions.tagId}
+        buttonText={buttonTexts.tagId}
+        on:selectOption={(e) => handleSelectFilter("tagId", e)}
+      />
+    </div>
+  </section>
+</div>
+{#if info.extraFields.length > 0 && info.extraFields.some((item) => item.type === "BOOL")}
+  <div class="fr-grid-row fr-grid-row--gutters fr-py-3w filters">
+    <section>
+      <h6>Champs complémentaires</h6>
+
+      {#each info.extraFields as extraField}
+        {#if extraField.type === "BOOL"}
+          <BooleanSearchFilter
+            name={extraField.name}
+            options={toSelectOption(extraField)}
+            label={extraField.title}
+            on:change={(e) => handleExtraFieldValueChange(extraField.id, e)}
+          />
+        {/if}
+      {/each}
+    </section>
   </div>
+{/if}
 
-  <div class="fr-mb-2w">
-    <TextSearchFilter
-      label="Service producteur de la donnée"
-      options={filtersOptions.service}
-      buttonText={buttonTexts.service}
-      on:selectOption={(e) => handleSelectFilter("service", e)}
-    />
-  </div>
-
-  <div class="fr-mb-2w">
-    <TextSearchFilter
-      label="Licence de réutilisation"
-      options={filtersOptions.license}
-      buttonText={buttonTexts.license}
-      on:selectOption={(e) => handleSelectFilter("license", e)}
-    />
-  </div>
-
-  <h6 class="fr-mt-3w">Catalogues</h6>
-
-  <div class="fr-mb-2w">
-    <TextSearchFilter
-      label="Catalogue"
-      options={filtersOptions.organizationSiret}
-      buttonText={buttonTexts.organizationSiret}
-      on:selectOption={(e) => handleSelectFilter("organizationSiret", e)}
-    />
-  </div>
-</section>
-
-<section>
-  <h6>Sources et formats</h6>
-
-  <div class="fr-mb-2w">
-    <TextSearchFilter
-      label="Format de mise à disposition"
-      options={filtersOptions.formatId}
-      buttonText={buttonTexts.formatId}
-      on:selectOption={(e) => handleSelectFilter("formatId", e)}
-    />
-  </div>
-
-  <div class="fr-mb-2w">
-    <TextSearchFilter
-      label="Système d'information source"
-      options={filtersOptions.technicalSource}
-      buttonText={buttonTexts.technicalSource}
-      on:selectOption={(e) => handleSelectFilter("technicalSource", e)}
-    />
-  </div>
-</section>
-
-<section>
-  <h6>Mots-clés thématiques</h6>
-
-  <div class="fr-mb-2w">
-    <TextSearchFilter
-      label="Mot-clé"
-      options={filtersOptions.tagId}
-      buttonText={buttonTexts.tagId}
-      on:selectOption={(e) => handleSelectFilter("tagId", e)}
-    />
-  </div>
-</section>
+<style>
+  .filters {
+    justify-content: space-between;
+  }
+</style>

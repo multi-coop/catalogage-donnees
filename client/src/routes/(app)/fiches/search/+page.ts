@@ -12,6 +12,8 @@ export const load: PageLoad = async ({ fetch, url }) => {
   const q = url.searchParams.get("q") || "";
   const filtersValue = toFiltersValue(url.searchParams);
 
+  const organizationSiret = url.searchParams.get("organization_siret");
+
   const token = get(apiToken);
 
   const [paginatedDatasets, filtersInfo] = await Promise.all([
@@ -22,7 +24,7 @@ export const load: PageLoad = async ({ fetch, url }) => {
       q,
       filters: filtersValue,
     }),
-    getDatasetFiltersInfo({ fetch, apiToken: token }),
+    getDatasetFiltersInfo({ fetch, apiToken: token, organizationSiret }),
   ]);
 
   return {
