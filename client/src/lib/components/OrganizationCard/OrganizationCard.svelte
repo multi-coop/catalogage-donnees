@@ -1,7 +1,7 @@
 <script lang="ts">
   export let name: string;
   export let src: string;
-  export let href: string = "";
+  export let href = "";
   export let status: "catalog" | "registered" | "pending";
 </script>
 
@@ -10,7 +10,7 @@
     <div class="fr-card__content">
       <h3 class="fr-card__title">
         {#if href}
-          <a href={href}>{name}</a>
+          <a {href}>{name}</a>
         {:else}
           {name}
         {/if}
