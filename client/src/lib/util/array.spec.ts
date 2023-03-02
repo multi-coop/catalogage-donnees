@@ -1,4 +1,4 @@
-import { range } from "./array";
+import { chunk, range } from "./array";
 
 describe("range", () => {
   const startEndCases: [number, number, number[]][] = [
@@ -27,5 +27,24 @@ describe("range", () => {
 
   test.each(endCases)("when end=%s", (end, expected) => {
     expect(range(end)).toStrictEqual(expected);
+  });
+});
+
+describe("chunck", () => {
+  const cases: [string[], number, string[][] | string[]][] = [
+    [
+      ["a", "b", "c", "d", "e", "f", "g"],
+      1,
+      [["a"], ["b"], ["c"], ["d"], ["e"], ["f"], ["g"]],
+    ],
+    [
+      ["a", "b", "c", "d", "e", "f", "g"],
+      3,
+      [["a", "b", "c"], ["d", "e", "f"], ["g"]],
+    ],
+  ];
+
+  test.each(cases)("chunk this array", (data, chunckSize, expected) => {
+    expect(chunk(data, chunckSize)).toStrictEqual(expected);
   });
 });

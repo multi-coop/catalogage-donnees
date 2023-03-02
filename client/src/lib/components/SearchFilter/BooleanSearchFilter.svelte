@@ -21,7 +21,7 @@
 </script>
 
 <div class="fr-form-group">
-  <legend class="fr-fieldset__legend fr-text--regular" id="radio-legend">
+  <legend class="fr-text--regular fr-mb-2w">
     {label}
   </legend>
   <div class="fr-fieldset__content">

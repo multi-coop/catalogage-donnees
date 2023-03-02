@@ -42,11 +42,40 @@ catalogs:
               - Radio
               - Presse
               - Télévision
+          
         - id: "f8afd98d-d2a7-413f-9942-46810a3ea56e"
           name: donnees_con
           title: Données confidentielles
           hint_text: |
             Est-ce que cette donnée possède un caractère confidentiel ?
+          type: BOOL
+          data:
+            true_value: Oui
+            false_value: Non
+
+        - id: "3c866a2c-8958-46c5-8a45-672f4b756888"
+          name: donnees_géographiques
+          title: Données géographiques
+          hint_text: |
+            Est-ce que cette donnée est utilisable partout?
+          type: BOOL
+          data:
+            true_value: Oui
+            false_value: Non
+        - id: "ce5bc496-95c0-4bba-95f0-b65028ad738b"
+          name: donnees_temporelles
+          title: Données Temporelles
+          hint_text: |
+            Est-ce que cette donnée doit être conservée ad vitam eternam ?
+          type: BOOL
+          data:
+            true_value: Oui
+            false_value: Non
+        - id: "8973dff2-ece7-461e-ac2b-bad09af26ed6"
+          name: donnees_partielles
+          title: Données Partielles
+          hint_text: |
+            Est-ce que cette donnée est partielle ?
           type: BOOL
           data:
             true_value: Oui
@@ -156,6 +185,12 @@ datasets:
           - dataset_id: "16b398af-f8c7-48b9-898a-18ad3404f528"
             extra_field_id: "f8afd98d-d2a7-413f-9942-46810a3ea56e"
             value: "Non"
+          - dataset_id: "16b398af-f8c7-48b9-898a-18ad3404f528"
+            extra_field_id: "8973dff2-ece7-461e-ac2b-bad09af26ed6"
+            value: "Non"
+          - dataset_id: "16b398af-f8c7-48b9-898a-18ad3404f528"
+            extra_field_id: "ce5bc496-95c0-4bba-95f0-b65028ad738b"
+            value: "Oui"
                
       publication_restriction: "no_restriction"
 
@@ -179,7 +214,13 @@ datasets:
       license: Autre (Open)
       tag_ids:
         - "ceb19363-1681-4052-813c-f771d4459295"
-      extra_field_values: []
+      extra_field_values:
+        - dataset_id: "16b398af-f8c7-48b9-898a-18ad3404f528"
+          extra_field_id: "8973dff2-ece7-461e-ac2b-bad09af26ed6"
+          value: "Oui"
+        - dataset_id: "16b398af-f8c7-48b9-898a-18ad3404f528"
+          extra_field_id: "f8afd98d-d2a7-413f-9942-46810a3ea56e"
+          value: "Oui"
       publication_restriction: "no_restriction"
 
   - # Mimicks: https://www.data.gouv.fr/fr/datasets/restaurants-brasseries-et-cafeterias-des-crous/

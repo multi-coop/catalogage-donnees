@@ -24,11 +24,11 @@ export type DatasetFiltersValue = {
   technicalSource: string | null;
   tagId: string | null;
   license: string | null;
-  extraFieldValue: ExtraFieldValue | null;
+  extraFieldValues: ExtraFieldValue[] | null;
 };
 
 export type DatasetFiltersOptions = {
-  [K in keyof Omit<DatasetFiltersValue, "extraFieldValue">]: SelectOption<
+  [K in keyof Omit<DatasetFiltersValue, "extraFieldValues">]: SelectOption<
     DatasetFiltersValue[K]
   >[];
 };
