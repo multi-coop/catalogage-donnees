@@ -1,14 +1,19 @@
 <script lang="ts">
   export let name: string;
   export let src: string;
+  export let href: string = "";
   export let status: "catalog" | "registered" | "pending";
 </script>
 
-<div class="fr-card fr-card--sm ">
+<div class="fr-card fr-card--sm" class:fr-enlarge-link={href}>
   <div class="fr-card__body">
     <div class="fr-card__content">
       <h3 class="fr-card__title">
-        {name}
+        {#if href}
+          <a href={href}>{name}</a>
+        {:else}
+          {name}
+        {/if}
       </h3>
       <div class="fr-card__start">
         <ul class="fr-badge-group">
