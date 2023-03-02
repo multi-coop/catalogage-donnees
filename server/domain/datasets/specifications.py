@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Sequence
+from typing import List, Optional, Sequence
 
 from server.domain.common.types import ID
 from server.domain.extra_fields.entities import ExtraFieldValue
@@ -17,5 +17,5 @@ class DatasetSpec:
     technical_source__in: Optional[Sequence[str]] = None
     tag__id__in: Optional[Sequence[ID]] = None
     license: Optional[str] = None
-    extra_field_value: Optional[ExtraFieldValue] = None
+    extra_field_values: Optional[List[ExtraFieldValue]] = None
     include_all_datasets: bool = False

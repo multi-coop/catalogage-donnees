@@ -28,7 +28,7 @@ class DatasetListParams:
         tag_id: Optional[List[ID]] = Query(None),
         license: Optional[str] = Query(None),
         publication_restriction: Optional[PublicationRestriction] = Query(None),
-        extra_field_value: Optional[str] = Query(None),
+        extra_field_values: Optional[str] = Query(None),
     ) -> None:
         self.q = q
         self.organization_siret = organization_siret
@@ -41,7 +41,7 @@ class DatasetListParams:
         self.tag_id = tag_id
         self.license = license
         self.publication_restriction = publication_restriction
-        self.extra_field_value = extra_field_value
+        self.extra_field_values = extra_field_values
 
 
 class DatasetCreate(CreateDatasetValidationMixin, BaseModel):
