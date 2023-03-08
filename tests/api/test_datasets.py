@@ -19,7 +19,12 @@ from server.domain.dataformats.entities import DataFormat
 from server.domain.dataformats.repositories import DataFormatRepository
 from server.domain.datasets.entities import PublicationRestriction, UpdateFrequency
 from server.domain.datasets.exceptions import DatasetDoesNotExist
-from server.domain.extra_fields.entities import ExtraFieldValue, TextExtraField
+from server.domain.extra_fields.entities import (
+    BoolExtraField,
+    ExtraField,
+    ExtraFieldValue,
+    TextExtraField,
+)
 from server.domain.organizations.types import Siret
 from server.infrastructure.database import Database
 from server.infrastructure.extra_fields.models import ExtraFieldValueModel
@@ -1135,16 +1140,65 @@ class TestExtraFieldValues:
         self, client: httpx.AsyncClient
     ) -> None:
         bus = resolve(MessageBus)
-        siret, user, extra_field_id = await self._setup()
+        siret = await bus.execute(CreateOrganizationFactory.build())
 
-        value = "204 Go"
+        extra_fields: List[ExtraField] = [
+            TextExtraField(
+                title="Latitude GPS du MTE",
+                hint_text="La latitude où se trouve le MTE",
+                name="latitude_mte",
+                organization_siret=siret,
+            ),
+            BoolExtraField(
+                data={
+                    "false_value": "Oui",
+                    "true_value": "Non",
+                },
+                title="Type de données",
+                hint_text="Est-ce que ces données sont des données ?",
+                name="type_donnees",
+                organization_siret=siret,
+            ),
+        ]
+
+        await bus.execute(
+            CreateCatalog(organization_siret=siret, extra_fields=extra_fields)
+        )
+
+        catalog = await bus.execute(GetCatalogBySiret(siret=siret))
+
+        user = await create_test_password_user(
+            CreatePasswordUserFactory.build(organization_siret=siret)
+        )
+
+        value_1 = "48.891980000000046"
+        value_2 = "Non"
 
         command = CreateDatasetFactory.build(
             account=user.account,
             organization_siret=siret,
             format_ids=[1, 2],
             extra_field_values=[
-                ExtraFieldValue(extra_field_id=extra_field_id, value=value)
+                ExtraFieldValue(
+                    extra_field_id=catalog.extra_fields[0].id, value=value_1
+                ),
+                ExtraFieldValue(
+                    extra_field_id=catalog.extra_fields[1].id, value=value_2
+                ),
+            ],
+        )
+
+        await bus.execute(command)
+
+        command = CreateDatasetFactory.build(
+            account=user.account,
+            organization_siret=siret,
+            format_ids=[1, 2],
+            extra_field_values=[
+                ExtraFieldValue(
+                    extra_field_id=catalog.extra_fields[0].id, value="85Go"
+                ),
+                ExtraFieldValue(extra_field_id=catalog.extra_fields[1].id, value="Oui"),
             ],
         )
 
@@ -1160,8 +1214,21 @@ class TestExtraFieldValues:
         await bus.execute(command)
 
         params = {
-            "extra_field_value": json.dumps(
-                {"extra_field_id": str(extra_field_id), "value": value}
+            "extra_field_values": json.dumps(
+                [
+                    {
+                        "extra_field_id": str(
+                            catalog.extra_fields[0].id,
+                        ),
+                        "value": value_1,
+                    },
+                    {
+                        "extra_field_id": str(
+                            catalog.extra_fields[1].id,
+                        ),
+                        "value": value_2,
+                    },
+                ]
             )
         }
 

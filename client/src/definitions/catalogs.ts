@@ -5,7 +5,7 @@ export type Catalog = {
   organization: Organization;
   extraFields: ExtraField[];
 };
-export interface ExtraFieldValue {
+export type ExtraFieldValue = {
   extraFieldId: string;
   value: string;
-}
+};

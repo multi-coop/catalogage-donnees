@@ -49,7 +49,7 @@ describe("transformers -- Dataset filters", () => {
     technicalSource: "Serveur GIS",
     tagId: null,
     license: "Licence Ouverte",
-    extraFieldValue: null,
+    extraFieldValues: null,
   };
 
   test("toFiltersParams", () => {
@@ -61,7 +61,7 @@ describe("transformers -- Dataset filters", () => {
       ["technical_source", "Serveur GIS"],
       ["tag_id", null],
       ["license", "Licence Ouverte"],
-      ["extra_field_value", null],
+      ["extra_field_values", null],
     ];
 
     expect(toFiltersParams(value)).toEqual(params);

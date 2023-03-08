@@ -77,12 +77,37 @@ export const toFiltersInfo = (data: any): DatasetFiltersInfo => {
   };
 };
 
+const getExtraFieldValues = (
+  extraFieldValuesString: string | null
+): ExtraFieldValue[] | null => {
+  if (!extraFieldValuesString) {
+    return null;
+  }
+
+  return JSON.parse(extraFieldValuesString).map(
+    transformAPIQueryParamToExtraFieldValue
+  );
+};
+
+const getExtraFieldValuesString = (
+  extraFieldValues: ExtraFieldValue[] | null
+): string | null => {
+  if (!extraFieldValues) {
+    return null;
+  }
+
+  return JSON.stringify(
+    extraFieldValues.map(transformExtraFieldValueToAPIQueryParam)
+  );
+};
+
 export const toFiltersValue = (
   searchParams: URLSearchParams
 ): DatasetFiltersValue => {
   const formatId = searchParams.get("format_id");
 
-  const extraFieldValue = searchParams.get("extra_field_value");
+  const extraFieldValuesString = searchParams.get("extra_field_values");
+
   return {
     organizationSiret: searchParams.get("organization_siret"),
     geographicalCoverage: searchParams.get("geographical_coverage"),
@@ -91,9 +116,7 @@ export const toFiltersValue = (
     technicalSource: searchParams.get("technical_source"),
     tagId: searchParams.get("tag_id"),
     license: searchParams.get("license"),
-    extraFieldValue: extraFieldValue
-      ? transformAPIQueryParamToExtraFieldValue(JSON.parse(extraFieldValue))
-      : null,
+    extraFieldValues: getExtraFieldValues(extraFieldValuesString),
   };
 };
 
@@ -108,7 +131,7 @@ export const toFiltersParams = (
     technicalSource,
     tagId,
     license,
-    extraFieldValue,
+    extraFieldValues,
   } = value;
 
   return [
@@ -119,14 +142,7 @@ export const toFiltersParams = (
     ["technical_source", technicalSource],
     ["tag_id", tagId],
     ["license", license],
-    [
-      "extra_field_value",
-      extraFieldValue
-        ? JSON.stringify(
-            transformExtraFieldValueToAPIQueryParam(extraFieldValue)
-          )
-        : null,
-    ],
+    ["extra_field_values", getExtraFieldValuesString(extraFieldValues)],
   ];
 };
 
@@ -165,7 +181,7 @@ export const toFiltersButtonTexts = (
   tagIdToName: Record<string, string>,
   formatIdToName: Record<string, string>
 ): {
-  [K in keyof Omit<DatasetFiltersValue, "extraFieldValue">]: Maybe<string>;
+  [K in keyof Omit<DatasetFiltersValue, "extraFieldValues">]: Maybe<string>;
 } => {
   return {
     organizationSiret: Maybe.map(

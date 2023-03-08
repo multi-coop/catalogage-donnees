@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Optional
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
@@ -53,11 +53,11 @@ async def list_datasets(
 
     page = Page(number=params.page_number, size=params.page_size)
 
-    extra_field_value: Optional[ExtraFieldValue] = None
+    extra_field_values: Optional[List[ExtraFieldValue]] = None
 
-    if params.extra_field_value is not None:
-        item = json.loads(params.extra_field_value)
-        extra_field_value = ExtraFieldValue(**item)
+    if params.extra_field_values is not None:
+        items = json.loads(params.extra_field_values)
+        extra_field_values = [ExtraFieldValue(**item) for item in items]
 
     query = GetAllDatasets(
         page=page,
@@ -70,7 +70,7 @@ async def list_datasets(
             technical_source__in=params.technical_source,
             tag__id__in=params.tag_id,
             license=params.license,
-            extra_field_value=extra_field_value,
+            extra_field_values=extra_field_values,
         ),
         account=request.user.account,
     )

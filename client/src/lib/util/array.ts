@@ -28,3 +28,14 @@ export const last = <T>(arr: ArrayWithItems<T>): T => {
 
 export const removeEmptyValues = (items: Array<string | null>): Array<string> =>
   items.filter((item) => item) as string[];
+
+export const chunk = <T = string>(
+  arr: T[],
+  chunkSize = 1,
+  cache: T[][] = []
+): T[][] => {
+  const tmp: T[] = [...arr];
+  if (chunkSize <= 0) return cache;
+  while (tmp.length) cache.push(tmp.splice(0, chunkSize));
+  return cache;
+};
