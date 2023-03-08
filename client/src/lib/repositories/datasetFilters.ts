@@ -17,7 +17,7 @@ export const getDatasetFiltersInfo: GetDatasetFiltersInfo = async ({
   const urlBase = `${getApiUrl()}/datasets/filters`;
 
   const url = organizationSiret
-    ? `${urlBase}?organization_siret=${organizationSiret}`
+    ? `${urlBase}/?organization_siret=${organizationSiret}`
     : `${urlBase}/`;
 
   const request = new Request(url, {

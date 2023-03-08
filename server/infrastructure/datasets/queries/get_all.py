@@ -170,6 +170,8 @@ class GetAllQuery:
             .order_by(*orderbyclauses, CatalogRecordModel.created_at.desc())
         )
 
+        print(self.statement)
+
     def instance(self, row: Row) -> DatasetModel:
         return row[0]
 
