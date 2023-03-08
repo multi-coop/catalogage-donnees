@@ -132,14 +132,22 @@ class GetAllQuery:
             else:
                 whereclauses.append(DatasetModel.license == license)
 
-        if (extra_field_value := spec.extra_field_value) is not None:
+        if (extra_field_values := spec.extra_field_values) is not None:
             joinclauses.append((DatasetModel.extra_field_values, {"isouter": True}))
-            whereclauses.append(
-                ExtraFieldValueModel.value.like(f"%{extra_field_value.value}%")
-            )
+
+            clauses = [
+                and_(
+                    ExtraFieldValueModel.value.like(f"%{extra_field_value.value}%"),
+                    ExtraFieldValueModel.extra_field_id
+                    == extra_field_value.extra_field_id,
+                )
+                for extra_field_value in extra_field_values
+            ]
+
+            whereclauses.append(or_(*clauses))
 
         stmt = (
-            select(DatasetModel, *columns)
+            select(DatasetModel, CatalogRecordModel.created_at, *columns)
             .join(DatasetModel.catalog_record)
             .join(CatalogRecordModel.catalog)
             .join(CatalogModel.organization)
@@ -157,6 +165,7 @@ class GetAllQuery:
                 selectinload(DatasetModel.tags),
                 selectinload(DatasetModel.extra_field_values),
             )
+            .distinct()
             .where(*whereclauses)
             .order_by(*orderbyclauses, CatalogRecordModel.created_at.desc())
         )
