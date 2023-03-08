@@ -347,6 +347,31 @@ async def test_get_catalog(
 
 
 @pytest.mark.asyncio
+async def test_get_catalogs(
+    client: httpx.AsyncClient, temp_user: TestPasswordUser
+) -> None:
+    bus = resolve(MessageBus)
+
+    siret = await bus.execute(CreateOrganizationFactory.build(name="Org 1"))
+    await bus.execute(
+        CreateCatalog(
+            organization_siret=siret,
+            extra_fields=[
+                TextExtraField(
+                    organization_siret=siret,
+                    name="domaine",
+                    title="Domaine",
+                    hint_text="Domaine associé au jeu de données",
+                )
+            ],
+        )
+    )
+    response = await client.get("/catalogs/", auth=temp_user.auth)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
 class TestCatalogPermissions:
     async def test_create_anonymous_forbidden(self, client: httpx.AsyncClient) -> None:
         bus = resolve(MessageBus)
