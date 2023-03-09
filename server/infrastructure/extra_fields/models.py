@@ -53,7 +53,7 @@ class ExtraFieldValueModel(Base):
     __tablename__ = "extra_field_value"
 
     dataset_id: ID = Column(
-        UUID(as_uuid=True), ForeignKey("dataset.id"), primary_key=True
+        UUID(as_uuid=True), ForeignKey("dataset.id"), primary_key=True, index=True
     )
     dataset: "DatasetModel" = relationship(
         "DatasetModel", back_populates="extra_field_values"

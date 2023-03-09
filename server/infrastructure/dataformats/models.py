@@ -13,7 +13,7 @@ if TYPE_CHECKING:  # pragma: no cover
 dataset_dataformat = Table(
     "dataset_dataformat",
     mapper_registry.metadata,
-    Column("dataset_id", ForeignKey("dataset.id"), primary_key=True),
+    Column("dataset_id", ForeignKey("dataset.id"), primary_key=True, index=True),
     Column("dataformat_id", ForeignKey("dataformat.id"), primary_key=True),
 )
 
