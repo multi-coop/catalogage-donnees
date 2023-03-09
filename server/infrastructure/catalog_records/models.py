@@ -23,9 +23,7 @@ class CatalogRecordModel(Base):
         DateTime(timezone=True), server_default=func.clock_timestamp(), nullable=False
     )
     organization_siret: Siret = Column(
-        CHAR(14),
-        ForeignKey("catalog.organization_siret"),
-        nullable=False,
+        CHAR(14), ForeignKey("catalog.organization_siret"), nullable=False, index=True
     )
 
     catalog: "CatalogModel" = relationship(

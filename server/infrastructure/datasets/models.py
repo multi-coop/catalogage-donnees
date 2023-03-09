@@ -24,6 +24,7 @@ class DatasetModel(Base):
     catalog_record_id: uuid.UUID = Column(
         UUID(as_uuid=True),
         ForeignKey("catalog_record.id", ondelete="CASCADE"),
+        index=True,
         nullable=False,
     )
     catalog_record: "CatalogRecordModel" = relationship(
@@ -33,19 +34,21 @@ class DatasetModel(Base):
         uselist=False,
     )
 
-    title = Column(String, nullable=False)
-    description = Column(String, nullable=False)
-    service = Column(String, nullable=False)
-    geographical_coverage = Column(String, nullable=False)
+    title = Column(String, nullable=False, index=True)
+    description = Column(String, nullable=False, index=True)
+    service = Column(String, nullable=False, index=True)
+    geographical_coverage = Column(String, nullable=False, index=True)
     formats: List[DataFormatModel] = relationship(
         "DataFormatModel",
         back_populates="datasets",
         secondary=dataset_dataformat,
     )
-    technical_source = Column(String)
-    producer_email = Column(String, nullable=True)
+    technical_source = Column(String, index=True)
+    producer_email = Column(String, nullable=True, index=True)
     contact_emails = Column(ARRAY(String), server_default="{}", nullable=False)
-    update_frequency = Column(Enum(UpdateFrequency, enum="update_frequency_enum"))
+    update_frequency = Column(
+        Enum(UpdateFrequency, enum="update_frequency_enum"), index=True
+    )
     publication_restriction = Column(
         Enum(PublicationRestriction, enum="publication_restriction_enum")
     )
