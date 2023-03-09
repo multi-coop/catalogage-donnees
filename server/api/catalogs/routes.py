@@ -1,11 +1,17 @@
 # flake8: noqa E501
 
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, Response
 
 from server.application.catalogs.commands import CreateCatalog
-from server.application.catalogs.queries import GetCatalogBySiret, GetCatalogExport
+from server.application.catalogs.queries import (
+    GetAllCatalogs,
+    GetCatalogBySiret,
+    GetCatalogExport,
+)
 from server.application.catalogs.views import CatalogView
 from server.config.di import resolve
 from server.domain.catalogs.exceptions import CatalogAlreadyExists, CatalogDoesNotExist
@@ -58,6 +64,12 @@ async def get_catalog(siret: Siret) -> CatalogView:
         return await bus.execute(GetCatalogBySiret(siret=siret))
     except CatalogDoesNotExist as exc:
         raise HTTPException(404, detail=str(exc))
+
+
+@router.get("/", dependencies=[Depends(IsAuthenticated())])
+async def get_catalogs() -> List[CatalogView]:
+    bus = resolve(MessageBus)
+    return await bus.execute(GetAllCatalogs())
 
 
 @router.get("/{siret}/export.csv")
