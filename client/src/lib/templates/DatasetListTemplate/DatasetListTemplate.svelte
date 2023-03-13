@@ -10,9 +10,13 @@
   import paths from "$lib/paths";
   import OrganizationCard from "src/lib/components/OrganizationCard/OrganizationCard.svelte";
   import logoMC from "$lib/assets/organizations/logoMC.svg";
+  import type { Catalog } from "src/definitions/catalogs";
 
   export let paginatedDatasets: Maybe<Paginated<Dataset>>;
   export let currentPage: number;
+  export let catalogs: Maybe<Catalog[]>
+
+  console.log(catalogs)
 
   const submitSearch = (event: CustomEvent<string>) => {
     const q = event.detail;
@@ -20,6 +24,7 @@
     const href = `${paths.datasetSearch}${queryString}`;
     goto(href);
   };
+
 </script>
 
 <section class="fr-background-alt--grey fr-mb-6w">

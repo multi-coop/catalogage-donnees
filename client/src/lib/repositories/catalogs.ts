@@ -10,6 +10,11 @@ type GetCatalogBySiret = (opts: {
   siret: string;
 }) => Promise<Maybe<Catalog>>;
 
+type GetCatalogs = (opts: {
+  fetch: Fetch;
+  apiToken: string;
+}) => Promise<Maybe<Catalog[]>>;
+
 export const getCatalogBySiret: GetCatalogBySiret = async ({
   fetch,
   apiToken,
@@ -28,3 +33,21 @@ export const getCatalogBySiret: GetCatalogBySiret = async ({
     return toCatalog(data);
   });
 };
+
+export const getCatalogs: GetCatalogs = async ({
+  fetch,
+  apiToken
+}) => {
+  const url = `${getApiUrl()}/catalogs/`;
+
+  const request = new Request(url, {
+    headers: getHeaders(apiToken),
+  });
+
+  const response = await makeApiRequest(fetch, request);
+
+  return Maybe.map(response, async (response) => {
+    const data = await response.json();
+    return data
+  });
+}
