@@ -5,7 +5,7 @@
     DatasetFiltersInfo,
     DatasetFiltersValue,
   } from "src/definitions/datasetFilters";
-  import type { ExtraField } from "src/definitions/extraField";
+
   import type { SelectOption } from "src/definitions/form";
   import type { Organization } from "src/definitions/organization";
   import type { Tag } from "src/definitions/tag";
@@ -16,8 +16,10 @@
     toFiltersButtonTexts,
     toFiltersOptions,
   } from "src/lib/transformers/datasetFilters";
-  import { toSelectOption } from "src/lib/transformers/extraField";
-  import { chunk } from "src/lib/util/array";
+  import {
+    toSelectOption,
+    transformEnumExtraFieldToSelectOptoon,
+  } from "src/lib/transformers/extraField";
   import { createEventDispatcher } from "svelte";
 
   export let info: DatasetFiltersInfo;
@@ -39,7 +41,9 @@
     return map;
   };
 
-  $: extraFieldChunks = chunk<ExtraField>(info.extraFields, 5);
+  $: extraFields = info.extraFields.filter(
+    (item) => item.type === "ENUM" || item.type == "BOOL"
+  );
 
   $: organizationSiretToName = createOrganizationSiretToNameMap(
     info.organizationSiret
@@ -83,31 +87,42 @@
     return extraFieldValues.some((item) => item.extraFieldId === id);
   };
 
-  const handleExtraFieldValueChange = (name: string, event: Event) => {
-    const target = event.target as HTMLInputElement;
+  const handleRadioButtonChange = (extraFieldId: string, event: Event) => {
+    const value = (event.target as HTMLInputElement).value;
 
+    handleExtraFieldValueChange(extraFieldId, value);
+  };
+
+  const handleExtraFieldValueChange = (
+    extraFieldId: string,
+    valueFromInput: string | null
+  ) => {
     let newExtraFieldValues: ExtraFieldValue[] = [];
 
+    if (!valueFromInput) {
+      return;
+    }
+
     if (value.extraFieldValues) {
-      if (hasAlreadyTheFilter(value.extraFieldValues, name)) {
+      if (hasAlreadyTheFilter(value.extraFieldValues, extraFieldId)) {
         const filteredExtraFields = removeExistingExtraFieldValue(
           value.extraFieldValues,
-          name
+          extraFieldId
         );
 
         newExtraFieldValues = [
           ...filteredExtraFields,
           {
-            extraFieldId: name,
-            value: target.value,
+            extraFieldId: extraFieldId,
+            value: valueFromInput,
           },
         ];
       } else {
         newExtraFieldValues = [
           ...value.extraFieldValues,
           {
-            extraFieldId: name,
-            value: target.value,
+            extraFieldId: extraFieldId,
+            value: valueFromInput,
           },
         ];
       }
@@ -116,8 +131,8 @@
     if (!value.extraFieldValues) {
       newExtraFieldValues = [
         {
-          extraFieldId: name,
-          value: target.value,
+          extraFieldId: extraFieldId,
+          value: valueFromInput,
         },
       ];
     }
@@ -131,11 +146,8 @@
   };
 </script>
 
-<div
-  data-test-id="filter-panel"
-  class="fr-grid-row fr-grid-row--gutters fitler_section fr-mt-3w"
->
-  <section>
+<div data-test-id="filter-panel" class="filter-row fr-mt-2w">
+  <section class="filter-col">
     <h6>Informations générales</h6>
 
     <div class="fr-mb-2w">
@@ -177,7 +189,7 @@
     </div>
   </section>
 
-  <section>
+  <section class="filter-col">
     <h6>Sources et formats</h6>
 
     <div class="fr-mb-2w">
@@ -198,8 +210,7 @@
       />
     </div>
   </section>
-
-  <section>
+  <section class="filter-col">
     <h6>Mots-clés thématiques</h6>
 
     <div class="fr-mb-2w">
@@ -212,39 +223,43 @@
     </div>
   </section>
 </div>
-{#if info.extraFields.length > 0 && info.extraFields.some((item) => item.type === "BOOL")}
-  <section
-    class="fr-py-3w fr-grid-row fr-grid-row--gutters extra_field_filters_section"
-  >
+{#if info.extraFields.length > 0}
+  <section class="fr-mt-2w">
     <h6>Champs complémentaires</h6>
-
-    {#each extraFieldChunks as extraFieldChunk}
-      <div class="fr-grid-row  extra_field_filter_chunck">
-        {#each extraFieldChunk as extraField}
+    <div class="filter-row">
+      {#each extraFields as extraField}
+        <div class="filter-col">
           {#if extraField.type === "BOOL"}
             <BooleanSearchFilter
               name={extraField.name}
               options={toSelectOption(extraField)}
               label={extraField.title}
-              on:change={(e) => handleExtraFieldValueChange(extraField.id, e)}
+              on:change={(e) => handleRadioButtonChange(extraField.id, e)}
             />
           {/if}
-        {/each}
-      </div>
-    {/each}
+
+          {#if extraField.type === "ENUM"}
+            <TextSearchFilter
+              label={extraField.title}
+              options={transformEnumExtraFieldToSelectOptoon(extraField)}
+              on:selectOption={(e) =>
+                handleExtraFieldValueChange(extraField.id, `${e.detail.value}`)}
+            />
+          {/if}
+        </div>
+      {/each}
+    </div>
   </section>
 {/if}
 
 <style>
-  .extra_field_filters_section {
-    flex-direction: column;
-  }
-
-  .fitler_section {
+  .filter-row {
+    display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
   }
 
-  .extra_field_filter_chunck {
-    gap: 80px;
+  .filter-col {
+    width: 30%;
   }
 </style>
