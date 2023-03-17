@@ -1,7 +1,7 @@
 <div class="fr-connect-group">
   <button class="fr-connect" on:click>
     <span class="fr-connect__login">S’identifier avec</span>
-    <span class="fr-connect__brand">FranceConnect</span>
+    <span class="fr-connect__brand">MonComptePro</span>
   </button>
   <p>
     <a
