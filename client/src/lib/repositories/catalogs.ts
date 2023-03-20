@@ -34,10 +34,7 @@ export const getCatalogBySiret: GetCatalogBySiret = async ({
   });
 };
 
-export const getCatalogs: GetCatalogs = async ({
-  fetch,
-  apiToken
-}) => {
+export const getCatalogs: GetCatalogs = async ({ fetch, apiToken }) => {
   const url = `${getApiUrl()}/catalogs/`;
 
   const request = new Request(url, {
@@ -48,6 +45,6 @@ export const getCatalogs: GetCatalogs = async ({
 
   return Maybe.map(response, async (response) => {
     const data = await response.json();
-    return data
+    return data;
   });
-}
+};

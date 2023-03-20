@@ -19,17 +19,19 @@
 
   let pageNumber = getPageFromParams($page.url.searchParams) || 1;
 
-  const getDatasetsAndOrganizations = async(fetch : Fetch, apiToken : string, page:number) : Promise<[Maybe<Paginated<Dataset>>, Maybe<Catalog[]>]> => {
-
+  const getDatasetsAndOrganizations = async (
+    fetch: Fetch,
+    apiToken: string,
+    page: number
+  ): Promise<[Maybe<Paginated<Dataset>>, Maybe<Catalog[]>]> => {
     // fetch datasets
 
-    const datasets = await getDatasets({fetch, apiToken, page: pageNumber})
-  
-    const catalogs = await getCatalogs({fetch, apiToken}) 
+    const datasets = await getDatasets({ fetch, apiToken, page: pageNumber });
 
+    const catalogs = await getCatalogs({ fetch, apiToken });
 
-    return [datasets, catalogs]
-  }
+    return [datasets, catalogs];
+  };
 </script>
 
 <SkipLink
@@ -49,7 +51,11 @@
         <Spinner />
       </div>
     {:then [paginatedDatasets, catalogs]}
-      <DatasetListTemplate currentPage={pageNumber} {paginatedDatasets} {catalogs}/>
+      <DatasetListTemplate
+        currentPage={pageNumber}
+        {paginatedDatasets}
+        {catalogs}
+      />
     {/await}
   {:else}
     <LandingTemplate />

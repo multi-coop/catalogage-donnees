@@ -10,12 +10,12 @@
   import paths from "$lib/paths";
   import OrganizationCard from "src/lib/components/OrganizationCard/OrganizationCard.svelte";
   import type { Catalog } from "src/definitions/catalogs";
-  
+
   export let paginatedDatasets: Maybe<Paginated<Dataset>>;
   export let currentPage: number;
-  export let catalogs: Maybe<Catalog[]>
+  export let catalogs: Maybe<Catalog[]>;
 
-  console.log(catalogs)
+  console.log(catalogs);
 
   const submitSearch = (event: CustomEvent<string>) => {
     const q = event.detail;
@@ -23,7 +23,6 @@
     const href = `${paths.datasetSearch}${queryString}`;
     goto(href);
   };
-
 </script>
 
 <section class="fr-background-alt--grey fr-mb-6w">
@@ -36,12 +35,10 @@
 </section>
 
 <section class="fr-container fr-py-8w">
-  <h2 class="fr-h3">
-    Les catalogues
-  </h2>
+  <h2 class="fr-h3">Les catalogues</h2>
   <div class="fr-grid-row fr-grid-row--gutters">
     {#if catalogs}
-      {#each catalogs as {organization}}
+      {#each catalogs as { organization }}
         {#if organization.siret != "00000000000000"}
           <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
             <OrganizationCard

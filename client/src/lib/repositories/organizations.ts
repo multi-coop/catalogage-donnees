@@ -22,8 +22,8 @@ export const getOrganizations: GetOrganizations = async ({
 
   return Maybe.map(response, async (response) => {
     const data = await response.json();
-    console.log(data)
-    
-    return data
+    console.log(data);
+
+    return data;
   });
 };
