@@ -36,9 +36,9 @@
     title="Consulter cette fiche de données"
   >
     <div class="item__logo">
-      {#if dataset.catalogRecord.organization.logoUrl}
+      {#if dataset.catalogRecord.organization.logo_url}
         <img
-          src={dataset.catalogRecord.organization.logoUrl}
+          src={dataset.catalogRecord.organization.logo_url}
           alt={`logo ${dataset.catalogRecord.organization.name}`}
         />
       {:else}

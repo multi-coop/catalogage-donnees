@@ -34,10 +34,10 @@
     <header class="fr-mt-5w">
       <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle">
         <div class="fr-col-sm-4 fr-col-md-3 fr-col-lg-2">
-          {#if catalog.organization.logoUrl}
+          {#if catalog.organization.logo_url}
             <img
               class="organization-logo"
-              src={catalog.organization.logoUrl}
+              src={catalog.organization.logo_url}
               alt={`logo ${catalog.organization.name}`}
             />
           {:else}
