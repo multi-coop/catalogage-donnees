@@ -6,7 +6,7 @@ export const getFakeDataset = (dataset: Partial<Dataset> = {}): Dataset => {
     id: dataset.id || "xxx-xxx-xxx",
     catalogRecord: dataset.catalogRecord || {
       createdAt: new Date(),
-      organization: { name: "Fake", siret: "00000000000000" },
+      organization: { name: "Fake", siret: "00000000000000", logo_url: "https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/culture/logo.svg" },
     },
     title: dataset.title || "Mon jeu de donnée",
     description: dataset.description || "un joli jeu de donnée",
