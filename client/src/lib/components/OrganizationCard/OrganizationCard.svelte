@@ -1,6 +1,6 @@
 <script lang="ts">
   export let name: string;
-  export let src: string | undefined;
+  export let src: string;
   export let href = "";
   export let status: "catalog" | "registered" | "pending";
 </script>
