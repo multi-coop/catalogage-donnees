@@ -15,8 +15,6 @@
   export let currentPage: number;
   export let catalogs: Maybe<Catalog[]>;
 
-  console.log(catalogs);
-
   const submitSearch = (event: CustomEvent<string>) => {
     const q = event.detail;
     const queryString = toQueryString([["q", q]]);

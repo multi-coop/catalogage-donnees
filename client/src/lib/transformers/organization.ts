@@ -7,6 +7,6 @@ export const toOrganization = (
 ): Organization => {
   return {
     ...rawOrganization,
-    logoUrl: rawOrganization.logo_url,
+    logo_url: rawOrganization.logo_url,
   };
 };

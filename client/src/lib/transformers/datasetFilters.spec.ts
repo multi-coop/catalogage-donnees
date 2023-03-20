@@ -14,7 +14,7 @@ import {
 
 describe("transformers -- Dataset filters", () => {
   const info: DatasetFiltersInfo = {
-    organizationSiret: [{ siret: "ign_siret", name: "IGN" }],
+    organizationSiret: [{ siret: "ign_siret", name: "IGN", logo_url: "" }],
     geographicalCoverage: [
       "Métropole Européenne de Lille",
       "France métropolitaine",
