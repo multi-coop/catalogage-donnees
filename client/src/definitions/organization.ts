@@ -1,5 +1,5 @@
 export type Organization = {
   siret: string;
   name: string;
-  logoUrl?: string;
+  logo_url?: string;
 };
