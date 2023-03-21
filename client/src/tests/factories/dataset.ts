@@ -9,7 +9,7 @@ export const getFakeDataset = (dataset: Partial<Dataset> = {}): Dataset => {
       organization: {
         name: "Fake",
         siret: "00000000000000",
-        logo_url:
+        logoUrl:
           "https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/culture/logo.svg",
       },
     },

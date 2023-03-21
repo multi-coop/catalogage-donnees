@@ -14,8 +14,8 @@ export const getFakeOrganization = (
   return {
     name: obj.name || "Test org",
     siret: obj.siret || getFakeSiret(),
-    logo_url:
-      obj.logo_url ||
+    logoUrl:
+      obj.logoUrl ||
       "https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/culture/logo.svg",
   };
 };

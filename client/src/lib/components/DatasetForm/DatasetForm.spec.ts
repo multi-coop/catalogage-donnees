@@ -32,7 +32,7 @@ describe("Test the dataset form", () => {
   const organization: Organization = {
     siret: "<siret>",
     name: "Org 1",
-    logo_url:
+    logoUrl:
       "https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/culture/logo.svg",
   };
 
@@ -199,7 +199,7 @@ describe("Test the dataset form", () => {
         organization: {
           name: "Fake",
           siret: "<siret>",
-          logo_url:
+          logoUrl:
             "https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/culture/logo.svg",
         },
       },
@@ -304,7 +304,7 @@ describe("Test the dataset form", () => {
         organization: {
           name: "Fake",
           siret: "<siret>",
-          logo_url:
+          logoUrl:
             "https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/culture/logo.svg",
         },
       },

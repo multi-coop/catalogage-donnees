@@ -45,7 +45,7 @@
 <!-- svelte-ignore a11y-no-redundant-roles -- this is the main page region. Here this role is not redundant -->
 <main id="contenu" role="main">
   {#if $account}
-    {#await getDatasetsAndOrganizations(fetch, $apiToken, pageNumber)}
+    {#await getDatasetsAndOrganizations(fetch, $apiToken)}
       <div class="spinner-container">
         <Spinner />
       </div>

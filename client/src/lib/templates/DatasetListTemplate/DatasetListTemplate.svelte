@@ -41,7 +41,7 @@
           <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
             <OrganizationCard
               name={organization.name}
-              src={organization.logo_url}
+              src={organization.logoUrl}
               href={`/fiches/search?organization_siret=${organization.siret}&page=1`}
               status="catalog"
             />

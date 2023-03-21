@@ -15,7 +15,7 @@ export const ADMIN_PASSWORD_SANTE = getToolsPassword(
 export const TEST_ORGANIZATION: Organization = {
   siret: "11004601800013",
   name: "Ministère de la culture",
-  logo_url:
+  logoUrl:
     "https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/culture/logo.svg",
 };
 
