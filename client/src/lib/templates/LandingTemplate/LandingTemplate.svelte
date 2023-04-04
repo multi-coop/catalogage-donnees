@@ -65,7 +65,7 @@
       <OrganizationCard
         name="Agence nationale de l'habitat"
         src={"https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/anah/logo.svg"}
-        status="pending"
+        status="catalog"
       />
     </div>
 
@@ -73,7 +73,9 @@
       <OrganizationCard
         name="Direction interministérielle du numérique"
         src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/dinum/logo.svg"
-        status="pending"
+        status="catalog"
+      />
+    </div>
       />
     </div>
   </div>
