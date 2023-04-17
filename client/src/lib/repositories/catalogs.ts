@@ -1,6 +1,11 @@
 import type { Catalog } from "src/definitions/catalogs";
 import type { Fetch } from "src/definitions/fetch";
-import { getApiUrl, getHeaders, makeApiRequest } from "../fetch";
+import {
+  getApiUrl,
+  getHeaders,
+  makeApiRequest,
+  makeApiRequestOrFail,
+} from "../fetch";
 import { toCatalog } from "../transformers/catalogs";
 import { Maybe } from "../util/maybe";
 
@@ -9,11 +14,6 @@ type GetCatalogBySiret = (opts: {
   apiToken: string;
   siret: string;
 }) => Promise<Maybe<Catalog>>;
-
-type GetCatalogs = (opts: {
-  fetch: Fetch;
-  apiToken: string;
-}) => Promise<Maybe<Catalog[]>>;
 
 export const getCatalogBySiret: GetCatalogBySiret = async ({
   fetch,
@@ -34,17 +34,20 @@ export const getCatalogBySiret: GetCatalogBySiret = async ({
   });
 };
 
+type GetCatalogs = (opts: {
+  fetch: Fetch;
+  apiToken: string;
+}) => Promise<Catalog[]>;
+
 export const getCatalogs: GetCatalogs = async ({ fetch, apiToken }) => {
   const url = `${getApiUrl()}/catalogs/`;
 
   const request = new Request(url, {
     headers: getHeaders(apiToken),
   });
-
-  const response = await makeApiRequest(fetch, request);
-
-  return Maybe.map(response, async (response) => {
-    const data = await response.json();
-    return data;
-  });
+  const response = await makeApiRequestOrFail(fetch, request);
+  const data = await response.json();
+  return data
+    .map(toCatalog)
+    .filter((item) => item.organization.siret !== "00000000000000");
 };

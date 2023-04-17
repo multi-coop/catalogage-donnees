@@ -22,9 +22,7 @@
   const getDatasetsAndOrganizations = async (
     fetch: Fetch,
     apiToken: string
-  ): Promise<[Maybe<Paginated<Dataset>>, Maybe<Catalog[]>]> => {
-    // fetch datasets
-
+  ): Promise<[Maybe<Paginated<Dataset>>, Catalog[]]> => {
     const datasets = await getDatasets({ fetch, apiToken, page: pageNumber });
 
     const catalogs = await getCatalogs({ fetch, apiToken });
