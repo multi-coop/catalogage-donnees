@@ -8,9 +8,14 @@
   import SearchForm from "$lib/components/SearchForm/SearchForm.svelte";
   import PaginationContainer from "$lib/components/PaginationContainer/PaginationContainer.svelte";
   import paths from "$lib/paths";
+  import OrganizationCard from "src/lib/components/OrganizationCard/OrganizationCard.svelte";
+  import type { Catalog } from "src/definitions/catalogs";
 
   export let paginatedDatasets: Maybe<Paginated<Dataset>>;
   export let currentPage: number;
+  export let catalogs: Catalog[];
+
+  console.log(catalogs);
 
   const submitSearch = (event: CustomEvent<string>) => {
     const q = event.detail;
@@ -26,6 +31,24 @@
       <h1>Recherchez un jeu de données</h1>
       <SearchForm on:submit={submitSearch} />
     </div>
+  </div>
+</section>
+
+<section class="fr-container fr-py-8w">
+  <h2 class="fr-h3">Les catalogues</h2>
+  <div class="fr-grid-row fr-grid-row--gutters">
+    {#if catalogs}
+      {#each catalogs as { organization }}
+        <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
+          <OrganizationCard
+            name={organization.name}
+            src={organization.logoUrl}
+            href={`/fiches/search?organization_siret=${organization.siret}&page=1`}
+            status="catalog"
+          />
+        </div>
+      {/each}
+    {/if}
   </div>
 </section>
 
