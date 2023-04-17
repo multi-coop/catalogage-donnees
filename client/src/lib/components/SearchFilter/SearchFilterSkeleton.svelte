@@ -4,17 +4,22 @@
   export let buttonText = buttonPlaceholder;
   export let label: string;
   export let isOverlayOpen = false;
+  export let higlighted = false;
 
   $: slug = slugify(label);
 </script>
 
 <div class="container">
-  <span data-testId={`${slug}-label`} id={`${slug}`}>{label}</span>
+  <span
+    class:fr-h5={higlighted}
+    data-testId={`${slug}-label`}
+    id={`${slug}-label`}>{label}</span
+  >
   <button
     aria-labelledby={`${slug}-label`}
     class="fr-select"
     data-testId={`${slug}-button`}
-    on:click>{buttonText}</button
+    on:mousedown>{buttonText}</button
   >
 
   {#if isOverlayOpen}
@@ -27,6 +32,11 @@
 <style>
   button {
     text-align: left;
+  }
+
+  span {
+    display: block;
+    margin-bottom: 15px;
   }
   .container {
     position: relative;

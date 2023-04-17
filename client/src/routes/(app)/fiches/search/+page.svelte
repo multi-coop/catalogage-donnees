@@ -5,7 +5,6 @@
   import SearchForm from "$lib/components/SearchForm/SearchForm.svelte";
   import { patchQueryString } from "$lib/util/urls";
   import { Maybe } from "$lib/util/maybe";
-  import { pluralize } from "src/lib/util/format";
   import FilterPanel from "./_FilterPanel.svelte";
   import PaginationContainer from "$lib/components/PaginationContainer/PaginationContainer.svelte";
   import {
@@ -16,12 +15,15 @@
   import { page as pageStore } from "$app/stores";
   import type { PageData } from "./$types";
   import { onMount } from "svelte";
+  import TextSearchFilter from "src/lib/components/SearchFilter/TextSearchFilter.svelte";
 
   export let data: PageData;
 
   $: ({ paginatedDatasets, q, currentPage, filtersInfo, filtersValue } = data);
 
   let displayFilters = false;
+
+  export let catalogButtonText = "";
 
   onMount(() => {
     const searchParams = $pageStore.url.searchParams;
@@ -38,9 +40,9 @@
     goto(href, { noscroll: true });
   };
 
-  const handleFilterChange = async (e: CustomEvent<DatasetFiltersValue>) => {
+  const handleFilterChange = async (filtersValues: DatasetFiltersValue) => {
     const href = patchQueryString($pageStore.url.searchParams, [
-      ...toFiltersParams(e.detail),
+      ...toFiltersParams(filtersValues),
       makePageParam(1),
     ]);
 
@@ -59,17 +61,49 @@
 
 <section class="fr-container">
   {#if Maybe.Some(paginatedDatasets)}
-    <div class="fr-grid-row summary">
-      <div class="fr-col-12 fr-pb-1w summary__header">
-        <h2>
-          {paginatedDatasets.totalItems}
-          {pluralize(
-            paginatedDatasets.totalItems,
-            "fiche de données",
-            "fiches de données"
-          )}
-        </h2>
+    <div class="fr-grid-row fr-pb-2w summary__header">
+      <div class="fr-col-7">
+        <TextSearchFilter
+          higlighted
+          label="Catalogue"
+          options={filtersInfo.organizationSiret.map(({ name, siret }) => ({
+            label: name,
+            value: siret,
+          }))}
+          buttonText={catalogButtonText ?? "Rechercher..."}
+          on:selectOption={(e) => {
+            if (!e.detail.value) {
+              handleFilterChange({
+                organizationSiret: null,
+                geographicalCoverage: null,
+                service: null,
+                formatId: null,
+                technicalSource: null,
+                tagId: null,
+                license: null,
+                extraFieldValues: null,
+              });
 
+              catalogButtonText = "";
+              return;
+            }
+
+            catalogButtonText = e.detail.label;
+            handleFilterChange({
+              organizationSiret: e.detail.value.toString(),
+              geographicalCoverage: null,
+              service: null,
+              formatId: null,
+              technicalSource: null,
+              tagId: null,
+              license: null,
+              extraFieldValues: null,
+            });
+          }}
+        />
+      </div>
+
+      <div class="fr-col-5 summary__header__buttons">
         <button
           on:click={() => (displayFilters = !displayFilters)}
           class="fr-btn fr-btn--secondary fr-btn--icon-right"
@@ -83,7 +117,7 @@
 
     {#if Maybe.Some(filtersInfo) && displayFilters}
       <FilterPanel
-        on:change={handleFilterChange}
+        on:change={(e) => handleFilterChange(e.detail)}
         info={filtersInfo}
         value={filtersValue}
       />
@@ -107,13 +141,12 @@
     border-bottom: 1px solid var(--border-default-grey);
   }
 
-  h2 {
-    padding: 0;
+  .summary__header__buttons {
+    display: flex;
+    justify-content: flex-end;
   }
 
-  .summary__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .fr-btn {
+    height: 50px;
   }
 </style>

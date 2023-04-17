@@ -8,6 +8,7 @@
   export let buttonText: string | null = "";
   export let label: string;
   export let options: SelectOption<any>[];
+  export let higlighted = false;
 
   $: options = [
     {
@@ -37,11 +38,12 @@
   buttonPlaceholder="Rechercher..."
   buttonText={buttonText || "Rechercher..."}
   isOverlayOpen={showOverLay}
-  on:click={handleShowOverLay}
+  {higlighted}
+  on:mousedown={handleShowOverLay}
 >
   <Basic
     on:selectOption
-    on:selectOption={handleShowOverLay}
+    on:selectOption={() => (showOverLay = false)}
     labelledby={slugify(label)}
     name={slugify(label)}
     on:focusout={handleShowOverLay}

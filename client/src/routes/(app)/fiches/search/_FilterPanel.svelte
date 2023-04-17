@@ -65,10 +65,6 @@
     key: K,
     e: CustomEvent<SelectOption<any> | null>
   ) => {
-    if (key === "organizationSiret" && !e.detail?.value) {
-      value.extraFieldValues = null;
-    }
-
     value[key] = e.detail?.value || null;
     dispatch("change", value);
   };
@@ -146,80 +142,70 @@
   };
 </script>
 
-<div data-test-id="filter-panel" class="filter-row fr-mt-2w">
-  <section class="filter-col">
-    <h6>Informations générales</h6>
+<div data-test-id="filter-panel" class="fr-mt-2w">
+  <section class="">
+    <h3 class="fr-h6">Champs communs</h3>
 
-    <div class="fr-mb-2w">
-      <TextSearchFilter
-        label="Couverture géographique"
-        options={filtersOptions.geographicalCoverage}
-        buttonText={buttonTexts.geographicalCoverage}
-        on:selectOption={(e) => handleSelectFilter("geographicalCoverage", e)}
-      />
-    </div>
+    <div class="fr-grid-row fr-grid-row--gutters">
+      <div class="fr-col-4">
+        <div class="fr-mb-2w">
+          <TextSearchFilter
+            label="Couverture géographique"
+            options={filtersOptions.geographicalCoverage}
+            buttonText={buttonTexts.geographicalCoverage}
+            on:selectOption={(e) =>
+              handleSelectFilter("geographicalCoverage", e)}
+          />
+        </div>
+        <div class="fr-mb-2w">
+          <TextSearchFilter
+            label="Service producteur de la donnée"
+            options={filtersOptions.service}
+            buttonText={buttonTexts.service}
+            on:selectOption={(e) => handleSelectFilter("service", e)}
+          />
+        </div>
 
-    <div class="fr-mb-2w">
-      <TextSearchFilter
-        label="Service producteur de la donnée"
-        options={filtersOptions.service}
-        buttonText={buttonTexts.service}
-        on:selectOption={(e) => handleSelectFilter("service", e)}
-      />
-    </div>
+        <div class="fr-mb-2w">
+          <TextSearchFilter
+            label="Licence de réutilisation"
+            options={filtersOptions.license}
+            buttonText={buttonTexts.license}
+            on:selectOption={(e) => handleSelectFilter("license", e)}
+          />
+        </div>
+      </div>
 
-    <div class="fr-mb-2w">
-      <TextSearchFilter
-        label="Licence de réutilisation"
-        options={filtersOptions.license}
-        buttonText={buttonTexts.license}
-        on:selectOption={(e) => handleSelectFilter("license", e)}
-      />
-    </div>
+      <div class="fr-col-4">
+        <div class="fr-mb-2w">
+          <TextSearchFilter
+            label="Format de mise à disposition"
+            options={filtersOptions.formatId}
+            buttonText={buttonTexts.formatId}
+            on:selectOption={(e) => handleSelectFilter("formatId", e)}
+          />
+        </div>
 
-    <h6 class="fr-mt-3w">Catalogues</h6>
+        <div class="fr-mb-2w">
+          <TextSearchFilter
+            label="Système d'information source"
+            options={filtersOptions.technicalSource}
+            buttonText={buttonTexts.technicalSource}
+            on:selectOption={(e) => handleSelectFilter("technicalSource", e)}
+          />
+        </div>
+      </div>
 
-    <div class="fr-mb-2w">
-      <TextSearchFilter
-        label="Catalogue"
-        options={filtersOptions.organizationSiret}
-        buttonText={buttonTexts.organizationSiret}
-        on:selectOption={(e) => handleSelectFilter("organizationSiret", e)}
-      />
-    </div>
-  </section>
-
-  <section class="filter-col">
-    <h6>Sources et formats</h6>
-
-    <div class="fr-mb-2w">
-      <TextSearchFilter
-        label="Format de mise à disposition"
-        options={filtersOptions.formatId}
-        buttonText={buttonTexts.formatId}
-        on:selectOption={(e) => handleSelectFilter("formatId", e)}
-      />
-    </div>
-
-    <div class="fr-mb-2w">
-      <TextSearchFilter
-        label="Système d'information source"
-        options={filtersOptions.technicalSource}
-        buttonText={buttonTexts.technicalSource}
-        on:selectOption={(e) => handleSelectFilter("technicalSource", e)}
-      />
-    </div>
-  </section>
-  <section class="filter-col">
-    <h6>Mots-clés thématiques</h6>
-
-    <div class="fr-mb-2w">
-      <TextSearchFilter
-        label="Mot-clé"
-        options={filtersOptions.tagId}
-        buttonText={buttonTexts.tagId}
-        on:selectOption={(e) => handleSelectFilter("tagId", e)}
-      />
+      <div class="fr-col-4">
+        <div class="fr-mb-2w">
+          <TextSearchFilter
+            label="Mot-clé"
+            options={filtersOptions.tagId}
+            buttonText={buttonTexts.tagId}
+            on:selectOption={(e) => handleSelectFilter("tagId", e)}
+          />
+        </div>
+      </div>
     </div>
   </section>
 </div>
