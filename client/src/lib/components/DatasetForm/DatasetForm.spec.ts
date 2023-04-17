@@ -32,6 +32,8 @@ describe("Test the dataset form", () => {
   const organization: Organization = {
     siret: "<siret>",
     name: "Org 1",
+    logoUrl:
+      "https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/culture/logo.svg",
   };
 
   const catalog: Catalog = { organization, extraFields: [] };
@@ -194,7 +196,12 @@ describe("Test the dataset form", () => {
     const initial: DatasetFormInitial = {
       catalogRecord: {
         createdAt: new Date(),
-        organization: { name: "Fake", siret: "<siret>" },
+        organization: {
+          name: "Fake",
+          siret: "<siret>",
+          logoUrl:
+            "https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/culture/logo.svg",
+        },
       },
       title: "Titre initial",
       description: "Description initiale",
@@ -294,7 +301,12 @@ describe("Test the dataset form", () => {
     const initial: DatasetFormInitial = {
       catalogRecord: {
         createdAt: new Date(),
-        organization: { name: "Fake", siret: "<siret>" },
+        organization: {
+          name: "Fake",
+          siret: "<siret>",
+          logoUrl:
+            "https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/culture/logo.svg",
+        },
       },
       title: "Titre initial",
       description: "Description initiale",

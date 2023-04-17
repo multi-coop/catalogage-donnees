@@ -1,6 +1,11 @@
 import type { Catalog } from "src/definitions/catalogs";
 import type { Fetch } from "src/definitions/fetch";
-import { getApiUrl, getHeaders, makeApiRequest } from "../fetch";
+import {
+  getApiUrl,
+  getHeaders,
+  makeApiRequest,
+  makeApiRequestOrFail,
+} from "../fetch";
 import { toCatalog } from "../transformers/catalogs";
 import { Maybe } from "../util/maybe";
 
@@ -27,4 +32,22 @@ export const getCatalogBySiret: GetCatalogBySiret = async ({
     const data = await response.json();
     return toCatalog(data);
   });
+};
+
+type GetCatalogs = (opts: {
+  fetch: Fetch;
+  apiToken: string;
+}) => Promise<Catalog[]>;
+
+export const getCatalogs: GetCatalogs = async ({ fetch, apiToken }) => {
+  const url = `${getApiUrl()}/catalogs/`;
+
+  const request = new Request(url, {
+    headers: getHeaders(apiToken),
+  });
+  const response = await makeApiRequestOrFail(fetch, request);
+  const data = await response.json();
+  return data
+    .map(toCatalog)
+    .filter((item) => item.organization.siret !== "00000000000000");
 };

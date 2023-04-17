@@ -10,8 +10,25 @@
   import SkipLink from "src/lib/components/SkipLink/SkipLink.svelte";
   import Header from "src/lib/components/Header/Header.svelte";
   import Footer from "src/lib/components/Footer/Footer.svelte";
+  import type { Fetch } from "src/definitions/fetch";
+  import type { Dataset } from "src/definitions/datasets";
+  import type { Paginated } from "src/definitions/pagination";
+  import type { Maybe } from "src/lib/util/maybe";
+  import { getCatalogs } from "src/lib/repositories/catalogs";
+  import type { Catalog } from "src/definitions/catalogs";
 
   let pageNumber = getPageFromParams($page.url.searchParams) || 1;
+
+  const getDatasetsAndOrganizations = async (
+    fetch: Fetch,
+    apiToken: string
+  ): Promise<[Maybe<Paginated<Dataset>>, Catalog[]]> => {
+    const datasets = await getDatasets({ fetch, apiToken, page: pageNumber });
+
+    const catalogs = await getCatalogs({ fetch, apiToken });
+
+    return [datasets, catalogs];
+  };
 </script>
 
 <SkipLink
@@ -26,12 +43,16 @@
 <!-- svelte-ignore a11y-no-redundant-roles -- this is the main page region. Here this role is not redundant -->
 <main id="contenu" role="main">
   {#if $account}
-    {#await getDatasets({ fetch, apiToken: $apiToken, page: pageNumber })}
+    {#await getDatasetsAndOrganizations(fetch, $apiToken)}
       <div class="spinner-container">
         <Spinner />
       </div>
-    {:then paginatedDatasets}
-      <DatasetListTemplate currentPage={pageNumber} {paginatedDatasets} />
+    {:then [paginatedDatasets, catalogs]}
+      <DatasetListTemplate
+        currentPage={pageNumber}
+        {paginatedDatasets}
+        {catalogs}
+      />
     {/await}
   {:else}
     <LandingTemplate />
