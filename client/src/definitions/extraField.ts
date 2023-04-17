@@ -18,7 +18,7 @@ export type BoolExtraField = {
   };
 } & ExtraFieldBase;
 
-type EnumExtraField = {
+export type EnumExtraField = {
   type: "ENUM";
   data: {
     values: string[];

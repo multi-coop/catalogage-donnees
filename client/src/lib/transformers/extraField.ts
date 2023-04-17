@@ -1,4 +1,7 @@
-import type { BoolExtraField } from "src/definitions/extraField";
+import type {
+  BoolExtraField,
+  EnumExtraField,
+} from "src/definitions/extraField";
 import type { SelectOption } from "src/definitions/form";
 
 export const toSelectOption = (extraField: BoolExtraField): SelectOption[] => {
@@ -12,4 +15,15 @@ export const toSelectOption = (extraField: BoolExtraField): SelectOption[] => {
       value: extraField.data.falseValue,
     },
   ];
+};
+
+export const transformEnumExtraFieldToSelectOptoon = (
+  extraField: EnumExtraField
+): SelectOption[] => {
+  return extraField.data.values.map((item) => {
+    return {
+      label: item,
+      value: item,
+    };
+  });
 };
