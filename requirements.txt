@@ -11,6 +11,7 @@ pydantic[email]==1.10.2
 python-json-logger==2.0.4
 uvicorn[standard]==0.18.3
 sqlalchemy[asyncio,mypy]==1.4.41
+sentry-sdk[fastapi] == 1.16.0
 
 # Debug
 fastapi-debug-toolbar==0.2.1

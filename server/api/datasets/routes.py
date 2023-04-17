@@ -164,3 +164,12 @@ async def delete_dataset(id: ID) -> None:
 
     command = DeleteDataset(id=id)
     await bus.execute(command)
+
+
+@router.get(
+    "/bug",
+    responses={404: {}},
+)
+async def trigger_error() -> None:
+    division_by_zero = 1 / 0
+    print(division_by_zero)

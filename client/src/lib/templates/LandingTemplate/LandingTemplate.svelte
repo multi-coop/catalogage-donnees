@@ -48,6 +48,30 @@
   <div class="fr-grid-row fr-grid-row--gutters">
     <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
       <OrganizationCard
+        name="Agence nationale de l'habitat"
+        src={"https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/anah/logo.svg"}
+        status="catalog"
+      />
+    </div>
+
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
+      <OrganizationCard
+        name="Direction interministérielle du numérique"
+        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/dinum/logo.svg"
+        status="catalog"
+      />
+    </div>
+
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
+      <OrganizationCard
+        name="Direction interministérielle de la transformation publique"
+        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/ditp/logo.svg"
+        status="catalog"
+      />
+    </div>
+
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
+      <OrganizationCard
         name="Ministère de la Culture"
         src={logoMC}
         status="catalog"
@@ -59,21 +83,6 @@
         name="Ministère de l’Europe et des Affaires étrangères"
         src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/affaires-etrangeres/logo.svg"
         status="catalog"
-      />
-    </div>
-    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
-      <OrganizationCard
-        name="Agence nationale de l'habitat"
-        src={"https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/anah/logo.svg"}
-        status="pending"
-      />
-    </div>
-
-    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
-      <OrganizationCard
-        name="Direction interministérielle du numérique"
-        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/dinum/logo.svg"
-        status="pending"
       />
     </div>
   </div>

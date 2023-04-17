@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 
 from pydantic import BaseSettings
 from sqlalchemy.engine.url import make_url
@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     config_repo_api_key: str = ""
     debug: bool = False
     testing: bool = False
+    sentry_dsn: Optional[str] = None
 
     class Config:
         env_prefix = "app_"
