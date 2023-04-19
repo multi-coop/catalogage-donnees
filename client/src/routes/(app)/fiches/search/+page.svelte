@@ -16,6 +16,11 @@
   import type { PageData } from "./$types";
   import { onMount } from "svelte";
   import TextSearchFilter from "src/lib/components/SearchFilter/TextSearchFilter.svelte";
+  import {
+    buildActiveFiltersMap,
+    getActiveFiltersCount,
+  } from "src/lib/util/datasetFilters";
+  import Tag from "src/lib/components/Tag/Tag.svelte";
 
   export let data: PageData;
 
@@ -24,6 +29,9 @@
   let displayFilters = false;
 
   export let catalogButtonText = "";
+
+  $: activeFiltersMap = buildActiveFiltersMap(filtersInfo, filtersValue);
+  $: activeFiltersCount = getActiveFiltersCount(activeFiltersMap);
 
   onMount(() => {
     const searchParams = $pageStore.url.searchParams;
@@ -47,6 +55,14 @@
     ]);
 
     goto(href, { noscroll: true });
+  };
+
+  const handleClickActiveFilter = (key: string) => {
+    console.log(key);
+    // handleFilterChange({
+    //   ...filtersValue,
+    //   [key]: undefined,
+    // });
   };
 </script>
 
@@ -73,17 +89,7 @@
           buttonText={catalogButtonText ?? "Rechercher..."}
           on:selectOption={(e) => {
             if (!e.detail.value) {
-              handleFilterChange({
-                organizationSiret: null,
-                geographicalCoverage: null,
-                service: null,
-                formatId: null,
-                technicalSource: null,
-                tagId: null,
-                license: null,
-                extraFieldValues: null,
-              });
-
+              handleFilterChange({});
               catalogButtonText = "";
               return;
             }
@@ -91,16 +97,32 @@
             catalogButtonText = e.detail.label;
             handleFilterChange({
               organizationSiret: e.detail.value.toString(),
-              geographicalCoverage: null,
-              service: null,
-              formatId: null,
-              technicalSource: null,
-              tagId: null,
-              license: null,
-              extraFieldValues: null,
+              geographicalCoverage: undefined,
+              service: undefined,
+              formatId: undefined,
+              technicalSource: undefined,
+              tagId: undefined,
+              license: undefined,
+              extraFieldValues: undefined,
             });
           }}
         />
+
+        <div class="fr-mt-3w">
+          <h4 class="fr-h6">Filtres actifs</h4>
+
+          <div role="list">
+            {#each Object.entries(activeFiltersMap) as [key, map]}
+              {#if map}
+                <Tag
+                  on:click={() => handleClickActiveFilter(key)}
+                  id={key}
+                  name={`${map.key} : ${map.value}`}
+                />
+              {/if}
+            {/each}
+          </div>
+        </div>
       </div>
 
       <div class="fr-col-5 summary__header__buttons">
@@ -110,7 +132,9 @@
           class:fr-icon-arrow-down-s-line={!displayFilters}
           class:fr-icon-arrow-up-s-line={displayFilters}
         >
-          Affiner la recherche
+          Affiner la recherche {activeFiltersCount > 0
+            ? `(${activeFiltersCount})`
+            : ""}
         </button>
       </div>
     </div>
@@ -143,10 +167,17 @@
 
   .summary__header__buttons {
     display: flex;
-    justify-content: flex-end;
+    flex-direction: column;
+    align-items: flex-end;
   }
 
   .fr-btn {
     height: 50px;
+  }
+
+  div[role="list"] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 </style>

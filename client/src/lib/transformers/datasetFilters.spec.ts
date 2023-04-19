@@ -45,11 +45,11 @@ describe("transformers -- Dataset filters", () => {
     organizationSiret: "ign_siret",
     geographicalCoverage: "France métropolitaine",
     formatId: 55,
-    service: null,
+    service: undefined,
     technicalSource: "Serveur GIS",
-    tagId: null,
+    tagId: undefined,
     license: "Licence Ouverte",
-    extraFieldValues: null,
+    extraFieldValues: undefined,
   };
 
   test("toFiltersParams", () => {

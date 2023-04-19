@@ -6,7 +6,6 @@ import type {
 } from "src/definitions/datasetFilters";
 import type { BoolExtraField, ExtraField } from "src/definitions/extraField";
 import type { QueryParamRecord } from "src/definitions/url";
-import { Maybe } from "../util/maybe";
 
 export const transformRawExtraFieldToBoolExtraField = (
   rawExtraField: any
@@ -90,7 +89,7 @@ const getExtraFieldValues = (
 };
 
 const getExtraFieldValuesString = (
-  extraFieldValues: ExtraFieldValue[] | null
+  extraFieldValues?: ExtraFieldValue[]
 ): string | null => {
   if (!extraFieldValues) {
     return null;
@@ -109,14 +108,15 @@ export const toFiltersValue = (
   const extraFieldValuesString = searchParams.get("extra_field_values");
 
   return {
-    organizationSiret: searchParams.get("organization_siret"),
-    geographicalCoverage: searchParams.get("geographical_coverage"),
-    service: searchParams.get("service"),
-    formatId: formatId ? parseInt(formatId) : null,
-    technicalSource: searchParams.get("technical_source"),
-    tagId: searchParams.get("tag_id"),
-    license: searchParams.get("license"),
-    extraFieldValues: getExtraFieldValues(extraFieldValuesString),
+    organizationSiret: searchParams.get("organization_siret") ?? undefined,
+    geographicalCoverage:
+      searchParams.get("geographical_coverage") ?? undefined,
+    service: searchParams.get("service") ?? undefined,
+    formatId: formatId ? parseInt(formatId) : undefined,
+    technicalSource: searchParams.get("technical_source") ?? undefined,
+    tagId: searchParams.get("tag_id") ?? undefined,
+    license: searchParams.get("license") ?? undefined,
+    extraFieldValues: getExtraFieldValues(extraFieldValuesString) ?? undefined,
   };
 };
 
@@ -181,20 +181,17 @@ export const toFiltersButtonTexts = (
   tagIdToName: Record<string, string>,
   formatIdToName: Record<string, string>
 ): {
-  [K in keyof Omit<DatasetFiltersValue, "extraFieldValues">]: Maybe<string>;
+  [K in keyof Omit<DatasetFiltersValue, "extraFieldValues">]: string | null;
 } => {
   return {
-    organizationSiret: Maybe.map(
-      value.organizationSiret,
-      (v) => organizationSiretToName[v]
-    ),
+    organizationSiret: value.organizationSiret
+      ? organizationSiretToName[value.organizationSiret]
+      : null,
     geographicalCoverage: value.geographicalCoverage,
     service: value.service,
-    formatId: Maybe.map(value.formatId, (v) => formatIdToName[v]),
-    tagId: Maybe.map(value.tagId, (v) => tagIdToName[v]),
+    formatId: value.formatId ? formatIdToName[value.formatId] : null,
+    tagId: value.tagId ? tagIdToName[value.tagId] : null,
     technicalSource: value.technicalSource,
-    license: Maybe.map(value.license, (v) =>
-      v === "*" ? "Toutes les licences" : v
-    ),
+    license: value.license === "*" ? "Toutes les licences" : value.license,
   };
 };

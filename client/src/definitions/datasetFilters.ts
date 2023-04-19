@@ -17,14 +17,30 @@ export type DatasetFiltersInfo = {
 };
 
 export type DatasetFiltersValue = {
-  organizationSiret: string | null;
-  geographicalCoverage: string | null;
-  service: string | null;
-  formatId: number | null;
-  technicalSource: string | null;
-  tagId: string | null;
-  license: string | null;
-  extraFieldValues: ExtraFieldValue[] | null;
+  organizationSiret?: string;
+  geographicalCoverage?: string;
+  service?: string;
+  formatId?: number;
+  technicalSource?: string;
+  tagId?: string;
+  license?: string;
+  extraFieldValues?: ExtraFieldValue[];
+};
+
+type BasicMap = {
+  key: string;
+  value: string | number;
+};
+
+export type ActiveDatasetFiltersMap = {
+  organizationSiret?: BasicMap;
+  geographicalCoverage?: BasicMap;
+  service?: BasicMap;
+  formatId?: BasicMap;
+  technicalSource?: BasicMap;
+  tagId?: BasicMap;
+  license?: BasicMap;
+  extraFieldValues?: BasicMap;
 };
 
 export type DatasetFiltersOptions = {
