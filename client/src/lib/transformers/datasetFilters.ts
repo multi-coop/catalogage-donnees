@@ -89,7 +89,7 @@ const getExtraFieldValues = (
 };
 
 const getExtraFieldValuesString = (
-  extraFieldValues?: ExtraFieldValue[]
+  extraFieldValues: ExtraFieldValue[] | null
 ): string | null => {
   if (!extraFieldValues) {
     return null;
@@ -108,15 +108,14 @@ export const toFiltersValue = (
   const extraFieldValuesString = searchParams.get("extra_field_values");
 
   return {
-    organizationSiret: searchParams.get("organization_siret") ?? undefined,
-    geographicalCoverage:
-      searchParams.get("geographical_coverage") ?? undefined,
-    service: searchParams.get("service") ?? undefined,
-    formatId: formatId ? parseInt(formatId) : undefined,
-    technicalSource: searchParams.get("technical_source") ?? undefined,
-    tagId: searchParams.get("tag_id") ?? undefined,
-    license: searchParams.get("license") ?? undefined,
-    extraFieldValues: getExtraFieldValues(extraFieldValuesString) ?? undefined,
+    organizationSiret: searchParams.get("organization_siret") ?? null,
+    geographicalCoverage: searchParams.get("geographical_coverage") ?? null,
+    service: searchParams.get("service") ?? null,
+    formatId: formatId ? parseInt(formatId) : null,
+    technicalSource: searchParams.get("technical_source") ?? null,
+    tagId: searchParams.get("tag_id") ?? null,
+    license: searchParams.get("license") ?? null,
+    extraFieldValues: getExtraFieldValues(extraFieldValuesString) ?? null,
   };
 };
 

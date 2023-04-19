@@ -17,16 +17,15 @@ export type DatasetFiltersInfo = {
 };
 
 export type DatasetFiltersValue = {
-  organizationSiret?: string;
-  geographicalCoverage?: string;
-  service?: string;
-  formatId?: number;
-  technicalSource?: string;
-  tagId?: string;
-  license?: string;
-  extraFieldValues?: ExtraFieldValue[];
+  organizationSiret: string | null;
+  geographicalCoverage: string | null;
+  service: string | null;
+  formatId: number | null;
+  technicalSource: string | null;
+  tagId: string | null;
+  license: string | null;
+  extraFieldValues: ExtraFieldValue[] | null;
 };
-
 type BasicMap = {
   key: string;
   value: string | number;

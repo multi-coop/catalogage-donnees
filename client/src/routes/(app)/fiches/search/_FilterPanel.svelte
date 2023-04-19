@@ -63,9 +63,9 @@
 
   const handleSelectFilter = <K extends keyof DatasetFiltersValue>(
     key: K,
-    e: CustomEvent<SelectOption<any> | null>
+    e: CustomEvent<SelectOption<any>>
   ) => {
-    value[key] = e.detail?.value || null;
+    value[key] = e.detail?.value;
     dispatch("change", value);
   };
 

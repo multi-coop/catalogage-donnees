@@ -13,7 +13,7 @@
   $: options = [
     {
       label: "Réinistialiser le filtre",
-      value: null,
+      value: undefined,
     },
     ...options,
   ];

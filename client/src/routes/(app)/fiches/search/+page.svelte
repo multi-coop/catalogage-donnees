@@ -31,6 +31,7 @@
   export let catalogButtonText = "";
 
   $: activeFiltersMap = buildActiveFiltersMap(filtersInfo, filtersValue);
+
   $: activeFiltersCount = getActiveFiltersCount(activeFiltersMap);
 
   onMount(() => {
@@ -49,20 +50,17 @@
   };
 
   const handleFilterChange = async (filtersValues: DatasetFiltersValue) => {
+    console.log(filtersValue);
     const href = patchQueryString($pageStore.url.searchParams, [
       ...toFiltersParams(filtersValues),
       makePageParam(1),
     ]);
-
     goto(href, { noscroll: true });
   };
 
   const handleClickActiveFilter = (key: string) => {
     console.log(key);
-    // handleFilterChange({
-    //   ...filtersValue,
-    //   [key]: undefined,
-    // });
+    handleFilterChange(filtersValue);
   };
 </script>
 
