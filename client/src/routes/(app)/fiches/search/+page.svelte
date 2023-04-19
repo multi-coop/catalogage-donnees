@@ -20,7 +20,6 @@
     buildActiveFiltersMap,
     getActiveFiltersCount,
   } from "src/lib/util/datasetFilters";
-  import Tag from "src/lib/components/Tag/Tag.svelte";
 
   export let data: PageData;
 
@@ -50,7 +49,6 @@
   };
 
   const handleFilterChange = async (filtersValues: DatasetFiltersValue) => {
-    console.log(filtersValue);
     const href = patchQueryString($pageStore.url.searchParams, [
       ...toFiltersParams(filtersValues),
       makePageParam(1),
@@ -59,8 +57,10 @@
   };
 
   const handleClickActiveFilter = (key: string) => {
-    console.log(key);
-    handleFilterChange(filtersValue);
+    handleFilterChange({
+      ...filtersValue,
+      [key]: null,
+    });
   };
 </script>
 
@@ -75,7 +75,7 @@
 
 <section class="fr-container">
   {#if Maybe.Some(paginatedDatasets)}
-    <div class="fr-grid-row fr-pb-2w summary__header">
+    <div class="fr-grid-row fr-pb-2w bottom_line">
       <div class="fr-col-7">
         <TextSearchFilter
           higlighted
@@ -84,10 +84,21 @@
             label: name,
             value: siret,
           }))}
-          buttonText={catalogButtonText ?? "Rechercher..."}
+          buttonText={filtersValue.organizationSiret
+            ? catalogButtonText
+            : "Rechercher..."}
           on:selectOption={(e) => {
             if (!e.detail.value) {
-              handleFilterChange({});
+              handleFilterChange({
+                organizationSiret: null,
+                geographicalCoverage: null,
+                service: null,
+                formatId: null,
+                technicalSource: null,
+                tagId: null,
+                license: null,
+                extraFieldValues: null,
+              });
               catalogButtonText = "";
               return;
             }
@@ -95,32 +106,16 @@
             catalogButtonText = e.detail.label;
             handleFilterChange({
               organizationSiret: e.detail.value.toString(),
-              geographicalCoverage: undefined,
-              service: undefined,
-              formatId: undefined,
-              technicalSource: undefined,
-              tagId: undefined,
-              license: undefined,
-              extraFieldValues: undefined,
+              geographicalCoverage: null,
+              service: null,
+              formatId: null,
+              technicalSource: null,
+              tagId: null,
+              license: null,
+              extraFieldValues: null,
             });
           }}
         />
-
-        <div class="fr-mt-3w">
-          <h4 class="fr-h6">Filtres actifs</h4>
-
-          <div role="list">
-            {#each Object.entries(activeFiltersMap) as [key, map]}
-              {#if map}
-                <Tag
-                  on:click={() => handleClickActiveFilter(key)}
-                  id={key}
-                  name={`${map.key} : ${map.value}`}
-                />
-              {/if}
-            {/each}
-          </div>
-        </div>
       </div>
 
       <div class="fr-col-5 summary__header__buttons">
@@ -136,6 +131,27 @@
         </button>
       </div>
     </div>
+
+    {#if activeFiltersCount > 0}
+      <div class="fr-grid-row fr-py-2w bottom_line">
+        <div class="fr-col-12">
+          <h4 class="fr-h6">Filtres actifs</h4>
+          <div role="list">
+            {#each Object.entries(activeFiltersMap) as [key, map]}
+              {#if map}
+                <button
+                  class="fr-tag fr-icon-close-line fr-tag--icon-left"
+                  aria-label={`Retirer ${map.key} : ${map.value}`}
+                  on:click|preventDefault={() => handleClickActiveFilter(key)}
+                >
+                  {`${map.key} : ${map.value}`}
+                </button>
+              {/if}
+            {/each}
+          </div>
+        </div>
+      </div>
+    {/if}
 
     {#if Maybe.Some(filtersInfo) && displayFilters}
       <FilterPanel
@@ -159,7 +175,7 @@
 </section>
 
 <style>
-  .summary__header {
+  .bottom_line {
     border-bottom: 1px solid var(--border-default-grey);
   }
 

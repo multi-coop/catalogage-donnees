@@ -47,7 +47,7 @@ test("buildActiveFiltersMap", () => {
     technicalSource: "ADEME",
     tagId: "122",
     license: "AGPL",
-    extraFieldValues: null
+    extraFieldValues: null,
   };
 
   const expectedResult: ActiveDatasetFiltersMap = {

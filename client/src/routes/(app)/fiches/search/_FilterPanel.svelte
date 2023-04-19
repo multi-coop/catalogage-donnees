@@ -5,20 +5,23 @@
     DatasetFiltersInfo,
     DatasetFiltersValue,
   } from "src/definitions/datasetFilters";
+  import type {
+    BoolExtraField,
+    EnumExtraField,
+  } from "src/definitions/extraField";
 
   import type { SelectOption } from "src/definitions/form";
   import type { Organization } from "src/definitions/organization";
   import type { Tag } from "src/definitions/tag";
 
-  import BooleanSearchFilter from "src/lib/components/SearchFilter/BooleanSearchFilter.svelte";
   import TextSearchFilter from "src/lib/components/SearchFilter/TextSearchFilter.svelte";
   import {
     toFiltersButtonTexts,
     toFiltersOptions,
   } from "src/lib/transformers/datasetFilters";
   import {
-    toSelectOption,
-    transformEnumExtraFieldToSelectOptoon,
+    transformBooleanExtraFieldToSelectOption,
+    transformEnumExtraFieldToSelectOption,
   } from "src/lib/transformers/extraField";
   import { createEventDispatcher } from "svelte";
 
@@ -61,6 +64,21 @@
 
   const dispatch = createEventDispatcher<{ change: DatasetFiltersValue }>();
 
+  const getExtraFieldButtonText = (
+    extraField: BoolExtraField | EnumExtraField
+  ) => {
+    const result = value.extraFieldValues?.find(
+      (item) => item.extraFieldId === extraField.id
+    );
+
+    console.log({
+      extraFieldName: extraField.name,
+      result: result,
+    });
+
+    return result?.value;
+  };
+
   const handleSelectFilter = <K extends keyof DatasetFiltersValue>(
     key: K,
     e: CustomEvent<SelectOption<any>>
@@ -83,23 +101,27 @@
     return extraFieldValues.some((item) => item.extraFieldId === id);
   };
 
-  const handleRadioButtonChange = (extraFieldId: string, event: Event) => {
-    const value = (event.target as HTMLInputElement).value;
-
-    handleExtraFieldValueChange(extraFieldId, value);
-  };
-
   const handleExtraFieldValueChange = (
     extraFieldId: string,
     valueFromInput: string | null
   ) => {
     let newExtraFieldValues: ExtraFieldValue[] = [];
 
-    if (!valueFromInput) {
-      return;
-    }
-
     if (value.extraFieldValues) {
+      if (!valueFromInput) {
+        const filteredExtraFields = value.extraFieldValues.filter(
+          (item) => item.extraFieldId !== extraFieldId
+        );
+
+        value = {
+          ...value,
+          extraFieldValues: filteredExtraFields,
+        };
+
+        dispatch("change", value);
+
+        return;
+      }
       if (hasAlreadyTheFilter(value.extraFieldValues, extraFieldId)) {
         const filteredExtraFields = removeExistingExtraFieldValue(
           value.extraFieldValues,
@@ -110,7 +132,7 @@
           ...filteredExtraFields,
           {
             extraFieldId: extraFieldId,
-            value: valueFromInput,
+            value: valueFromInput ?? "",
           },
         ];
       } else {
@@ -118,7 +140,7 @@
           ...value.extraFieldValues,
           {
             extraFieldId: extraFieldId,
-            value: valueFromInput,
+            value: valueFromInput ?? "",
           },
         ];
       }
@@ -128,7 +150,7 @@
       newExtraFieldValues = [
         {
           extraFieldId: extraFieldId,
-          value: valueFromInput,
+          value: valueFromInput ?? "",
         },
       ];
     }
@@ -214,20 +236,22 @@
     <h6>Champs complémentaires</h6>
     <div class="filter-row">
       {#each extraFields as extraField}
-        <div class="filter-col">
+        <div class="filter-col fr-mt-2w">
           {#if extraField.type === "BOOL"}
-            <BooleanSearchFilter
-              name={extraField.name}
-              options={toSelectOption(extraField)}
+            <TextSearchFilter
               label={extraField.title}
-              on:change={(e) => handleRadioButtonChange(extraField.id, e)}
+              options={transformBooleanExtraFieldToSelectOption(extraField)}
+              buttonText={getExtraFieldButtonText(extraField)}
+              on:selectOption={(e) =>
+                handleExtraFieldValueChange(extraField.id, `${e.detail.value}`)}
             />
           {/if}
 
           {#if extraField.type === "ENUM"}
             <TextSearchFilter
               label={extraField.title}
-              options={transformEnumExtraFieldToSelectOptoon(extraField)}
+              buttonText={getExtraFieldButtonText(extraField)}
+              options={transformEnumExtraFieldToSelectOption(extraField)}
               on:selectOption={(e) =>
                 handleExtraFieldValueChange(extraField.id, `${e.detail.value}`)}
             />

@@ -17,7 +17,7 @@ export const toSelectOption = (extraField: BoolExtraField): SelectOption[] => {
   ];
 };
 
-export const transformEnumExtraFieldToSelectOptoon = (
+export const transformEnumExtraFieldToSelectOption = (
   extraField: EnumExtraField
 ): SelectOption[] => {
   return extraField.data.values.map((item) => {
@@ -26,4 +26,13 @@ export const transformEnumExtraFieldToSelectOptoon = (
       value: item,
     };
   });
+};
+
+export const transformBooleanExtraFieldToSelectOption = (
+  extraField: BoolExtraField
+): SelectOption[] => {
+  return [
+    { label: extraField.data.trueValue, value: extraField.data.trueValue },
+    { label: extraField.data.falseValue, value: extraField.data.falseValue },
+  ];
 };
