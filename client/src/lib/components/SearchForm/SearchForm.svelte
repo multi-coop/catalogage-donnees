@@ -15,6 +15,7 @@
 >
   <label for="q" class="fr-label">Rechercher</label>
   <input
+    id="q"
     type="search"
     class="fr-input"
     name="q"

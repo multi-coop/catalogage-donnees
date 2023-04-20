@@ -26,7 +26,8 @@ export type DatasetFiltersValue = {
   license: string | null;
   extraFieldValues: ExtraFieldValue[] | null;
 };
-type BasicMap = {
+export type BasicMap = {
+  id?: string;
   key: string;
   value: string | number;
 };
@@ -39,7 +40,7 @@ export type ActiveDatasetFiltersMap = {
   technicalSource?: BasicMap;
   tagId?: BasicMap;
   license?: BasicMap;
-  extraFieldValues?: BasicMap;
+  extraFieldValues?: BasicMap[];
 };
 
 export type DatasetFiltersOptions = {

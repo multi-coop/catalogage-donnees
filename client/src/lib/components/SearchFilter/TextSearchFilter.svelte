@@ -9,11 +9,12 @@
   export let label: string;
   export let options: SelectOption<any>[];
   export let higlighted = false;
+  export let selected = false;
 
   $: options = [
     {
       label: "Réinistialiser le filtre",
-      value: undefined,
+      value: "",
     },
     ...options,
   ];
@@ -39,7 +40,8 @@
   buttonText={buttonText || "Rechercher..."}
   isOverlayOpen={showOverLay}
   {higlighted}
-  on:mousedown={handleShowOverLay}
+  {selected}
+  on:click={handleShowOverLay}
 >
   <Basic
     on:selectOption
