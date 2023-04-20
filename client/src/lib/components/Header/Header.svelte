@@ -22,7 +22,7 @@
         <div class="fr-header__brand fr-enlarge-link">
           <div class="fr-header__brand-top">
             <div class="fr-header__logo">
-              <a href="/" aria-label="Accueil - Etalab">
+              <a href="/" title="vers Accueil - Etalab">
                 <p class="fr-logo">
                   République
                   <br />Française
@@ -47,8 +47,8 @@
           </div>
 
           <div class="fr-header__service">
-            <a href="/" title={`Accueil - ${SITE_TITLE}- Etalab`}>
-              <p class="fr-header__service-title">{SITE_TITLE}</p>
+            <a href="/" title={` vers page d'accueil - catalogue.data.gouv.fr`}>
+              <p class="fr-header__service-title">catalogue.data.gouv.fr</p>
             </a>
           </div>
         </div>

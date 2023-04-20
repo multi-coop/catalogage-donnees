@@ -4,7 +4,7 @@ import type {
 } from "./definitions/datasets";
 import type { TrustedHtml } from "./lib/util/html";
 
-export const SITE_TITLE = "catalogue.data.gouv.fr";
+export const SITE_TITLE = "Catalogue";
 
 export const SITE_DESCRIPTION =
   "Un service pour aider les administrations à créer, gérer et ouvrir leurs catalogues.";

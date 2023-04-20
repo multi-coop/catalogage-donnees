@@ -26,7 +26,7 @@ def create_app(settings: Settings = None) -> App:
 
     app = App(
         debug=settings.debug,
-        title="API - catalogue.data.gouv.fr",
+        title="API - Catalogue",
         version="0.1.0",  # Required by FastAPI, but meaningless for now.
         docs_url=settings.docs_url,
     )

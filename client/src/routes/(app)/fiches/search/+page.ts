@@ -28,7 +28,7 @@ export const load: PageLoad = async ({ fetch, url }) => {
   ]);
 
   return {
-    title: `Rechercher un jeu de données - ${SITE_TITLE}`,
+    title: `${SITE_TITLE} - Rechercher un jeu de données`,
     paginatedDatasets,
     filtersInfo,
     filtersValue,

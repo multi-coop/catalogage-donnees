@@ -40,9 +40,7 @@ test.describe("Search", () => {
 
   test("Search page meta", async ({ page }) => {
     await page.goto("/fiches/search");
-    await expect(page).toHaveTitle(
-      "Rechercher un jeu de données - catalogue.data.gouv.fr"
-    );
+    await expect(page).toHaveTitle("Catalogue - Rechercher un jeu de données");
   });
 
   test("Performs a search from the home page", async ({ page, dataset }) => {
@@ -55,9 +53,6 @@ test.describe("Search", () => {
     expect(items[0].title).toBe(dataset.title);
 
     await expect(page).toHaveURL("/fiches/search?q=title");
-    await page
-      .locator(`text=/${items.length} fiche(s)? de données/i`)
-      .waitFor();
     await page.locator(`:has-text('${dataset.title}')`).first().waitFor();
   });
 
@@ -94,9 +89,6 @@ test.describe("Search", () => {
     expect(items[0].title).toBe(dataset.title);
 
     await expect(page).toHaveURL("/fiches/search?q=title&page=1");
-    await page
-      .locator(`text=/${items.length} fiche(s)? de données/i`)
-      .waitFor();
     await page.locator(`:has-text('${dataset.title}')`).first().waitFor();
 
     // Second search. Aim at getting no results.
@@ -123,7 +115,6 @@ test.describe("Search", () => {
     await page.goto(`/fiches/search?q=${dataset.title}`);
     const search = page.locator("form [name=q]");
     expect(await search.inputValue()).toBe(dataset.title);
-    await page.locator(`text=/fiche(s)? de données/i`).waitFor();
     await page.locator(`:has-text('${dataset.title}')`).first().waitFor();
   });
 
@@ -143,17 +134,12 @@ test.describe("Search filters", () => {
 
     const filterPanel = page.locator("[data-test-id='filter-panel']");
 
-    expect(await filterPanel.locator("h6").count()).toBe(4);
-    await filterPanel.locator("text=Informations générales").waitFor();
-    await filterPanel.locator("text=Catalogues").waitFor();
-    await filterPanel.locator("text=Sources et formats").waitFor();
-    await filterPanel.locator("text=Mots-clés thématiques").waitFor();
+    await filterPanel.locator("text=Champs communs").waitFor();
 
-    expect(await filterPanel.locator("button").count()).toBe(7);
+    expect(await filterPanel.locator("button").count()).toBe(6);
     await filterPanel.locator("text=Couverture géographique").waitFor();
     await filterPanel.locator("text=Service producteur de la donnée").waitFor();
     await filterPanel.locator("text=Licence de réutilisation").waitFor();
-    await filterPanel.locator("text='Catalogue'").waitFor();
     await filterPanel.locator("text=Format de mise à disposition").waitFor();
     await filterPanel.locator("text=Système d'information source").waitFor();
     await filterPanel.locator("text=Mot-clé").waitFor();

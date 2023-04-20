@@ -19,6 +19,7 @@
   import {
     buildActiveFiltersMap,
     getActiveFiltersCount,
+    removeNonExistingFiltersValue,
   } from "src/lib/util/datasetFilters";
 
   export let data: PageData;
@@ -50,7 +51,7 @@
 
   const handleFilterChange = async (filtersValues: DatasetFiltersValue) => {
     const href = patchQueryString($pageStore.url.searchParams, [
-      ...toFiltersParams(filtersValues),
+      ...toFiltersParams(removeNonExistingFiltersValue(filtersValues)),
       makePageParam(1),
     ]);
     goto(href, { noscroll: true });
@@ -60,6 +61,21 @@
     handleFilterChange({
       ...filtersValue,
       [key]: null,
+    });
+  };
+
+  const handleClickExtraFieldActiveFilter = (extrafieldId?: string) => {
+    if (!filtersValue.extraFieldValues || !extrafieldId) {
+      return;
+    }
+
+    const newExtraFieldsValues = filtersValue.extraFieldValues.filter(
+      (item) => item.extraFieldId !== extrafieldId
+    );
+
+    handleFilterChange({
+      ...filtersValue,
+      extraFieldValues: newExtraFieldsValues,
     });
   };
 </script>
@@ -121,6 +137,8 @@
       <div class="fr-col-5 summary__header__buttons">
         <button
           on:click={() => (displayFilters = !displayFilters)}
+          aria-controls="search-filters"
+          aria-expanded={displayFilters}
           class="fr-btn fr-btn--secondary fr-btn--icon-right"
           class:fr-icon-arrow-down-s-line={!displayFilters}
           class:fr-icon-arrow-up-s-line={displayFilters}
@@ -135,17 +153,30 @@
     {#if activeFiltersCount > 0}
       <div class="fr-grid-row fr-py-2w bottom_line">
         <div class="fr-col-12">
-          <h4 class="fr-h6">Filtres actifs</h4>
+          <h2 class="fr-h6">Filtres actifs</h2>
           <div role="list">
             {#each Object.entries(activeFiltersMap) as [key, map]}
               {#if map}
-                <button
-                  class="fr-tag fr-icon-close-line fr-tag--icon-left"
-                  aria-label={`Retirer ${map.key} : ${map.value}`}
-                  on:click|preventDefault={() => handleClickActiveFilter(key)}
-                >
-                  {`${map.key} : ${map.value}`}
-                </button>
+                {#if Array.isArray(map)}
+                  {#each map as mapItem}
+                    <button
+                      class="fr-tag fr-icon-close-line fr-tag--icon-left"
+                      aria-label={`Retirer le filtre ${mapItem.key} : ${mapItem.value}`}
+                      on:click|preventDefault={() =>
+                        handleClickExtraFieldActiveFilter(mapItem.id)}
+                    >
+                      {`${mapItem.key} : ${mapItem.value}`}
+                    </button>
+                  {/each}
+                {:else}
+                  <button
+                    class="fr-tag fr-icon-close-line fr-tag--icon-left"
+                    aria-label={`Retirer ${map.key} : ${map.value}`}
+                    on:click|preventDefault={() => handleClickActiveFilter(key)}
+                  >
+                    {`${map.key} : ${map.value}`}
+                  </button>
+                {/if}
               {/if}
             {/each}
           </div>
@@ -155,6 +186,7 @@
 
     {#if Maybe.Some(filtersInfo) && displayFilters}
       <FilterPanel
+        id="filter-panel"
         on:change={(e) => handleFilterChange(e.detail)}
         info={filtersInfo}
         value={filtersValue}
@@ -175,10 +207,6 @@
 </section>
 
 <style>
-  .bottom_line {
-    border-bottom: 1px solid var(--border-default-grey);
-  }
-
   .summary__header__buttons {
     display: flex;
     flex-direction: column;

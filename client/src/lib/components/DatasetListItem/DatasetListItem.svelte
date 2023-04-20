@@ -33,7 +33,7 @@
     data-test-id="dataset-list-item"
     class="item"
     href={paths.datasetDetail({ id: dataset.id })}
-    title="Consulter cette fiche de données"
+    title={`Consulter la fiche de données ${dataset.catalogRecord.organization.name} : ${dataset.title}`}
   >
     <div class="item__logo">
       {#if dataset.catalogRecord.organization.logoUrl}

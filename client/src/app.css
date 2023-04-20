@@ -7,6 +7,10 @@ mark {
   background-color: var(--background-contrast-info);
 }
 
+.bottom_line {
+  border-bottom: 1px solid var(--border-default-grey);
+}
+
 :root {
   /*
   Breakpoints in DSFR. This is for reference only. The @media CSS spec does not

@@ -27,6 +27,7 @@
 
   export let info: DatasetFiltersInfo;
   export let value: DatasetFiltersValue;
+  export let id: string;
 
   const createOrganizationSiretToNameMap = (
     organizations: Organization[]
@@ -70,11 +71,6 @@
     const result = value.extraFieldValues?.find(
       (item) => item.extraFieldId === extraField.id
     );
-
-    console.log({
-      extraFieldName: extraField.name,
-      result: result,
-    });
 
     return result?.value;
   };
@@ -164,9 +160,9 @@
   };
 </script>
 
-<div data-test-id="filter-panel" class="fr-mt-2w">
+<div data-test-id="filter-panel" {id} class="fr-mt-2w">
   <section class="">
-    <h3 class="fr-h6">Champs communs</h3>
+    <h2 class="fr-h6">Champs communs</h2>
 
     <div class="fr-grid-row fr-grid-row--gutters">
       <div class="fr-col-4">
@@ -174,6 +170,7 @@
           <TextSearchFilter
             label="Couverture géographique"
             options={filtersOptions.geographicalCoverage}
+            selected={!!buttonTexts.geographicalCoverage}
             buttonText={buttonTexts.geographicalCoverage}
             on:selectOption={(e) =>
               handleSelectFilter("geographicalCoverage", e)}
@@ -182,6 +179,7 @@
         <div class="fr-mb-2w">
           <TextSearchFilter
             label="Service producteur de la donnée"
+            selected={!!buttonTexts.service}
             options={filtersOptions.service}
             buttonText={buttonTexts.service}
             on:selectOption={(e) => handleSelectFilter("service", e)}
@@ -192,6 +190,7 @@
           <TextSearchFilter
             label="Licence de réutilisation"
             options={filtersOptions.license}
+            selected={!!buttonTexts.license}
             buttonText={buttonTexts.license}
             on:selectOption={(e) => handleSelectFilter("license", e)}
           />
@@ -203,6 +202,7 @@
           <TextSearchFilter
             label="Format de mise à disposition"
             options={filtersOptions.formatId}
+            selected={!!buttonTexts.formatId}
             buttonText={buttonTexts.formatId}
             on:selectOption={(e) => handleSelectFilter("formatId", e)}
           />
@@ -213,6 +213,7 @@
             label="Système d'information source"
             options={filtersOptions.technicalSource}
             buttonText={buttonTexts.technicalSource}
+            selected={!!buttonTexts.technicalSource}
             on:selectOption={(e) => handleSelectFilter("technicalSource", e)}
           />
         </div>
@@ -224,6 +225,7 @@
             label="Mot-clé"
             options={filtersOptions.tagId}
             buttonText={buttonTexts.tagId}
+            selected={!!buttonTexts.tagId}
             on:selectOption={(e) => handleSelectFilter("tagId", e)}
           />
         </div>
@@ -231,9 +233,10 @@
     </div>
   </section>
 </div>
+
 {#if info.extraFields.length > 0}
-  <section class="fr-mt-2w">
-    <h6>Champs complémentaires</h6>
+  <section class="fr-my-2w bottom_line-">
+    <h2 class="fr-h6">Champs complémentaires</h2>
     <div class="filter-row">
       {#each extraFields as extraField}
         <div class="filter-col fr-mt-2w">
@@ -242,6 +245,7 @@
               label={extraField.title}
               options={transformBooleanExtraFieldToSelectOption(extraField)}
               buttonText={getExtraFieldButtonText(extraField)}
+              selected={!!getExtraFieldButtonText(extraField)}
               on:selectOption={(e) =>
                 handleExtraFieldValueChange(extraField.id, `${e.detail.value}`)}
             />
@@ -251,6 +255,7 @@
             <TextSearchFilter
               label={extraField.title}
               buttonText={getExtraFieldButtonText(extraField)}
+              selected={!!getExtraFieldButtonText(extraField)}
               options={transformEnumExtraFieldToSelectOption(extraField)}
               on:selectOption={(e) =>
                 handleExtraFieldValueChange(extraField.id, `${e.detail.value}`)}

@@ -26,9 +26,9 @@ export const load: PageLoad = async ({ fetch, params }) => {
     );
 
     return {
-      title: `${
+      title: `${SITE_TITLE} -  ${
         Maybe.Some(dataset) ? dataset.title : "Fiche de jeu de données"
-      } - ${SITE_TITLE}`,
+      }`,
       catalog,
       dataset,
     };

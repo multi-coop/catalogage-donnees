@@ -46,4 +46,15 @@ test.describe("accessibilty - pages with required authentication", () => {
     const accessibilityScanResults = await makeAxeBuilder().analyze();
     expect(accessibilityScanResults.violations).toEqual([]);
   });
+
+  test.use({ storageState: STATE_AUTHENTICATED });
+  test("search page should not have any automatically detectable accessibility issues", async ({
+    page,
+    makeAxeBuilder,
+  }) => {
+    await page.goto("/fiches/search");
+
+    const accessibilityScanResults = await makeAxeBuilder().analyze();
+    expect(accessibilityScanResults.violations).toEqual([]);
+  });
 });

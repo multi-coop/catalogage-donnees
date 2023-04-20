@@ -24,7 +24,7 @@ test.describe("Basic form submission", () => {
 
     await page.goto("/contribuer");
     await expect(page).toHaveTitle(
-      "Contribuer une fiche de jeu de données - catalogue.data.gouv.fr"
+      "Contribuer une fiche de jeu de données - Catalogue"
     );
 
     await page.locator("text=Ministère de la Culture").waitFor();

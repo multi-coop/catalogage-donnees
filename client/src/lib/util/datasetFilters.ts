@@ -1,8 +1,34 @@
+import type { ExtraFieldValue } from "src/definitions/catalogs";
 import type {
   ActiveDatasetFiltersMap,
+  BasicMap,
   DatasetFiltersInfo,
   DatasetFiltersValue,
 } from "src/definitions/datasetFilters";
+import type { ExtraField } from "src/definitions/extraField";
+
+const getExtraFieldValuesFiltersMap = (
+  extraFields: ExtraField[],
+  extraFieldValues: ExtraFieldValue[]
+): BasicMap[] => {
+  return extraFieldValues.reduce((prev, next) => {
+    const foundExtraField = extraFields.find(
+      (item) => item.id === next.extraFieldId
+    );
+
+    if (!foundExtraField) {
+      return prev;
+    }
+    return [
+      ...prev,
+      {
+        id: foundExtraField.id,
+        key: foundExtraField.title,
+        value: next.value,
+      },
+    ];
+  }, [] as BasicMap[]);
+};
 
 export const buildActiveFiltersMap = (
   filtersInfo: DatasetFiltersInfo,
@@ -60,8 +86,35 @@ export const buildActiveFiltersMap = (
           value: filtersValue.license,
         }
       : undefined,
+    extraFieldValues: filtersValue.extraFieldValues
+      ? getExtraFieldValuesFiltersMap(
+          filtersInfo.extraFields,
+          filtersValue.extraFieldValues
+        )
+      : undefined,
   };
 };
 
-export const getActiveFiltersCount = (map: ActiveDatasetFiltersMap): number =>
-  Object.entries(map).reduce((prev, next) => (next[1] ? prev + 1 : prev), 0);
+export const getActiveFiltersCount = (map: ActiveDatasetFiltersMap): number => {
+  return Object.entries(map).reduce((prev, next) => {
+    if (!next[1]) {
+      return prev;
+    }
+    if (Array.isArray(next[1])) {
+      return next[1].length + prev;
+    }
+    return 1 + prev;
+  }, 0);
+};
+
+export const removeNonExistingFiltersValue = (
+  filtersValues: DatasetFiltersValue
+): DatasetFiltersValue => {
+  return Object.entries(filtersValues).reduce((prev, next) => {
+    if (next[1]) {
+      return { ...prev, [next[0]]: next[1] };
+    }
+
+    return prev;
+  }, {} as DatasetFiltersValue);
+};
