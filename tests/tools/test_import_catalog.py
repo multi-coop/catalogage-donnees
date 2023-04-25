@@ -46,9 +46,9 @@ async def test_import_catalog_example(tmp_path: Path) -> None:
     csv_path.write_text(
         dedent(
             """\
-            titre;description;mots_cles;nom_orga;siret_orga;id_alt_orga;service;si;contact_service;contact_personne;date_pub;date_maj;freq_maj;couv_geo;url;formats;licence;donnees_geoloc
-            Titre1;Description1;"Tag 1,Tag 2";Ministère 1;11004601800013;;Direction1;SI1;service@mydomain.org;contact@mydomain.org;;2022-10-06;annuelle;aquitaine;;geojson, xls, oracle et shp;etalab-2.0;oui
-            Titre2;Description2;"Tag 1,Tag 3";Ministère 1;11004601800013;;Direction1;SI2;service@mydomain.org;contact@mydomain.org;;;Invalid;NSP;;Information manquante;etalab-2.0;oui
+            titre;description;mots_cles;nom_orga;siret_orga;id_alt_orga;service;si;contact_service;contact_personne;date_pub;date_maj;freq_maj;couv_geo;url;formats;licence;donnees_geoloc;publication_restriction
+            Titre1;Description1;"Tag 1,Tag 2";Ministère 1;11004601800013;;Direction1;SI1;service@mydomain.org;contact@mydomain.org;;2022-10-06;annuelle;aquitaine;;geojson, xls, oracle et shp;etalab-2.0;oui;
+            Titre2;Description2;"Tag 1,Tag 3";Ministère 1;11004601800013;;Direction1;SI2;service@mydomain.org;contact@mydomain.org;;;Invalid;NSP;;Information manquante;etalab-2.0;oui;
             """  # noqa
         )
     )
@@ -78,11 +78,7 @@ async def test_import_catalog_example(tmp_path: Path) -> None:
     assert all(d["params"]["organization_siret"] == siret for d in initdata["datasets"])
 
     d0 = initdata["datasets"][0]["params"]
-    assert sorted(d0["formats"]) == [
-        "fichier SIG (Shapefile, ...)",
-        "fichier tabulaire (Excell, CSV,...)",
-        "oracle et shp",
-    ]
+    assert sorted(d0["formats"]) == ["geojson", "oracle et shp", "xls"]
     assert d0["geographical_coverage"] == "aquitaine"
     assert d0["update_frequency"] == "yearly"
     assert "[[ Notes d'import automatique ]]" not in d0["description"]

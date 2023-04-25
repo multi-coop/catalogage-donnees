@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 
 from server.application.catalogs.queries import GetCatalogBySiret
 from server.application.catalogs.views import ExtraFieldView
+from server.application.dataformats.queries import GetAllDataFormat
 from server.application.organizations.queries import GetOrganizationBySiret
 from server.application.tags.queries import GetAllTags
 from server.config.di import bootstrap, resolve
@@ -61,24 +62,27 @@ def _map_geographical_coverage(value: Optional[str], config: Config) -> str:
 
 
 def _map_formats(
-    value: Optional[str], import_notes: TextIO, config: Config
+    value: Optional[str],
+    existing_format_names: List[str],
+    formats_to_create: List[str],
 ) -> List[str]:
-
     if not value:
         return []
 
-    def _map_format(value: str) -> List[str]:
+    format_names = []
 
-        dataformat = config.formats.map.get(value, value)
+    # Split and normalize tag names. For example:
+    # "périmètre délimité des abords (PDA), urbanisme; géolocalisation"
+    #   -> {"périmètre délimité des abords (PDA)", "urbanisme", "géolocalisation"}
+    cleaned_names = set(name.strip() for name in value.replace(";", ",").split(","))
 
-        try:
-            return [dataformat]
-        except ValueError:
-            return [value]
+    for name in cleaned_names:
+        if name not in existing_format_names and name not in formats_to_create:
+            formats_to_create.append(name)
 
-    result = list(set(f for val in value.split(",") for f in _map_format(val.strip())))
+        format_names.append(name)
 
-    return result
+    return format_names
 
 
 def _map_contact_emails(value: Optional[str]) -> List[str]:
@@ -128,14 +132,21 @@ def _map_tag_ids(
     cleaned_names = set(name.strip() for name in value.replace(";", ",").split(","))
 
     for name in cleaned_names:
-        try:
-            tag_id = existing_tag_ids_by_name[name]
-        except KeyError:
-            tag_id = id_factory()
-            tag = {"id": str(tag_id), "params": {"name": name}}
-            tags_to_create.append(tag)
+        if name in existing_tag_ids_by_name:
+            format_id = existing_tag_ids_by_name[name]
+        else:
+            res = next(
+                (sub for sub in tags_to_create if sub["params"]["name"] == name),
+                None,
+            )
+            if res is not None:
+                format_id = res["id"]
+            else:
+                format_id = id_factory()
+                tag = {"id": str(format_id), "params": {"name": name}}
+                tags_to_create.append(tag)
 
-        tag_ids.append(str(tag_id))
+            tag_ids.append(str(format_id))
 
     return tag_ids
 
@@ -178,10 +189,17 @@ async def main(config_path: Path, out_path: Path) -> int:
     tags = await bus.execute(GetAllTags())
     existing_tag_ids_by_name = {tag.name: tag.id for tag in tags}
 
-    with config.input_csv.path.open(encoding=config.input_csv.encoding) as f:
+    formats = await bus.execute(GetAllDataFormat())
+    existing_format_name = [format.name for format in formats]
+
+    with config.input_csv.path.open(mode="r", encoding="utf-8") as f:
         reader = csv.DictReader(f, delimiter=config.input_csv.delimiter)
-        fieldnames = list(reader.fieldnames or [])
         rows = list(reader)
+
+        if reader.fieldnames is None:
+            raise ValueError("No field name found: is your CSV file well formatted ?")
+
+        fieldnames = set(reader.fieldnames)
 
     common_fields = {
         "titre",
@@ -199,9 +217,10 @@ async def main(config_path: Path, out_path: Path) -> int:
         "url",
         "licence",
         "mots_cles",
+        "publication_restriction",
     }
 
-    actual_extra_fields = set(fieldnames) - common_fields - config.ignore_fields
+    actual_extra_fields = fieldnames - common_fields - config.ignore_fields
 
     if actual_extra_fields != expected_extra_fields:
         raise ValueError(
@@ -210,9 +229,11 @@ async def main(config_path: Path, out_path: Path) -> int:
         )
 
     tags_to_create: List[dict] = []
+    formats_to_create: List[str] = []
     datasets = []
 
     for k, row in enumerate(rows):
+
         if (siret_orga := row["siret_orga"]) != organization.siret:
             raise ValueError(
                 f"at row {k}: {siret_orga=!r} does not match {organization.siret=!r}"
@@ -228,13 +249,14 @@ async def main(config_path: Path, out_path: Path) -> int:
         params: dict = {}
 
         params["organization_siret"] = organization.siret
+        params["publication_restriction"] = row["publication_restriction"]
         params["title"] = row["titre"]
         params["description"] = row["description"]
         params["service"] = row["service"] or None
         params["geographical_coverage"] = _map_geographical_coverage(
             row["couv_geo"] or None, config
         )
-        params["formats"] = _map_formats(row["formats"] or None, import_notes, config)
+
         params["technical_source"] = row["si"] or None
         params["producer_email"] = row["contact_service"] or None
         params["contact_emails"] = _map_contact_emails(row["contact_personne"] or None)
@@ -248,6 +270,10 @@ async def main(config_path: Path, out_path: Path) -> int:
         params["license"] = row["licence"] or None
         params["tag_ids"] = _map_tag_ids(
             row["mots_cles"] or None, existing_tag_ids_by_name, tags_to_create
+        )
+
+        params["formats"] = _map_formats(
+            row["formats"] or None, existing_format_name, formats_to_create
         )
 
         params["extra_field_values"] = _map_extra_field_values(
@@ -267,10 +293,10 @@ async def main(config_path: Path, out_path: Path) -> int:
         users=[],
         tags=tags_to_create,
         datasets=datasets,
-        formats=[],
+        formats=formats_to_create,
     ).dict()
 
-    out_path.write_text(yaml.safe_dump(initdata))
+    out_path.write_text(yaml.safe_dump(initdata, allow_unicode=True), encoding="utf-8")
 
     return 0
 
