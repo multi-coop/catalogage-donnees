@@ -24,7 +24,7 @@ test.describe("Basic form submission", () => {
 
     await page.goto("/contribuer");
     await expect(page).toHaveTitle(
-      "Contribuer une fiche de jeu de données - Catalogue"
+      "Catalogue - Contribuer une fiche de jeu de données"
     );
 
     await page.locator("text=Ministère de la Culture").waitFor();
@@ -51,6 +51,8 @@ test.describe("Basic form submission", () => {
     expect(await geographicalCoverage.inputValue()).toBe(
       geographicalCoverageText
     );
+
+    await page.getByText(geographicalCoverageText).click();
 
     // "Sources et formats" section
 
@@ -101,9 +103,13 @@ test.describe("Basic form submission", () => {
     await url.fill(urlText);
     expect(await url.inputValue()).toBe(urlText);
 
-    const license = page.locator("form [name=license]");
+    const license = await page.locator("form [name=license]");
+
     await license.fill(licenseText);
+
     expect(await license.inputValue()).toBe(licenseText);
+
+    await page.getByText(licenseText).first().click();
 
     // "Mots clés" section
 
