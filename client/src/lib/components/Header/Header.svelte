@@ -3,7 +3,6 @@
   import { page } from "$app/stores";
   import { logout, account } from "$lib/stores/auth";
   import { navigationItems } from "$lib/stores/layout/navigation";
-  import { SITE_TITLE } from "src/constants";
   import { Maybe } from "$lib/util/maybe";
 
   $: path = $page.url.pathname;
