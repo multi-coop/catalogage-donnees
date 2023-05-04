@@ -22,7 +22,7 @@
         <div class="fr-header__brand fr-enlarge-link">
           <div class="fr-header__brand-top">
             <div class="fr-header__logo">
-              <a href="/" aria-label="Accueil - Etalab">
+              <a href="/" title="vers Accueil - Etalab">
                 <p class="fr-logo">
                   République
                   <br />Française

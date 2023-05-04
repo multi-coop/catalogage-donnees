@@ -26,6 +26,22 @@ export type DatasetFiltersValue = {
   license: string | null;
   extraFieldValues: ExtraFieldValue[] | null;
 };
+export type BasicMap = {
+  id?: string;
+  key: string;
+  value: string | number;
+};
+
+export type ActiveDatasetFiltersMap = {
+  organizationSiret?: BasicMap;
+  geographicalCoverage?: BasicMap;
+  service?: BasicMap;
+  formatId?: BasicMap;
+  technicalSource?: BasicMap;
+  tagId?: BasicMap;
+  license?: BasicMap;
+  extraFieldValues?: BasicMap[];
+};
 
 export type DatasetFiltersOptions = {
   [K in keyof Omit<DatasetFiltersValue, "extraFieldValues">]: SelectOption<

@@ -5,20 +5,23 @@
     DatasetFiltersInfo,
     DatasetFiltersValue,
   } from "src/definitions/datasetFilters";
+  import type {
+    BoolExtraField,
+    EnumExtraField,
+  } from "src/definitions/extraField";
 
   import type { SelectOption } from "src/definitions/form";
   import type { Organization } from "src/definitions/organization";
   import type { Tag } from "src/definitions/tag";
 
-  import BooleanSearchFilter from "src/lib/components/SearchFilter/BooleanSearchFilter.svelte";
   import TextSearchFilter from "src/lib/components/SearchFilter/TextSearchFilter.svelte";
   import {
     toFiltersButtonTexts,
     toFiltersOptions,
   } from "src/lib/transformers/datasetFilters";
   import {
-    toSelectOption,
-    transformEnumExtraFieldToSelectOptoon,
+    transformBooleanExtraFieldToSelectOption,
+    transformEnumExtraFieldToSelectOption,
   } from "src/lib/transformers/extraField";
   import { createEventDispatcher } from "svelte";
 
@@ -61,15 +64,21 @@
 
   const dispatch = createEventDispatcher<{ change: DatasetFiltersValue }>();
 
+  const getExtraFieldButtonText = (
+    extraField: BoolExtraField | EnumExtraField
+  ) => {
+    const result = value.extraFieldValues?.find(
+      (item) => item.extraFieldId === extraField.id
+    );
+
+    return result?.value;
+  };
+
   const handleSelectFilter = <K extends keyof DatasetFiltersValue>(
     key: K,
-    e: CustomEvent<SelectOption<any> | null>
+    e: CustomEvent<SelectOption<any>>
   ) => {
-    if (key === "organizationSiret" && !e.detail?.value) {
-      value.extraFieldValues = null;
-    }
-
-    value[key] = e.detail?.value || null;
+    value[key] = e.detail?.value;
     dispatch("change", value);
   };
 
@@ -87,23 +96,27 @@
     return extraFieldValues.some((item) => item.extraFieldId === id);
   };
 
-  const handleRadioButtonChange = (extraFieldId: string, event: Event) => {
-    const value = (event.target as HTMLInputElement).value;
-
-    handleExtraFieldValueChange(extraFieldId, value);
-  };
-
   const handleExtraFieldValueChange = (
     extraFieldId: string,
     valueFromInput: string | null
   ) => {
     let newExtraFieldValues: ExtraFieldValue[] = [];
 
-    if (!valueFromInput) {
-      return;
-    }
-
     if (value.extraFieldValues) {
+      if (!valueFromInput) {
+        const filteredExtraFields = value.extraFieldValues.filter(
+          (item) => item.extraFieldId !== extraFieldId
+        );
+
+        value = {
+          ...value,
+          extraFieldValues: filteredExtraFields,
+        };
+
+        dispatch("change", value);
+
+        return;
+      }
       if (hasAlreadyTheFilter(value.extraFieldValues, extraFieldId)) {
         const filteredExtraFields = removeExistingExtraFieldValue(
           value.extraFieldValues,
@@ -114,7 +127,7 @@
           ...filteredExtraFields,
           {
             extraFieldId: extraFieldId,
-            value: valueFromInput,
+            value: valueFromInput ?? "",
           },
         ];
       } else {
@@ -122,7 +135,7 @@
           ...value.extraFieldValues,
           {
             extraFieldId: extraFieldId,
-            value: valueFromInput,
+            value: valueFromInput ?? "",
           },
         ];
       }
@@ -132,7 +145,7 @@
       newExtraFieldValues = [
         {
           extraFieldId: extraFieldId,
-          value: valueFromInput,
+          value: valueFromInput ?? "",
         },
       ];
     }
@@ -146,102 +159,103 @@
   };
 </script>
 
-<div data-test-id="filter-panel" class="filter-row fr-mt-2w">
-  <section class="filter-col">
-    <h6>Informations générales</h6>
+<div data-test-id="filter-panel" class="fr-mt-2w">
+  <section class="">
+    <h3 class="fr-h6">Champs communs</h3>
 
-    <div class="fr-mb-2w">
-      <TextSearchFilter
-        label="Couverture géographique"
-        options={filtersOptions.geographicalCoverage}
-        buttonText={buttonTexts.geographicalCoverage}
-        on:selectOption={(e) => handleSelectFilter("geographicalCoverage", e)}
-      />
-    </div>
+    <div class="fr-grid-row fr-grid-row--gutters">
+      <div class="fr-col-4">
+        <div class="fr-mb-2w">
+          <TextSearchFilter
+            label="Couverture géographique"
+            options={filtersOptions.geographicalCoverage}
+            selected={!!buttonTexts.geographicalCoverage}
+            buttonText={buttonTexts.geographicalCoverage}
+            on:selectOption={(e) =>
+              handleSelectFilter("geographicalCoverage", e)}
+          />
+        </div>
+        <div class="fr-mb-2w">
+          <TextSearchFilter
+            label="Service producteur de la donnée"
+            selected={!!buttonTexts.service}
+            options={filtersOptions.service}
+            buttonText={buttonTexts.service}
+            on:selectOption={(e) => handleSelectFilter("service", e)}
+          />
+        </div>
 
-    <div class="fr-mb-2w">
-      <TextSearchFilter
-        label="Service producteur de la donnée"
-        options={filtersOptions.service}
-        buttonText={buttonTexts.service}
-        on:selectOption={(e) => handleSelectFilter("service", e)}
-      />
-    </div>
+        <div class="fr-mb-2w">
+          <TextSearchFilter
+            label="Licence de réutilisation"
+            options={filtersOptions.license}
+            selected={!!buttonTexts.license}
+            buttonText={buttonTexts.license}
+            on:selectOption={(e) => handleSelectFilter("license", e)}
+          />
+        </div>
+      </div>
 
-    <div class="fr-mb-2w">
-      <TextSearchFilter
-        label="Licence de réutilisation"
-        options={filtersOptions.license}
-        buttonText={buttonTexts.license}
-        on:selectOption={(e) => handleSelectFilter("license", e)}
-      />
-    </div>
+      <div class="fr-col-4">
+        <div class="fr-mb-2w">
+          <TextSearchFilter
+            label="Format de mise à disposition"
+            options={filtersOptions.formatId}
+            selected={!!buttonTexts.formatId}
+            buttonText={buttonTexts.formatId}
+            on:selectOption={(e) => handleSelectFilter("formatId", e)}
+          />
+        </div>
 
-    <h6 class="fr-mt-3w">Catalogues</h6>
+        <div class="fr-mb-2w">
+          <TextSearchFilter
+            label="Système d'information source"
+            options={filtersOptions.technicalSource}
+            buttonText={buttonTexts.technicalSource}
+            selected={!!buttonTexts.technicalSource}
+            on:selectOption={(e) => handleSelectFilter("technicalSource", e)}
+          />
+        </div>
+      </div>
 
-    <div class="fr-mb-2w">
-      <TextSearchFilter
-        label="Catalogue"
-        options={filtersOptions.organizationSiret}
-        buttonText={buttonTexts.organizationSiret}
-        on:selectOption={(e) => handleSelectFilter("organizationSiret", e)}
-      />
-    </div>
-  </section>
-
-  <section class="filter-col">
-    <h6>Sources et formats</h6>
-
-    <div class="fr-mb-2w">
-      <TextSearchFilter
-        label="Format de mise à disposition"
-        options={filtersOptions.formatId}
-        buttonText={buttonTexts.formatId}
-        on:selectOption={(e) => handleSelectFilter("formatId", e)}
-      />
-    </div>
-
-    <div class="fr-mb-2w">
-      <TextSearchFilter
-        label="Système d'information source"
-        options={filtersOptions.technicalSource}
-        buttonText={buttonTexts.technicalSource}
-        on:selectOption={(e) => handleSelectFilter("technicalSource", e)}
-      />
-    </div>
-  </section>
-  <section class="filter-col">
-    <h6>Mots-clés thématiques</h6>
-
-    <div class="fr-mb-2w">
-      <TextSearchFilter
-        label="Mot-clé"
-        options={filtersOptions.tagId}
-        buttonText={buttonTexts.tagId}
-        on:selectOption={(e) => handleSelectFilter("tagId", e)}
-      />
+      <div class="fr-col-4">
+        <div class="fr-mb-2w">
+          <TextSearchFilter
+            label="Mot-clé"
+            options={filtersOptions.tagId}
+            buttonText={buttonTexts.tagId}
+            selected={!!buttonTexts.tagId}
+            on:selectOption={(e) => handleSelectFilter("tagId", e)}
+          />
+        </div>
+      </div>
     </div>
   </section>
 </div>
+
 {#if info.extraFields.length > 0}
-  <section class="fr-mt-2w">
+  <section class="fr-my-2w bottom_line-">
     <h6>Champs complémentaires</h6>
     <div class="filter-row">
       {#each extraFields as extraField}
-        <div class="filter-col">
+        <div class="filter-col fr-mt-2w">
           {#if extraField.type === "BOOL"}
-            <BooleanSearchFilter
-              name={extraField.name}
-              options={toSelectOption(extraField)}
+            <TextSearchFilter
               label={extraField.title}
-              on:change={(e) => handleRadioButtonChange(extraField.id, e)}
+              options={transformBooleanExtraFieldToSelectOption(extraField)}
+              buttonText={getExtraFieldButtonText(extraField)}
+              selected={!!getExtraFieldButtonText(extraField)}
+              on:selectOption={(e) =>
+                handleExtraFieldValueChange(extraField.id, `${e.detail.value}`)}
             />
           {/if}
 
           {#if extraField.type === "ENUM"}
             <TextSearchFilter
               label={extraField.title}
-              options={transformEnumExtraFieldToSelectOptoon(extraField)}
+              buttonText={getExtraFieldButtonText(extraField)}
+              selected={!!getExtraFieldButtonText(extraField)}
+              options={transformEnumExtraFieldToSelectOption(extraField)}
               on:selectOption={(e) =>
                 handleExtraFieldValueChange(extraField.id, `${e.detail.value}`)}
             />

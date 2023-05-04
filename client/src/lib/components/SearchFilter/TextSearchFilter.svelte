@@ -8,11 +8,13 @@
   export let buttonText: string | null = "";
   export let label: string;
   export let options: SelectOption<any>[];
+  export let higlighted = false;
+  export let selected = false;
 
   $: options = [
     {
       label: "Réinistialiser le filtre",
-      value: null,
+      value: "",
     },
     ...options,
   ];
@@ -37,11 +39,13 @@
   buttonPlaceholder="Rechercher..."
   buttonText={buttonText || "Rechercher..."}
   isOverlayOpen={showOverLay}
+  {higlighted}
+  {selected}
   on:click={handleShowOverLay}
 >
   <Basic
     on:selectOption
-    on:selectOption={handleShowOverLay}
+    on:selectOption={() => (showOverLay = false)}
     labelledby={slugify(label)}
     name={slugify(label)}
     on:focusout={handleShowOverLay}

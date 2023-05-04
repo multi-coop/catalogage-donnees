@@ -5,23 +5,26 @@
   import { createEventDispatcher } from "svelte";
 
   const dispatch = createEventDispatcher<{
-    selectOption: SelectOption<number | string | null>;
+    selectOption: SelectOption<number>;
     addItem: string;
   }>();
 
   export let name: string;
   export let label = "";
   export let hintText = "";
-  export let options: SelectOption<number | string | null>[];
+  export let options: SelectOption<number>[];
   export let error = "";
   export let value = "";
-  export let labelledby = "";
+  export let labelledby = " ";
 
+  let disableAddItem = true;
   let suggestionList: HTMLElement;
   let currentLiIndex = 0;
-  let showSuggestions = false;
-  let selectedOption: SelectOption<number | string | null>;
+
+  let selectedOption: SelectOption<number>;
   let textBoxHasFocus = false;
+  let listBoxHasFocus = false;
+  let showSuggestions = false;
 
   $: regexp = value ? new RegExp(escape(value), "i") : null;
 
@@ -29,35 +32,58 @@
     ? options.filter((item) => (regexp ? item.label.match(regexp) : true))
     : [];
 
-  const getSelectedOption = (
-    value: string
-  ): SelectOption<number | string | null> | undefined =>
+  $: if (options.length === 0) {
+    showSuggestions = false;
+  }
+
+  const getSelectedOption = (value: string): SelectOption<number> | undefined =>
     filteredSuggestions.find((item) => item.label === value.trim());
 
-  const handleSelectOption = (option: SelectOption<number | string | null>) => {
+  const handleSelectOption = (option: SelectOption<number>) => {
     selectedOption = option;
     dispatch("selectOption", selectedOption);
-    showSuggestions = false;
   };
 
   const handleClickOption = (optionValue: string) => {
     const foundOption = getSelectedOption(optionValue);
 
     if (foundOption) {
-      value = foundOption.label;
+      value = "";
       handleSelectOption(foundOption);
     }
     showSuggestions = false;
   };
 
   const handleInput = (ev: Event & { currentTarget: HTMLInputElement }) => {
+    disableAddItem = true;
     textBoxHasFocus = true;
     showSuggestions = true;
     value = ev.currentTarget.value;
+
+    const optionAlreadyExists =
+      options.findIndex((item) => item.label === value) !== -1;
+
+    if (!optionAlreadyExists) {
+      disableAddItem = false;
+    }
   };
 
   const handeChange = (ev: Event & { currentTarget: HTMLInputElement }) => {
+    disableAddItem = true;
     value = ev.currentTarget.value;
+
+    const optionAlreadyExists =
+      options.findIndex((item) => item.label === value) !== -1;
+
+    if (!optionAlreadyExists) {
+      disableAddItem = false;
+    }
+  };
+
+  const handleInputFocused = () => {
+    showSuggestions = true;
+    textBoxHasFocus = true;
+    listBoxHasFocus = false;
   };
 
   const manageKeyboardInterractions = (e: KeyboardEvent) => {
@@ -109,12 +135,18 @@
             return;
           }
 
+          // if the listbox is not displayed, clears the textbox.
+
+          if (!showSuggestions) {
+            textBoxHasFocus = true;
+            value = "";
+          }
           break;
 
         case "ArrowDown":
           // If the textbox is not empty and the listbox is displayed, moves visual focus to the first suggested value.
           textBoxHasFocus = false;
-
+          listBoxHasFocus = true;
           if (value && showSuggestions) {
             currentLiIndex = 0;
           }
@@ -140,6 +172,7 @@
           if (!value && !showSuggestions) {
             textBoxHasFocus = false;
             showSuggestions = true;
+            listBoxHasFocus = true;
             currentLiIndex = options.length - 1;
           }
 
@@ -173,7 +206,7 @@
             const foundOption = getSelectedOption(selectedSuggestionItem);
 
             if (foundOption) {
-              value = foundOption.label;
+              value = "";
               showSuggestions = false;
               handleSelectOption(foundOption);
             }
@@ -185,26 +218,28 @@
 
         case "Escape":
           /**
-           * 
-  
-              Closes the listbox.
-              Sets visual focus on the textbox.
-  
-          */
+         * 
+
+            Closes the listbox.
+            Sets visual focus on the textbox.
+
+        */
 
           showSuggestions = false;
+          listBoxHasFocus = false;
           textBoxHasFocus = true;
           break;
 
         /**
-             * 
-                Moves visual focus to the next option.
-                If visual focus is on the last option, moves visual focus to the first option.
-                Note: This wrapping behavior is useful when Home and End move the editing cursor as described below.
-  
-            */
+           * 
+              Moves visual focus to the next option.
+              If visual focus is on the last option, moves visual focus to the first option.
+              Note: This wrapping behavior is useful when Home and End move the editing cursor as described below.
+
+          */
 
         case "ArrowDown":
+          listBoxHasFocus = true;
           currentLiIndex += 1;
 
           if (currentLiIndex === suggestionItems.length) {
@@ -213,13 +248,14 @@
           break;
 
         case "ArrowUp":
+          listBoxHasFocus = true;
           /**
-             * 
-                Moves visual focus to the previous option.
-                If visual focus is on the first option, moves visual focus to the last option.
-                Note: This wrapping behavior is useful when Home and End move the editing cursor as described below.
-  
-            */
+           * 
+              Moves visual focus to the previous option.
+              If visual focus is on the first option, moves visual focus to the last option.
+              Note: This wrapping behavior is useful when Home and End move the editing cursor as described below.
+
+          */
           if (currentLiIndex === 0) {
             currentLiIndex = suggestionItems.length - 1;
           } else {
@@ -228,27 +264,24 @@
           break;
         case "ArrowRight":
           /**
-             * 
-              Moves visual focus to the textbox and moves the editing cursor one character to the right.
-  
-            */
+           * 
+            Moves visual focus to the textbox and moves the editing cursor one character to the right.
+
+          */
+          listBoxHasFocus = false;
           textBoxHasFocus = true;
           break;
         case "ArrowLeft":
           /**
            *  	Moves visual focus to the textbox and moves the editing cursor one character to the left.
            */
+          listBoxHasFocus = false;
           textBoxHasFocus = true;
           break;
         default:
           break;
       }
     }
-  };
-
-  const handleFocusIn = () => {
-    showSuggestions = true;
-    textBoxHasFocus = false;
   };
 </script>
 
@@ -274,6 +307,7 @@
       class:inputOutline={textBoxHasFocus}
       type="text"
       {name}
+      id={name}
       {value}
       required
       role="combobox"
@@ -287,21 +321,23 @@
         ? `suggestion-item-${currentLiIndex}`
         : null}
       on:input={handleInput}
-      on:focus={handleFocusIn}
-      on:focusout
+      on:focus={handleInputFocused}
+      on:focusout={() => {
+        textBoxHasFocus = false;
+        showSuggestions = false;
+      }}
     />
-
-    <slot name="add-item" />
   </div>
 
   <ul
     bind:this={suggestionList}
+    tabindex="-1"
     class:hide={!showSuggestions}
     class="fr-raw-list dropdown--list"
     id={`${name}-suggestions`}
     role="listbox"
     aria-label="Formats de données"
-    class:suggestionlist--focused={!textBoxHasFocus}
+    class:suggestionlist--focused={listBoxHasFocus}
   >
     {#each filteredSuggestions as { label }, index}
       <li
@@ -352,7 +388,12 @@
 
   .dropdown--list {
     width: 100%;
-    height: 100%;
+    max-height: 32vh;
+    overflow: scroll;
+    background-color: var(--grey-1000-75);
+    border: 1px solid var(--background-contrast-grey);
+    box-shadow: 0 0 10px var(--grey-925);
+    z-index: 10;
   }
 
   .dropdown--list-item {
