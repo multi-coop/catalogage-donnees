@@ -27,6 +27,7 @@
 
   export let info: DatasetFiltersInfo;
   export let value: DatasetFiltersValue;
+  export let id: string;
 
   const createOrganizationSiretToNameMap = (
     organizations: Organization[]
@@ -159,9 +160,9 @@
   };
 </script>
 
-<div data-test-id="filter-panel" class="fr-mt-2w">
+<div data-test-id="filter-panel" {id} class="fr-mt-2w">
   <section class="">
-    <h3 class="fr-h6">Champs communs</h3>
+    <h2 class="fr-h6">Champs communs</h2>
 
     <div class="fr-grid-row fr-grid-row--gutters">
       <div class="fr-col-4">
@@ -235,7 +236,7 @@
 
 {#if info.extraFields.length > 0}
   <section class="fr-my-2w bottom_line-">
-    <h6>Champs complémentaires</h6>
+    <h2 class="fr-h6">Champs complémentaires</h2>
     <div class="filter-row">
       {#each extraFields as extraField}
         <div class="filter-col fr-mt-2w">

@@ -137,6 +137,8 @@
       <div class="fr-col-5 summary__header__buttons">
         <button
           on:click={() => (displayFilters = !displayFilters)}
+          aria-controls="search-filters"
+          aria-expanded={displayFilters}
           class="fr-btn fr-btn--secondary fr-btn--icon-right"
           class:fr-icon-arrow-down-s-line={!displayFilters}
           class:fr-icon-arrow-up-s-line={displayFilters}
@@ -151,7 +153,7 @@
     {#if activeFiltersCount > 0}
       <div class="fr-grid-row fr-py-2w bottom_line">
         <div class="fr-col-12">
-          <h4 class="fr-h6">Filtres actifs</h4>
+          <h2 class="fr-h6">Filtres actifs</h2>
           <div role="list">
             {#each Object.entries(activeFiltersMap) as [key, map]}
               {#if map}
@@ -159,7 +161,7 @@
                   {#each map as mapItem}
                     <button
                       class="fr-tag fr-icon-close-line fr-tag--icon-left"
-                      aria-label={`Retirer ${mapItem.key} : ${mapItem.value}`}
+                      aria-label={`Retirer le filtre ${mapItem.key} : ${mapItem.value}`}
                       on:click|preventDefault={() =>
                         handleClickExtraFieldActiveFilter(mapItem.id)}
                     >
@@ -184,6 +186,7 @@
 
     {#if Maybe.Some(filtersInfo) && displayFilters}
       <FilterPanel
+        id="filter-panel"
         on:change={(e) => handleFilterChange(e.detail)}
         info={filtersInfo}
         value={filtersValue}

@@ -3,7 +3,6 @@
   import { page } from "$app/stores";
   import { logout, account } from "$lib/stores/auth";
   import { navigationItems } from "$lib/stores/layout/navigation";
-  import { SITE_TITLE } from "src/constants";
   import { Maybe } from "$lib/util/maybe";
 
   $: path = $page.url.pathname;
@@ -47,8 +46,8 @@
           </div>
 
           <div class="fr-header__service">
-            <a href="/" title={`Accueil - ${SITE_TITLE}- Etalab`}>
-              <p class="fr-header__service-title">{SITE_TITLE}</p>
+            <a href="/" title={` vers page d'accueil - catalogue.data.gouv.fr`}>
+              <p class="fr-header__service-title">catalogue.data.gouv.fr</p>
             </a>
           </div>
         </div>
