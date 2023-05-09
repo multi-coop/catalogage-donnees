@@ -5,6 +5,7 @@
   import logoMC from "$lib/assets/organizations/logoMC.svg";
   import flowChart from "$lib/assets/registration_flow_chart.svg";
   import {
+    CONTACT_EMAIL,
     REGISTER_ORGANIZATION_LINK,
     USER_DOCUMENTATION_LINK,
   } from "src/constants";
@@ -88,9 +89,8 @@
   </div>
 
   <p class="fr-mt-4w">
-    Si votre organisation n’est pas enregistrée vous ne pourrez pas vous
-    connecter au catalogue. Vous pouvez cependant en faire la demande en
-    cliquant sur le lien suivant.
+    Afin de vous connecter à catalogue.data.gouv.fr, votre organisation doit
+    d'abord être enregistrée.
   </p>
 
   <div>
@@ -98,7 +98,22 @@
       target="_blank"
       rel="noopener"
       class="fr-btn fr-btn--secondary fr-btn--icon-right fr-icon-edit-fill"
-      href={REGISTER_ORGANIZATION_LINK}>Enregistrer mon organisation</a
+      href={REGISTER_ORGANIZATION_LINK}
+      >Guide pour enregistrer son organisation</a
+    >
+  </div>
+
+  <p class="fr-mt-4w">
+    Vous pouvez aussi nous en faire la demande directement :
+  </p>
+
+  <div>
+    <a
+      target="_blank"
+      rel="noopener"
+      class="fr-btn fr-btn--secondary fr-btn--icon-right fr-icon-edit-fill"
+      href={`mailto:${CONTACT_EMAIL}?subject=Enregistrement sur catalogue.data.gouv.fr&body=Bonjour, je souhaite que mon organisation soit ajoutée sur catalogue.data.gouv.fr...`}
+      >catalogue@data.gouv.fr</a
     >
   </div>
 </section>
