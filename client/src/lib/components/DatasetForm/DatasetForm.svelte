@@ -301,7 +301,7 @@
     />
   </div>
 
-  <h2 id="mot-cles" class="fr-mb-5w">Mot-clés thématiques</h2>
+  <h2 id="mot-cles" class="fr-mb-5w">Mots-clés thématiques</h2>
 
   <div class="form--content fr-mb-8w">
     <TagSelector

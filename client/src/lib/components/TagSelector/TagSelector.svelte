@@ -43,8 +43,8 @@
   bind:value
   on:change={handleChange}
   required
-  label={"Mot-clés"}
-  hintText="Les mot-clés seront utilisés par les réutilisateurs pour affiner leur recherche. Sélectionnez ceux qui vous semblent les plus représentatifs de vos données."
+  label={"Mots-clés"}
+  hintText="Les mots-clés seront utilisés par les réutilisateurs pour affiner leur recherche. Sélectionnez ceux qui vous semblent les plus représentatifs de vos données."
   {id}
   {name}
   placeholder="Ajouter un mot-clé"

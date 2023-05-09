@@ -93,7 +93,7 @@ test("buildActiveFiltersMap", () => {
       value: "myorganization",
     },
     geographicalCoverage: {
-      key: "Couverture géopgraphique",
+      key: "Couverture géographique",
       value: "oversea",
     },
     service: {
@@ -142,7 +142,7 @@ test("getActiveFiltersMap", () => {
       value: "myorganization",
     },
     geographicalCoverage: {
-      key: "Couverture géopgraphique",
+      key: "Couverture géographique",
       value: "oversea",
     },
     service: {
