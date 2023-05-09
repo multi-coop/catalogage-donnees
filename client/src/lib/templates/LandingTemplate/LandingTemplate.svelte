@@ -5,6 +5,7 @@
   import logoMC from "$lib/assets/organizations/logoMC.svg";
   import flowChart from "$lib/assets/registration_flow_chart.svg";
   import {
+    CONTACT_EMAIL,
     REGISTER_ORGANIZATION_LINK,
     USER_DOCUMENTATION_LINK,
   } from "src/constants";
