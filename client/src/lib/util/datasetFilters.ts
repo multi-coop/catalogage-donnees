@@ -52,7 +52,7 @@ export const buildActiveFiltersMap = (
       : undefined,
     geographicalCoverage: filtersValue.geographicalCoverage
       ? {
-          key: "Couverture géopgraphique",
+          key: "Couverture géographique",
           value: filtersValue.geographicalCoverage,
         }
       : undefined,

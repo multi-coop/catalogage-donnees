@@ -205,9 +205,9 @@ test.describe("Basic form submission", () => {
     // Purposefully test a small-size section: it should become active
     // even if the next section is fairly high on the page.
     await page.click(
-      "[aria-label='Menu latéral'] >> text='Mot-clés thématiques'"
+      "[aria-label='Menu latéral'] >> text='Mots-clés thématiques'"
     );
-    await expect(activeSidebarItem).toHaveText("Mot-clés thématiques");
+    await expect(activeSidebarItem).toHaveText("Mots-clés thématiques");
 
     // Move up 1/4th of the window, should make previous section active.
     await page.evaluate(() => window.scrollBy(0, -window.innerHeight / 4));

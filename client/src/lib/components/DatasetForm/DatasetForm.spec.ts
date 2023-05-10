@@ -102,7 +102,7 @@ describe("Test the dataset form", () => {
 
   test('The "tags" field is present', async () => {
     const { getByLabelText } = render(DatasetForm, { catalog, formats: [] });
-    const tags = getByLabelText("Mot-clés", {
+    const tags = getByLabelText("Mots-clés", {
       exact: false,
     });
     expect(tags).toBeInTheDocument();
