@@ -2,7 +2,6 @@
   import { goto } from "$app/navigation";
 
   import books from "$lib/assets/books-circle.svg";
-  import logoMC from "$lib/assets/organizations/logoMC.svg";
   import flowChart from "$lib/assets/registration_flow_chart.svg";
   import {
     CONTACT_EMAIL,
@@ -74,7 +73,7 @@
     <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
       <OrganizationCard
         name="Ministère de la Culture"
-        src={logoMC}
+        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/culture/logo.svg"
         status="catalog"
       />
     </div>
