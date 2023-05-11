@@ -56,16 +56,16 @@
 
     <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
       <OrganizationCard
-        name="Direction interministérielle du numérique"
-        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/dinum/logo.svg"
+        name="Direction interministérielle de la transformation publique"
+        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/ditp/logo.svg"
         status="catalog"
       />
     </div>
 
     <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
       <OrganizationCard
-        name="Direction interministérielle de la transformation publique"
-        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/ditp/logo.svg"
+        name="Direction interministérielle du numérique"
+        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/dinum/logo.svg"
         status="catalog"
       />
     </div>
