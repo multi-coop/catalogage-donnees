@@ -80,6 +80,14 @@
 
     <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
       <OrganizationCard
+        name="Ministère de la Justice"
+        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/justice/logo.svg"
+        status="catalog"
+      />
+    </div>
+
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
+      <OrganizationCard
         name="Ministère de l’Enseignement supérieur et de la Recherche"
         src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/mesr/logo.svg"
         status="catalog"
