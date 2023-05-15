@@ -2,7 +2,6 @@
   import { goto } from "$app/navigation";
 
   import books from "$lib/assets/books-circle.svg";
-  import logoMC from "$lib/assets/organizations/logoMC.svg";
   import flowChart from "$lib/assets/registration_flow_chart.svg";
   import {
     CONTACT_EMAIL,
@@ -57,14 +56,6 @@
 
     <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
       <OrganizationCard
-        name="Direction interministérielle du numérique"
-        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/dinum/logo.svg"
-        status="catalog"
-      />
-    </div>
-
-    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
-      <OrganizationCard
         name="Direction interministérielle de la transformation publique"
         src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/ditp/logo.svg"
         status="catalog"
@@ -73,8 +64,40 @@
 
     <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
       <OrganizationCard
+        name="Direction interministérielle du numérique"
+        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/dinum/logo.svg"
+        status="catalog"
+      />
+    </div>
+
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
+      <OrganizationCard
         name="Ministère de la Culture"
-        src={logoMC}
+        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/culture/logo.svg"
+        status="catalog"
+      />
+    </div>
+
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
+      <OrganizationCard
+        name="Ministère de l’Agriculture et de la Souveraineté alimentaire"
+        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/agriculture/logo.svg"
+        status="catalog"
+      />
+    </div>
+
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
+      <OrganizationCard
+        name="Ministère de la Justice"
+        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/justice/logo.svg"
+        status="catalog"
+      />
+    </div>
+
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
+      <OrganizationCard
+        name="Ministère de l’Enseignement supérieur et de la Recherche"
+        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/mesr/logo.svg"
         status="catalog"
       />
     </div>
