@@ -71,6 +71,14 @@
 
     <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
       <OrganizationCard
+        name="Direction de la recherche, des études, de l'évaluation et des statistiques"
+        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/drees/logo.svg"
+        status="catalog"
+      />
+    </div>
+
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
+      <OrganizationCard
         name="Direction interministérielle de la transformation publique"
         src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/ditp/logo.svg"
         status="catalog"
@@ -87,32 +95,8 @@
 
     <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
       <OrganizationCard
-        name="Direction de la recherche, des études, de l'évaluation et des statistiques"
-        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/drees/logo.svg"
-        status="catalog"
-      />
-    </div>
-
-    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
-      <OrganizationCard
-        name="Ministère de la Culture"
-        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/culture/logo.svg"
-        status="catalog"
-      />
-    </div>
-
-    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
-      <OrganizationCard
         name="Ministère de l’Agriculture et de la Souveraineté alimentaire"
         src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/agriculture/logo.svg"
-        status="catalog"
-      />
-    </div>
-
-    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
-      <OrganizationCard
-        name="Ministère de la Justice"
-        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/justice/logo.svg"
         status="catalog"
       />
     </div>
@@ -129,6 +113,22 @@
       <OrganizationCard
         name="Ministère de l’Europe et des Affaires étrangères"
         src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/affaires-etrangeres/logo.svg"
+        status="catalog"
+      />
+    </div>
+
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
+      <OrganizationCard
+        name="Ministère de la Culture"
+        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/culture/logo.svg"
+        status="catalog"
+      />
+    </div>
+
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
+      <OrganizationCard
+        name="Ministère de la Justice"
+        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/justice/logo.svg"
         status="catalog"
       />
     </div>
