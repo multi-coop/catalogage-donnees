@@ -49,5 +49,15 @@ export const getCatalogs: GetCatalogs = async ({ fetch, apiToken }) => {
   const data = await response.json();
   return data
     .map(toCatalog)
+    .sort((a: Catalog, b: Catalog) => {
+
+      if (a.organization.name < b.organization.name) {
+        return -1;
+      }
+      if (a.organization.name > b.organization.name) {
+        return 1;
+      }
+      return 0;
+    })
     .filter((item) => item.organization.siret !== "00000000000000");
 };
