@@ -48,8 +48,23 @@
   <div class="fr-grid-row fr-grid-row--gutters">
     <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
       <OrganizationCard
+        name="Agence de la transition écologique"
+        src={"https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/ademe/logo.svg"}
+        status="catalog"
+      />
+    </div>
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
+      <OrganizationCard
         name="Agence nationale de l'habitat"
         src={"https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/anah/logo.svg"}
+        status="catalog"
+      />
+    </div>
+
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
+      <OrganizationCard
+        name="Centre d'études et d'expertise sur les risques, l'environnement, la mobilité et l'aménagement"
+        src={"https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/cerema/logo.svg"}
         status="catalog"
       />
     </div>
@@ -66,6 +81,14 @@
       <OrganizationCard
         name="Direction interministérielle du numérique"
         src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/dinum/logo.svg"
+        status="catalog"
+      />
+    </div>
+
+    <div class="fr-col-12 fr-col-sm-6 fr-col-md-5 fr-col-lg-3">
+      <OrganizationCard
+        name="Direction de la recherche, des études, de l'évaluation et des statistiques"
+        src="https://raw.githubusercontent.com/etalab/catalogage-donnees-config/main/organizations/drees/logo.svg"
         status="catalog"
       />
     </div>
