@@ -50,7 +50,6 @@ export const getCatalogs: GetCatalogs = async ({ fetch, apiToken }) => {
   return data
     .map(toCatalog)
     .sort((a: Catalog, b: Catalog) => {
-
       if (a.organization.name < b.organization.name) {
         return -1;
       }
