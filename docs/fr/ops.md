@@ -56,16 +56,17 @@ Les différents déploiements sont organisés en _environnements_ (copies de l'i
 | Nom     | Description | URL | À déployer depuis |
 |---------|-------------|-----|-------------------|
 | prod    | Environnement de production | https://catalogue.data.gouv.fr | `master` |
-| demo    | Environnement de démo | https://demo.catalogue.multi.coop | `master` |
-| staging | Environnement de staging | https://staging.catalogue.multi.coop | `staging` |
+
+⚠️ Depuis juillet 2023, l'instance de production a été migrée sur l'infrastructure de la DINUM. Les instance de démo et de staging ont été fermées. Les environnements actuels, ainsi que leurs ressources et localisations, n'ont pas encore été documentés.
+
 
 Voici, à date, une liste des ressources pour chaque environnement et leur localisation.
 
 | Ressource | Environnements | Lieu | Contact |
 |-----------|----------------|------|---------|
-| Instance cloud (VM) | Tous | Console Scaleway de Multi| johan.richer[ @ ]multi.coop |
-| Instance PostgreSQL | Tous | Console Scaleway de Multi | johan.richer[ @ ]multi.coop |
-| Enregistrement DNS | Tous | Service DNS de Multi | johan.richer[ @ ]multi.coop |
+| Instance cloud (VM) | Tous | ? | ? |
+| Instance PostgreSQL | Tous | ? | ? |
+| Enregistrement DNS | Tous | ? | ? |
 | URLs de callback OpenID Connect pour "Comptes DataPass" | Tous | Infrastructure BetaGouv | Contacter l'équipe "Compte DataPass" sur BetaGouv, ou ouvrir un billet sur [betagouv/api-auth](https://github.com/betagouv/api-auth) |
 
 ### Versions
