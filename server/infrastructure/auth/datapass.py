@@ -56,7 +56,7 @@ class _AuthlibDataPassOpenIDClient(DataPassOpenIDClient):
             server_metadata_url=(
                 f"{settings.datapass_url}/.well-known/openid-configuration"
             ),
-            client_kwargs={"scope": "openid email organizations"},
+            client_kwargs={"scope": "openid email organization"},
         )
 
         self._app: StarletteOAuth2App = oauth.datapass

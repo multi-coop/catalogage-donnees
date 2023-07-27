@@ -155,40 +155,47 @@ async def callback(request: Request) -> Response:
     try:
         account = await bus.execute(LoginDataPassUser(email=email))
     except LoginFailed:
-        their_datapass_organizations = userinfo["organizations"]
 
         sirets_here = await organization_repository.get_siret_set()
 
-        their_organizations_here = [
-            organization
-            for organization in their_datapass_organizations
-            if organization["siret"] in sirets_here
-        ]
+        if userinfo["siret"] in sirets_here:
+            organization_siret = Siret(userinfo["siret"])
 
-        if len(their_organizations_here) == 0:
-            # None of the user's organizations have been registered in our system yet.
+        else:
             url = get_client_root_url()
             url = url.replace(path="/auth/datapass/create-organization")
             return RedirectResponse(url, status_code=307)
+        
+        # their_organizations_here = [
+        #     organization
+        #     for organization in their_datapass_organizations
+        #     if organization["siret"] in sirets_here
+        # ]
 
-        if len(their_organizations_here) > 1:
-            # More than one of the user's organizations is registered in our system,
-            # we need the user to pick one.
-            organization_choices = [
-                {"siret": org["siret"], "name": org["label"]}
-                for org in their_organizations_here
-            ]
-            info = {
-                "email": email,
-                "organizations": organization_choices,
-            }
-            signed_token = HasSignedToken.make_signed_token()
-            url = get_client_root_url()
-            url = url.replace(path="/auth/datapass/pick-organization")
-            url = url.include_query_params(info=json.dumps(info), token=signed_token)
-            return RedirectResponse(url, status_code=307)
+        # if len(their_organizations_here) == 0:
+        #     # None of the user's organizations have been registered in our system yet.
+        #     url = get_client_root_url()
+        #     url = url.replace(path="/auth/datapass/create-organization")
+        #     return RedirectResponse(url, status_code=307)
 
-        organization_siret = Siret(their_organizations_here[0]["siret"])
+        # if len(their_organizations_here) > 1:
+        #     # More than one of the user's organizations is registered in our system,
+        #     # we need the user to pick one.
+        #     organization_choices = [
+        #         {"siret": org["siret"], "name": org["label"]}
+        #         for org in their_organizations_here
+        #     ]
+        #     info = {
+        #         "email": email,
+        #         "organizations": organization_choices,
+        #     }
+        #     signed_token = HasSignedToken.make_signed_token()
+        #     url = get_client_root_url()
+        #     url = url.replace(path="/auth/datapass/pick-organization")
+        #     url = url.include_query_params(info=json.dumps(info), token=signed_token)
+        #     return RedirectResponse(url, status_code=307)
+
+        # organization_siret = Siret(their_organizations_here[0]["siret"])
 
         await bus.execute(
             CreateDataPassUser(
