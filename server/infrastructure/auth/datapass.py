@@ -56,12 +56,14 @@ class _AuthlibDataPassOpenIDClient(DataPassOpenIDClient):
             server_metadata_url=(
                 f"{settings.datapass_url}/.well-known/openid-configuration"
             ),
-            client_kwargs={"scope": "openid email organizations"},
+            client_kwargs={"scope": "openid email organization"},
         )
 
         self._app: StarletteOAuth2App = oauth.datapass
 
     async def authorize_redirect(self, request: Request, callback_uri: str) -> Response:
+        # TRICK TO WORK WITH DOCKER CONTAINERS :
+        callback_uri = callback_uri.replace("http://localhost:3579", "https://catalogue.data.gouv.fr")
         return await self._app.authorize_redirect(
             request,
             callback_uri,
