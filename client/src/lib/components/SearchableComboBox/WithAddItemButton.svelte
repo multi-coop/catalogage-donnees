@@ -319,6 +319,7 @@
       on:click={handleAddItem}
       type="button"
       class="fr-btn fr-icon-add-line"
+      title={`créer un nouveau format de donnée`}
     />
   </div>
 

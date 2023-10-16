@@ -63,18 +63,20 @@
     on:selectOption={handleSelectFormat}
   />
 
-  <div role="list" aria-live="polite">
-    {#each selectedFormatOptions as format, index}
-      {#if format.name}
-        <Tag
-          id={`${format.name}-option-${index}`}
-          name={format.name}
-          role="listitem"
-          on:click={handleRemoveDataFormat}
-        />
-      {/if}
-    {/each}
-  </div>
+  {#if selectedFormatOptions.length > 0}
+    <div role="list" aria-live="polite">
+      {#each selectedFormatOptions as format, index}
+        {#if format.name}
+          <Tag
+            id={`${format.name}-option-${index}`}
+            name={format.name}
+            role="listitem"
+            on:click={handleRemoveDataFormat}
+          />
+        {/if}
+      {/each}
+    </div>
+  {/if}
 </div>
 
 <style>

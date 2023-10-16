@@ -12,8 +12,8 @@
       {#each Object.keys(linksMap) as linkmapKey}
         <li>
           <a class="fr-nav__link" href={`#${linksMap[linkmapKey]}`}
-            >{linkmapKey}</a
-          >
+            >{linkmapKey}
+          </a>
         </li>
       {/each}
     </ul>

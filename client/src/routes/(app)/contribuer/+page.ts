@@ -23,7 +23,7 @@ export const load: PageLoad = async ({ fetch }) => {
   ]);
 
   return {
-    title: `Contribuer une fiche de jeu de données - ${SITE_TITLE}`,
+    title: `${SITE_TITLE} - Contribuer une fiche de jeu de données`,
     catalog,
     tags,
     licenses,

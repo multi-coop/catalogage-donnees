@@ -2,26 +2,27 @@
   import type { SelectOption } from "src/definitions/form";
   import RequiredMarker from "../RequiredMarker/RequiredMarker.svelte";
   import { escape } from "src/lib/util/string";
+
   import { createEventDispatcher } from "svelte";
 
   const dispatch = createEventDispatcher<{
-    selectOption: SelectOption<number>;
+    selectOption: SelectOption<number | string>;
     addItem: string;
   }>();
 
   export let name: string;
   export let label = "";
-  export let hintText = "";
-  export let options: SelectOption<number>[];
+  export let hintText: any = "";
+  export let options: SelectOption<number | string>[];
   export let error = "";
   export let value = "";
   export let labelledby = " ";
+  export let required = true;
 
-  let disableAddItem = true;
   let suggestionList: HTMLElement;
   let currentLiIndex = 0;
 
-  let selectedOption: SelectOption<number>;
+  let selectedOption: SelectOption<number | string>;
   let textBoxHasFocus = false;
   let listBoxHasFocus = false;
   let showSuggestions = false;
@@ -36,10 +37,12 @@
     showSuggestions = false;
   }
 
-  const getSelectedOption = (value: string): SelectOption<number> | undefined =>
+  const getSelectedOption = (
+    value: string
+  ): SelectOption<number | string> | undefined =>
     filteredSuggestions.find((item) => item.label === value.trim());
 
-  const handleSelectOption = (option: SelectOption<number>) => {
+  const handleSelectOption = (option: SelectOption<number | string>) => {
     selectedOption = option;
     dispatch("selectOption", selectedOption);
   };
@@ -55,31 +58,14 @@
   };
 
   const handleInput = (ev: Event & { currentTarget: HTMLInputElement }) => {
-    disableAddItem = true;
     textBoxHasFocus = true;
     showSuggestions = true;
     value = ev.currentTarget.value;
-
-    const optionAlreadyExists =
-      options.findIndex((item) => item.label === value) !== -1;
-
-    if (!optionAlreadyExists) {
-      disableAddItem = false;
-    }
   };
 
   const handeChange = (ev: Event & { currentTarget: HTMLInputElement }) => {
-    disableAddItem = true;
     value = ev.currentTarget.value;
-
-    const optionAlreadyExists =
-      options.findIndex((item) => item.label === value) !== -1;
-
-    if (!optionAlreadyExists) {
-      disableAddItem = false;
-    }
   };
-
   const handleInputFocused = () => {
     showSuggestions = true;
     textBoxHasFocus = true;
@@ -289,11 +275,19 @@
   {#if label}
     <label class="fr-label" for={name}>
       {label}
-      <RequiredMarker />
+
+      {#if required}
+        <RequiredMarker />
+      {/if}
+
       {#if hintText}
-        <span class="fr-hint-text" id={`select-hint-${name}-hint`}>
-          {hintText}
-        </span>
+        {#if typeof hintText === "string"}
+          <span class="fr-hint-text" id={`select-hint-${name}-hint`}>
+            {hintText}
+          </span>
+        {:else}
+          <svelte:component this={hintText} />
+        {/if}
       {/if}
     </label>
   {/if}
@@ -309,7 +303,7 @@
       {name}
       id={name}
       {value}
-      required
+      {required}
       role="combobox"
       autocomplete="off"
       aria-controls={`${name}-suggestions`}

@@ -16,7 +16,6 @@
   import { formatHTMLDate } from "$lib/util/format";
   import { account } from "src/lib/stores/auth";
   import ContactEmailsField from "../ContactEmailsField/ContactEmailsField.svelte";
-  import GeographicalCoverageField from "./_GeographicalCoverageField.svelte";
   import Select from "../Select/Select.svelte";
   import InputField from "../InputField/InputField.svelte";
   import TextareaField from "../TextareaField/TextareaField.svelte";
@@ -24,12 +23,13 @@
   import { handleSelectChange } from "src/lib/util/form";
   import TagSelector from "../TagSelector/TagSelector.svelte";
   import RadioGroupField from "../RadioGroupField/RadioGroupField.svelte";
-  import LicenseField from "./_LicenseField.svelte";
+  import LicenseFieldHintText from "./_LicenseFieldHintText.svelte";
   import type { Catalog, ExtraFieldValue } from "src/definitions/catalogs";
   import ExtraField from "./_ExtraField.svelte";
   import Alert from "../Alert/Alert.svelte";
   import type { DataFormat } from "src/definitions/dataformat";
   import FormatSelector from "../FormatSelector/FormatSelector.svelte";
+  import SearchableComboBox from "../SearchableComboBox/Basic.svelte";
 
   export let submitLabel = "Publier la fiche de données";
   export let loadingLabel = "Publication en cours...";
@@ -273,11 +273,20 @@
       on:input={handleFieldChange}
     />
 
-    <GeographicalCoverageField
+    <SearchableComboBox
+      name="geographicalCoverage"
+      label="Couverture géographique"
+      hintText="Quelle est l'étendue de la zone couverte par ce jeu de données ?"
       value={$form.geographicalCoverage}
       error={$errors.geographicalCoverage}
-      suggestions={geographicalCoverages}
-      on:input={(ev) => updateValidateField("geographicalCoverage", ev.detail)}
+      options={geographicalCoverages.map((item) => {
+        return {
+          label: item,
+          value: item,
+        };
+      })}
+      on:selectOption={(ev) =>
+        updateValidateField("geographicalCoverage", ev.detail.value)}
     />
   </div>
 
@@ -397,11 +406,20 @@
       on:input={handleFieldChange}
     />
 
-    <LicenseField
+    <SearchableComboBox
+      name="license"
+      required={false}
+      label="Licence de réutilisation"
+      hintText={LicenseFieldHintText}
       value={$form.license}
       error={$errors.license}
-      suggestions={licenses}
-      on:input={(ev) => updateValidateField("license", ev.detail)}
+      options={licenses.map((item) => {
+        return {
+          label: item,
+          value: item,
+        };
+      })}
+      on:selectOption={(ev) => updateValidateField("license", ev.detail.value)}
     />
   </div>
 
